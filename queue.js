@@ -1,0 +1,11 @@
+import { Worker, Queue } from 'bullmq';
+import { redis as connection } from '../server/lib/redis.js';
+import { summarize } from './bots/summarize.js';
+import { repurpose } from './bots/repurpose.js';
+import { caption } from './bots/caption.js';
+import { post } from './bots/post.js';
+import { schedule } from './bots/schedule.js';
+export const queue=new Queue('jobs',{connection});
+const handlers={summarize:async(job)=>summarize(job.data),repurpose:async(job)=>repurpose(job.data),caption:async(job)=>caption(job.data),post:async(job)=>post(job.data),schedule:async(job)=>schedule(job.data)};
+new Worker('jobs',async(job)=>{const fn=handlers[job.name];if(!fn) throw new Error('No handler for job: '+job.name);return await fn(job)},{connection});
+console.log('[workers] listening for jobs…');
