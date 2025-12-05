@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package feed;
+
+option go_package = "./proto";
+
+// Feed service for high-performance video recommendations
+service FeedService {
+  // GetFeed returns personalized video feed for a user
+  rpc GetFeed(FeedRequest) returns (FeedResponse);
+  
+  // GetTrendingFeed returns trending videos (global)
+  rpc GetTrendingFeed(TrendingRequest) returns (FeedResponse);
+  
+  // RecordInteraction records user interaction for ML model
+  rpc RecordInteraction(InteractionRequest) returns (InteractionResponse);
+}
+
+message FeedRequest {
+  string user_id = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+  string category = 4; // "tube", "reels", "battles", "premium"
+}
+
+message TrendingRequest {
+  int32 limit = 1;
+  string category = 2;
+  string time_range = 3; // "24h", "7d", "30d"
+}
+
+message FeedResponse {
+  repeated VideoItem videos = 1;
+  bool has_more = 2;
+  string next_cursor = 3;
+}
+
+message VideoItem {
+  string video_id = 1;
+  string title = 2;
+  string video_url = 3;
+  string thumbnail_url = 4;
+  int32 views = 5;
+  int32 likes = 6;
+  double engagement_score = 7;
+}
+
+message InteractionRequest {
+  string user_id = 1;
+  string video_id = 2;
+  string interaction_type = 3; // "view", "like", "share", "comment", "swipe"
+  int32 watch_duration_ms = 4;
+}
+
+message InteractionResponse {
+  bool success = 1;
+  string message = 2;
+}

@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package moderation;
+
+option go_package = "./moderation";
+
+// The Content Moderation Service definition.
+service ModerationService {
+  // AnalyzeVideo analyzes a video for policy violations and quality issues.
+  rpc AnalyzeVideo (AnalyzeVideoRequest) returns (AnalyzeVideoResponse);
+}
+
+// Request message for video analysis.
+message AnalyzeVideoRequest {
+  string video_id = 1;
+  string video_url = 2;
+  string caption = 3;
+  string user_id = 4;
+}
+
+// Message representing a single policy violation or quality issue.
+message Violation {
+  string policy_name = 1;
+  float confidence_score = 2;
+  string severity = 3; // LOW, MEDIUM, HIGH
+}
+
+// Response message for video analysis.
+message AnalyzeVideoResponse {
+  bool is_safe = 1;
+  float quality_score = 2; // 0.0 to 1.0 (Higher is better)
+  repeated Violation violations = 3;
+}

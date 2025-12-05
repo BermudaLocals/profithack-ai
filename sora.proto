@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package sora;
+
+option go_package = "./sora";
+
+// The Sora 2 AI Video Generation Service definition.
+service SoraService {
+  // GenerateVideo handles the request to generate a video from a text prompt.
+  rpc GenerateVideo (GenerateVideoRequest) returns (GenerateVideoResponse);
+}
+
+// Request message for video generation.
+message GenerateVideoRequest {
+  string user_id = 1;
+  string prompt = 2;
+  int32 duration_seconds = 3;
+  // Style parameters (e.g., cinematic, anime, photorealistic)
+  string style = 4; 
+}
+
+// Response message for video generation.
+message GenerateVideoResponse {
+  string job_id = 1;
+  // Status can be PENDING, PROCESSING, COMPLETED, FAILED
+  string status = 2; 
+  // Final URL is only present if status is COMPLETED
+  string video_url = 3; 
+}

@@ -1,0 +1,62 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Spiral Head Logo for PROFITHACK AI -->
+  <defs>
+    <linearGradient id="spiralGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff00ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#a855f7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#a855f7;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Outer glow -->
+  <circle cx="256" cy="256" r="240" fill="url(#glowGradient)" opacity="0.5"/>
+  
+  <!-- Head outline -->
+  <ellipse cx="256" cy="240" rx="140" ry="160" fill="none" stroke="url(#spiralGradient)" stroke-width="8"/>
+  
+  <!-- Spiral brain/mind representation -->
+  <path d="M 256 120 Q 340 140, 350 200 Q 360 260, 300 300 Q 240 340, 180 300 Q 120 260, 130 200 Q 140 140, 220 120" 
+        fill="none" stroke="url(#spiralGradient)" stroke-width="6" stroke-linecap="round"/>
+  
+  <path d="M 256 150 Q 310 165, 315 205 Q 320 245, 280 270 Q 240 295, 200 270 Q 160 245, 165 205 Q 170 165, 230 150" 
+        fill="none" stroke="url(#spiralGradient)" stroke-width="5" stroke-linecap="round" opacity="0.8"/>
+  
+  <path d="M 256 180 Q 285 190, 288 215 Q 291 240, 270 255 Q 249 270, 228 255 Q 207 240, 210 215 Q 213 190, 242 180" 
+        fill="none" stroke="url(#spiralGradient)" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+  
+  <!-- Central AI core -->
+  <circle cx="256" cy="210" r="25" fill="url(#spiralGradient)"/>
+  <circle cx="256" cy="210" r="15" fill="#ffffff" opacity="0.9"/>
+  <circle cx="256" cy="210" r="8" fill="url(#spiralGradient)"/>
+  
+  <!-- Eyes -->
+  <circle cx="220" cy="230" r="12" fill="url(#spiralGradient)"/>
+  <circle cx="220" cy="230" r="6" fill="#ffffff"/>
+  
+  <circle cx="292" cy="230" r="12" fill="url(#spiralGradient)"/>
+  <circle cx="292" cy="230" r="6" fill="#ffffff"/>
+  
+  <!-- Tech nodes/neural connections -->
+  <circle cx="180" cy="180" r="6" fill="#ff00ff" opacity="0.8"/>
+  <circle cx="332" cy="180" r="6" fill="#00d4ff" opacity="0.8"/>
+  <circle cx="200" cy="300" r="6" fill="#a855f7" opacity="0.8"/>
+  <circle cx="312" cy="300" r="6" fill="#ff00ff" opacity="0.8"/>
+  
+  <!-- Connection lines (neural network style) -->
+  <line x1="180" y1="180" x2="220" y2="230" stroke="url(#spiralGradient)" stroke-width="2" opacity="0.4"/>
+  <line x1="332" y1="180" x2="292" y2="230" stroke="url(#spiralGradient)" stroke-width="2" opacity="0.4"/>
+  <line x1="200" y1="300" x2="220" y2="230" stroke="url(#spiralGradient)" stroke-width="2" opacity="0.4"/>
+  <line x1="312" y1="300" x2="292" y2="230" stroke="url(#spiralGradient)" stroke-width="2" opacity="0.4"/>
+  
+  <!-- Text -->
+  <text x="256" y="440" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="url(#spiralGradient)" text-anchor="middle">
+    PROFIT
+  </text>
+  <text x="256" y="480" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="url(#spiralGradient)" text-anchor="middle">
+    HACK AI
+  </text>
+</svg>

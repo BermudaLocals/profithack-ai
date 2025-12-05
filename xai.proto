@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package xai;
+
+option go_package = "./xai";
+
+// The XAI Service definition.
+service XAIService {
+  // GetRecommendation provides a list of video IDs and the explanation for the recommendation.
+  rpc GetRecommendation (XAIRequest) returns (XAIResponse);
+}
+
+// Request message for the XAI service.
+message XAIRequest {
+  string user_id = 1;
+  int32 count = 2;
+  repeated string exclude_video_ids = 3;
+}
+
+// Message representing a single recommended video with its explanation.
+message RecommendedVideo {
+  string video_id = 1;
+  string explanation = 2; // The "Explainable" part
+}
+
+// Response message for the XAI service.
+message XAIResponse {
+  repeated RecommendedVideo recommendations = 1;
+}

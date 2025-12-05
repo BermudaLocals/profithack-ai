@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package chaos;
+
+option go_package = "./chaos";
+
+// The Chaos Engineering Service definition.
+service ChaosService {
+  // InjectLatency simulates network latency in a target service.
+  rpc InjectLatency (LatencyRequest) returns (ChaosResponse);
+  // InjectFailure simulates failures in a target service.
+  rpc InjectFailure (FailureRequest) returns (ChaosResponse);
+}
+
+// Request message for latency injection.
+message LatencyRequest {
+  string service_name = 1;
+  int32 duration_ms = 2;
+  float probability = 3; // 0.0 to 1.0
+}
+
+// Request message for failure injection.
+message FailureRequest {
+  string service_name = 1;
+  string error_message = 2;
+  float probability = 3; // 0.0 to 1.0
+}
+
+// Response message for chaos operations.
+message ChaosResponse {
+  bool success = 1;
+  string message = 2;
+}

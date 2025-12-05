@@ -1,0 +1,177 @@
+# PROFITHACK AI - Prometheus Alert Rules
+# Critical alerts for production monitoring
+
+groups:
+  # ============================================================================
+  # CRITICAL ALERTS - Immediate Response Required
+  # ============================================================================
+  - name: critical_alerts
+    interval: 30s
+    rules:
+      # High Latency Alert - Golang Feed Service
+      - alert: HighLatencyFeedService
+        expr: histogram_quantile(0.95, rate(grpc_server_handling_seconds_bucket{job="golang-feed-service"}[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          service: feed-service
+        annotations:
+          summary: "Golang Feed Service P95 latency too high"
+          description: "Feed service P95 latency is {{ $value }}s (threshold: 50ms). This affects user experience for {{ $labels.instance }}."
+
+      # Error Rate Alert - Any Service
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[1m]) / rate(http_requests_total[1m]) > 0.01
+        for: 1m
+        labels:
+          severity: critical
+          service: "{{ $labels.job }}"
+        annotations:
+          summary: "High error rate detected"
+          description: "Service {{ $labels.job }} has error rate {{ $value | humanizePercentage }} (threshold: 1%)."
+
+      # Queue Depth Alert - Kafka
+      - alert: KafkaQueueDepthHigh
+        expr: kafka_consumergroup_lag > 1000
+        for: 10m
+        labels:
+          severity: critical
+          service: kafka
+        annotations:
+          summary: "Kafka queue depth too high"
+          description: "Kafka consumer group {{ $labels.consumergroup }} has lag of {{ $value }} messages (threshold: 1000)."
+
+      # Queue Depth Alert - BullMQ
+      - alert: BullMQQueueDepthHigh
+        expr: bullmq_queue_waiting_count > 1000
+        for: 10m
+        labels:
+          severity: critical
+          service: bullmq
+        annotations:
+          summary: "BullMQ queue depth too high"
+          description: "BullMQ queue {{ $labels.queue }} has {{ $value }} waiting jobs (threshold: 1000)."
+
+      # Database Connection Pool Exhausted
+      - alert: DatabaseConnectionPoolExhausted
+        expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.9
+        for: 5m
+        labels:
+          severity: critical
+          service: postgresql
+        annotations:
+          summary: "PostgreSQL connection pool nearly exhausted"
+          description: "Database {{ $labels.datname }} is using {{ $value | humanizePercentage }} of connection pool."
+
+      # Redis Memory Usage High
+      - alert: RedisMemoryHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 5m
+        labels:
+          severity: critical
+          service: redis
+        annotations:
+          summary: "Redis memory usage too high"
+          description: "Redis instance {{ $labels.instance }} is using {{ $value | humanizePercentage }} of available memory."
+
+  # ============================================================================
+  # WARNING ALERTS - Investigation Required
+  # ============================================================================
+  - name: warning_alerts
+    interval: 1m
+    rules:
+      # CPU Usage High
+      - alert: HighCPUUsage
+        expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "Instance {{ $labels.instance }} has CPU usage of {{ $value }}%."
+
+      # Memory Usage High
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Instance {{ $labels.instance }} has memory usage of {{ $value | humanizePercentage }}."
+
+      # Disk Space Low
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.15
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Disk space running low"
+          description: "Instance {{ $labels.instance }} has only {{ $value | humanizePercentage }} disk space remaining on {{ $labels.mountpoint }}."
+
+  # ============================================================================
+  # BUSINESS METRICS ALERTS
+  # ============================================================================
+  - name: business_alerts
+    interval: 5m
+    rules:
+      # Revenue Drop Alert
+      - alert: RevenueDrop
+        expr: rate(payment_successful_total[1h]) < 0.5 * rate(payment_successful_total[24h] offset 1d)
+        for: 30m
+        labels:
+          severity: critical
+          team: business
+        annotations:
+          summary: "Significant revenue drop detected"
+          description: "Hourly payment success rate is {{ $value | humanizePercentage }} of yesterday's average."
+
+      # User Signup Drop
+      - alert: SignupDrop
+        expr: rate(user_signups_total[1h]) < 0.3 * rate(user_signups_total[24h] offset 1d)
+        for: 1h
+        labels:
+          severity: warning
+          team: growth
+        annotations:
+          summary: "User signup rate significantly decreased"
+          description: "Hourly signup rate is {{ $value | humanizePercentage }} of yesterday's average."
+
+      # Video Upload Failure Rate High
+      - alert: VideoUploadFailureHigh
+        expr: rate(video_upload_failed_total[5m]) / rate(video_upload_total[5m]) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+          team: content
+        annotations:
+          summary: "High video upload failure rate"
+          description: "Video upload failure rate is {{ $value | humanizePercentage }} (threshold: 5%)."
+
+  # ============================================================================
+  # SERVICE AVAILABILITY ALERTS
+  # ============================================================================
+  - name: availability_alerts
+    interval: 1m
+    rules:
+      # Service Down
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service is down"
+          description: "Service {{ $labels.job }} on instance {{ $labels.instance }} is down."
+
+      # gRPC Service Unhealthy
+      - alert: gRPCServiceUnhealthy
+        expr: grpc_server_started_total - grpc_server_handled_total > 100
+        for: 5m
+        labels:
+          severity: critical
+          service: grpc
+        annotations:
+          summary: "gRPC service has high number of incomplete requests"
+          description: "gRPC service {{ $labels.grpc_service }} has {{ $value }} incomplete requests."
