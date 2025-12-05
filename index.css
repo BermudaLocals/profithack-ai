@@ -1,0 +1,962 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* PWA Install Prompt Animation */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out forwards;
+}
+
+/* Slow rotation animation for Masonic logo */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 6s linear infinite;
+}
+
+/* Text Outline for Maximum Readability Over ANY Background */
+@layer utilities {
+  .text-outlined {
+    /* Desktop */
+    -webkit-text-stroke: 2px rgba(0, 0, 0, 0.8);
+    text-stroke: 2px rgba(0, 0, 0, 0.8);
+    paint-order: stroke fill;
+    text-shadow: 
+      0 0 15px rgba(0, 0, 0, 0.5),
+      -2px -2px 0 rgba(0, 0, 0, 0.8),
+       2px -2px 0 rgba(0, 0, 0, 0.8),
+      -2px  2px 0 rgba(0, 0, 0, 0.8),
+       2px  2px 0 rgba(0, 0, 0, 0.8);
+  }
+  
+  /* Mobile - lighter outline */
+  @media (max-width: 768px) {
+    .text-outlined {
+      -webkit-text-stroke: 1px rgba(0, 0, 0, 0.6);
+      text-stroke: 1px rgba(0, 0, 0, 0.6);
+      text-shadow: 
+        0 0 8px rgba(0, 0, 0, 0.4),
+        -1px -1px 0 rgba(0, 0, 0, 0.6),
+         1px -1px 0 rgba(0, 0, 0, 0.6),
+        -1px  1px 0 rgba(0, 0, 0, 0.6),
+         1px  1px 0 rgba(0, 0, 0, 0.6);
+    }
+  }
+  
+  .text-outlined-thin {
+    /* Desktop */
+    -webkit-text-stroke: 1px rgba(0, 0, 0, 0.7);
+    text-stroke: 1px rgba(0, 0, 0, 0.7);
+    paint-order: stroke fill;
+    text-shadow: 
+      0 0 10px rgba(0, 0, 0, 0.4),
+      -1px -1px 0 rgba(0, 0, 0, 0.7),
+       1px -1px 0 rgba(0, 0, 0, 0.7),
+      -1px  1px 0 rgba(0, 0, 0, 0.7),
+       1px  1px 0 rgba(0, 0, 0, 0.7);
+  }
+  
+  /* Mobile - no outline for thin text */
+  @media (max-width: 768px) {
+    .text-outlined-thin {
+      -webkit-text-stroke: 0;
+      text-stroke: 0;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  .text-outlined-thick {
+    /* Desktop */
+    -webkit-text-stroke: 3px rgba(0, 0, 0, 0.9);
+    text-stroke: 3px rgba(0, 0, 0, 0.9);
+    paint-order: stroke fill;
+    text-shadow: 
+      0 0 20px rgba(0, 0, 0, 0.6),
+      -3px -3px 0 rgba(0, 0, 0, 0.9),
+       3px -3px 0 rgba(0, 0, 0, 0.9),
+      -3px  3px 0 rgba(0, 0, 0, 0.9),
+       3px  3px 0 rgba(0, 0, 0, 0.9);
+  }
+  
+  /* Mobile - medium outline */
+  @media (max-width: 768px) {
+    .text-outlined-thick {
+      -webkit-text-stroke: 1.5px rgba(0, 0, 0, 0.7);
+      text-stroke: 1.5px rgba(0, 0, 0, 0.7);
+      text-shadow: 
+        0 0 12px rgba(0, 0, 0, 0.5),
+        -1.5px -1.5px 0 rgba(0, 0, 0, 0.7),
+         1.5px -1.5px 0 rgba(0, 0, 0, 0.7),
+        -1.5px  1.5px 0 rgba(0, 0, 0, 0.7),
+         1.5px  1.5px 0 rgba(0, 0, 0, 0.7);
+    }
+  }
+}
+
+/* ProfitHack AI Neon Branding - Production Colors */
+:root {
+  --color-primary: #FF4500; /* Action/Accent Color (Orange-Red) */
+  --color-secondary: #00F2EA; /* Cyan/Teal Accent */
+  --color-accent: #FF00FF; /* Magenta/Pink Accent */
+  --color-background: #000000; /* Pure Black */
+  --color-surface: #121212; /* Dark Gray for cards */
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #AAAAAA;
+  
+  /* Legacy support */
+  --color-primary-accent: #FF00FF;
+  --color-secondary-accent: #00F2EA;
+}
+
+.neon-glow-magenta {
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.8), 0 0 20px rgba(255, 0, 127, 0.4);
+  text-shadow: 0 0 5px var(--color-primary-accent), 0 0 10px var(--color-primary-accent);
+  border: 1px solid rgba(255, 0, 127, 0.5);
+  transition: all 0.3s ease-in-out;
+}
+
+.neon-glow-cyan {
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.4);
+  text-shadow: 0 0 5px var(--color-secondary-accent), 0 0 10px var(--color-secondary-accent);
+  border: 1px solid rgba(0, 255, 255, 0.5);
+  transition: all 0.3s ease-in-out;
+}
+
+@keyframes pulse-neon {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-pulse-neon {
+  animation: pulse-neon 2s ease-in-out infinite;
+}
+
+/* TikTok Navigation Styling */
+.tiktok-nav-bar {
+  background-color: var(--color-background);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 50;
+}
+
+.tiktok-nav-item.active {
+  color: var(--color-primary-accent);
+  text-shadow: 0 0 5px var(--color-primary-accent);
+  transform: scale(1.1);
+  transition: all 0.2s ease-in-out;
+}
+
+/* Component Styling */
+.tiktok-like-button.liked {
+  color: var(--color-primary-accent);
+  animation: pulse-neon 0.5s ease-in-out;
+}
+
+.tiktok-follow-button {
+  background-color: var(--color-primary-accent);
+  color: var(--color-text-primary);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.tiktok-follow-button:hover {
+  background-color: #FF3399;
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+}
+
+/* Hide Scrollbar (for horizontal scrolling UI elements) */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
+/* Snap Scroll for TikTok-style carousels */
+.snap-x {
+  scroll-snap-type: x mandatory;
+}
+
+.snap-y {
+  scroll-snap-type: y mandatory;
+}
+
+.snap-center {
+  scroll-snap-align: center;
+}
+
+.snap-start {
+  scroll-snap-align: start;
+}
+
+/* Neon Utility Classes */
+.neon-badge-cyan {
+  background-color: rgba(0, 255, 255, 0.1);
+  color: var(--color-secondary-accent);
+  border: 1px solid var(--color-secondary-accent);
+  box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.neon-balance-magenta {
+  color: var(--color-primary-accent);
+  text-shadow: 0 0 5px var(--color-primary-accent);
+}
+
+.neon-balance-cyan {
+  color: var(--color-secondary-accent);
+  text-shadow: 0 0 5px var(--color-secondary-accent);
+}
+
+/* Grid movement animation */
+@keyframes gridMove {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 50px 50px;
+  }
+}
+
+/* Floating emoji animation - gentle bounce and sway */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* 3D Floating Icons Animation */
+@keyframes float3D {
+  0%, 100% {
+    transform: translateY(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+  }
+  25% {
+    transform: translateY(-15px) rotateX(5deg) rotateY(10deg) rotateZ(2deg);
+  }
+  50% {
+    transform: translateY(-25px) rotateX(-5deg) rotateY(-10deg) rotateZ(-2deg);
+  }
+  75% {
+    transform: translateY(-15px) rotateX(5deg) rotateY(10deg) rotateZ(2deg);
+  }
+}
+
+.float-3d {
+  animation: float3D 6s ease-in-out infinite;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+}
+
+.float-3d-slow {
+  animation: float3D 8s ease-in-out infinite;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+}
+
+.float-3d-fast {
+  animation: float3D 4s ease-in-out infinite;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+}
+
+/* Bermuda Triangle spinning and bouncing across page */
+@keyframes triangleSpinBounce {
+  0% {
+    transform: translate(-50%, -50%) translateX(-40vw) translateY(-30vh) rotate(0deg) scale(1);
+  }
+  10% {
+    transform: translate(-50%, -50%) translateX(-20vw) translateY(-40vh) rotate(36deg) scale(1.1);
+  }
+  20% {
+    transform: translate(-50%, -50%) translateX(0vw) translateY(-30vh) rotate(72deg) scale(1);
+  }
+  30% {
+    transform: translate(-50%, -50%) translateX(20vw) translateY(-40vh) rotate(108deg) scale(1.1);
+  }
+  40% {
+    transform: translate(-50%, -50%) translateX(40vw) translateY(-30vh) rotate(144deg) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateX(30vw) translateY(0vh) rotate(180deg) scale(1.2);
+  }
+  60% {
+    transform: translate(-50%, -50%) translateX(10vw) translateY(30vh) rotate(216deg) scale(1.1);
+  }
+  70% {
+    transform: translate(-50%, -50%) translateX(-10vw) translateY(40vh) rotate(252deg) scale(1);
+  }
+  80% {
+    transform: translate(-50%, -50%) translateX(-30vw) translateY(30vh) rotate(288deg) scale(1.1);
+  }
+  90% {
+    transform: translate(-50%, -50%) translateX(-40vw) translateY(0vh) rotate(324deg) scale(1);
+  }
+  100% {
+    transform: translate(-50%, -50%) translateX(-40vw) translateY(-30vh) rotate(360deg) scale(1);
+  }
+}
+
+.animate-triangle-float {
+  animation: triangleSpinBounce 50s ease-in-out infinite;
+}
+
+/* Money Gun Shooting Animation - Continuous Spray */
+@keyframes shootMoney {
+  0% {
+    transform: translateX(0) translateY(0) rotate(0deg) scale(0.9);
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(var(--shoot-x)) translateY(var(--shoot-y)) rotate(var(--shoot-rotate)) scale(0.9);
+    opacity: 0;
+  }
+}
+
+.animate-shoot-money {
+  animation: shootMoney 3s ease-out infinite;
+}
+
+@keyframes gunRecoil {
+  0%, 100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  50% {
+    transform: translateX(-5px) rotate(-3deg);
+  }
+}
+
+.animate-gun-recoil {
+  animation: gunRecoil 0.3s ease-in-out infinite;
+}
+
+/* Money Gun Bouncing, Rotating, and Flipping All Over Screen */
+@keyframes gunBounce {
+  0% {
+    transform: translate(10vw, 80vh) rotate(-45deg) scaleX(1);
+  }
+  10% {
+    transform: translate(25vw, 20vh) rotate(72deg) scaleX(-1);
+  }
+  20% {
+    transform: translate(70vw, 15vh) rotate(-108deg) scaleX(1);
+  }
+  30% {
+    transform: translate(85vw, 60vh) rotate(144deg) scaleX(-1);
+  }
+  40% {
+    transform: translate(60vw, 85vh) rotate(-180deg) scaleX(1);
+  }
+  50% {
+    transform: translate(15vw, 70vh) rotate(216deg) scaleX(-1);
+  }
+  60% {
+    transform: translate(40vw, 25vh) rotate(-252deg) scaleX(1);
+  }
+  70% {
+    transform: translate(75vw, 40vh) rotate(288deg) scaleX(-1);
+  }
+  80% {
+    transform: translate(50vw, 75vh) rotate(-324deg) scaleX(1);
+  }
+  90% {
+    transform: translate(20vw, 45vh) rotate(360deg) scaleX(-1);
+  }
+  100% {
+    transform: translate(10vw, 80vh) rotate(315deg) scaleX(1);
+  }
+}
+
+.animate-gun-bounce {
+  animation: gunBounce 25s linear infinite;
+}
+
+/* LIGHT MODE */
+:root {
+  --button-outline: rgba(0,0,0, .10);
+  --badge-outline: rgba(0,0,0, .05);
+
+  /* Automatic computation of border around primary / danger buttons */
+  --opaque-button-border-intensity: -8; /* In terms of percentages */
+
+  /* Backgrounds applied on top of other backgrounds when hovered/active */
+  --elevate-1: rgba(0,0,0, .03);
+  --elevate-2: rgba(0,0,0, .08);
+
+  --background: 0 0% 98%;
+
+  --foreground: 0 0% 12%;
+
+  --border: 0 0% 88%;
+
+  --card: 0 0% 96%;
+
+  --card-foreground: 0 0% 12%;
+
+  --card-border: 0 0% 92%;
+
+  --sidebar: 0 0% 94%;
+
+  --sidebar-foreground: 0 0% 12%;
+
+  --sidebar-border: 0 0% 90%;
+
+  --sidebar-primary: 280 85% 52%;
+
+  --sidebar-primary-foreground: 280 10% 98%;
+
+  --sidebar-accent: 0 0% 86%;
+
+  --sidebar-accent-foreground: 0 0% 15%;
+
+  --sidebar-ring: 280 85% 52%;
+
+  --popover: 0 0% 90%;
+
+  --popover-foreground: 0 0% 12%;
+
+  --popover-border: 0 0% 86%;
+
+  --primary: 280 85% 52%;
+
+  --primary-foreground: 280 10% 98%;
+
+  --secondary: 0 0% 84%;
+
+  --secondary-foreground: 0 0% 15%;
+
+  --muted: 0 2% 88%;
+
+  --muted-foreground: 0 0% 25%;
+
+  --accent: 280 15% 90%;
+
+  --accent-foreground: 280 8% 20%;
+
+  --destructive: 0 72% 45%;
+
+  --destructive-foreground: 0 10% 98%;
+
+  --input: 0 0% 60%;
+  --ring: 280 85% 52%;
+  --chart-1: 280 85% 45%;
+  --chart-2: 320 75% 50%;
+  --chart-3: 180 70% 40%;
+  --chart-4: 45 85% 48%;
+  --chart-5: 160 75% 42%;
+
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: "JetBrains Mono", Menlo, Monaco, "Courier New", monospace;
+  --radius: .5rem; /* 8px */
+  --shadow-2xs: 0px 1px 2px 0px hsl(280 85% 52% / 0.05);
+  --shadow-xs: 0px 1px 3px 0px hsl(280 85% 52% / 0.08);
+  --shadow-sm: 0px 2px 4px -1px hsl(280 85% 52% / 0.06), 0px 1px 2px -1px hsl(280 85% 52% / 0.04);
+  --shadow: 0px 4px 6px -1px hsl(280 85% 52% / 0.06), 0px 2px 4px -2px hsl(280 85% 52% / 0.04);
+  --shadow-md: 0px 6px 12px -2px hsl(280 85% 52% / 0.08), 0px 3px 6px -3px hsl(280 85% 52% / 0.06);
+  --shadow-lg: 0px 10px 20px -3px hsl(280 85% 52% / 0.10), 0px 4px 8px -4px hsl(280 85% 52% / 0.08);
+  --shadow-xl: 0px 20px 25px -5px hsl(280 85% 52% / 0.12), 0px 8px 10px -6px hsl(280 85% 52% / 0.10);
+  --shadow-2xl: 0px 25px 50px -12px hsl(280 85% 52% / 0.15);
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
+
+  /* Automatically computed borders - intensity can be controlled by the user by the --opaque-button-border-intensity setting */
+
+  /* Fallback for older browsers */
+  --sidebar-primary-border: hsl(var(--sidebar-primary));
+  --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+
+  /* Fallback for older browsers */
+  --sidebar-accent-border: hsl(var(--sidebar-accent));
+  --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+
+  /* Fallback for older browsers */
+  --primary-border: hsl(var(--primary));
+  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+
+  /* Fallback for older browsers */
+  --secondary-border: hsl(var(--secondary));
+  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+
+  /* Fallback for older browsers */
+  --muted-border: hsl(var(--muted));
+  --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+
+  /* Fallback for older browsers */
+  --accent-border: hsl(var(--accent));
+  --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+
+  /* Fallback for older browsers */
+  --destructive-border: hsl(var(--destructive));
+  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+}
+
+.dark {
+  --button-outline: rgba(255,255,255, .10);
+  --badge-outline: rgba(255,255,255, .05);
+
+  --opaque-button-border-intensity: 9;
+
+  --elevate-1: rgba(255,255,255, .04);
+  --elevate-2: rgba(255,255,255, .09);
+
+  /* Neon-dark cyberpunk theme - slate backgrounds */
+  --background: 222 47% 4%;
+
+  --foreground: 210 40% 98%;
+
+  --border: 217 33% 17%;
+
+  --card: 222 47% 6%;
+
+  --card-foreground: 210 40% 98%;
+
+  --card-border: 217 33% 14%;
+
+  --sidebar: 222 47% 7%;
+
+  --sidebar-foreground: 210 40% 98%;
+
+  --sidebar-border: 217 33% 17%;
+
+  /* Purple neon accent for primary */
+  --sidebar-primary: 280 85% 60%;
+
+  --sidebar-primary-foreground: 280 10% 98%;
+
+  --sidebar-accent: 217 33% 12%;
+
+  --sidebar-accent-foreground: 210 40% 98%;
+
+  --sidebar-ring: 280 85% 60%;
+
+  --popover: 222 47% 6%;
+
+  --popover-foreground: 210 40% 98%;
+
+  --popover-border: 217 33% 17%;
+
+  /* Pink-purple gradient for primary actions */
+  --primary: 320 85% 60%;
+
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 217 33% 12%;
+
+  --secondary-foreground: 210 40% 98%;
+
+  --muted: 217 33% 12%;
+
+  --muted-foreground: 215 20% 65%;
+
+  /* Cyan accent */
+  --accent: 188 94% 50%;
+
+  --accent-foreground: 222 47% 4%;
+
+  --destructive: 0 84% 60%;
+
+  --destructive-foreground: 0 0% 100%;
+
+  --input: 217 33% 20%;
+  --ring: 280 85% 60%;
+  
+  /* Neon chart colors - pink, purple, cyan theme */
+  --chart-1: 320 85% 65%;
+  --chart-2: 280 85% 65%;
+  --chart-3: 188 94% 60%;
+  --chart-4: 45 93% 58%;
+  --chart-5: 160 75% 58%;
+
+  /* Purple glow shadows */
+  --shadow-2xs: 0px 1px 2px 0px hsl(280 85% 60% / 0.08);
+  --shadow-xs: 0px 1px 3px 0px hsl(280 85% 60% / 0.12);
+  --shadow-sm: 0px 2px 4px -1px hsl(280 85% 60% / 0.10), 0px 1px 2px -1px hsl(280 85% 60% / 0.06);
+  --shadow: 0px 4px 6px -1px hsl(280 85% 60% / 0.10), 0px 2px 4px -2px hsl(280 85% 60% / 0.06);
+  --shadow-md: 0px 6px 12px -2px hsl(280 85% 60% / 0.14), 0px 3px 6px -3px hsl(280 85% 60% / 0.10);
+  --shadow-lg: 0px 10px 20px -3px hsl(280 85% 60% / 0.16), 0px 4px 8px -4px hsl(280 85% 60% / 0.12);
+  --shadow-xl: 0px 20px 25px -5px hsl(280 85% 60% / 0.18), 0px 8px 10px -6px hsl(280 85% 60% / 0.14);
+  --shadow-2xl: 0px 25px 50px -12px hsl(280 85% 60% / 0.20);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+
+  html {
+    @apply dark;
+  }
+}
+
+/**
+ * Using the elevate system.
+ * Automatic contrast adjustment.
+ *
+ * <element className="hover-elevate" />
+ * <element className="active-elevate-2" />
+ *
+ * // Using the tailwind utility when a data attribute is "on"
+ * <element className="toggle-elevate data-[state=on]:toggle-elevated" />
+ * // Or manually controlling the toggle state
+ * <element className="toggle-elevate toggle-elevated" />
+ *
+ * Elevation systems have to handle many states.
+ * - not-hovered, vs. hovered vs. active  (three mutually exclusive states)
+ * - toggled or not
+ * - focused or not (this is not handled with these utilities)
+ *
+ * Even without handling focused or not, this is six possible combinations that
+ * need to be distinguished from eachother visually.
+ */
+@layer utilities {
+
+  /* Hide ugly search cancel button in Chrome until we can style it properly */
+  input[type="search"]::-webkit-search-cancel-button {
+    @apply hidden;
+  }
+
+  /* Placeholder styling for contentEditable div */
+  [contenteditable][data-placeholder]:empty::before {
+    content: attr(data-placeholder);
+    color: hsl(var(--muted-foreground));
+    pointer-events: none;
+  }
+
+  /* .no-default-hover-elevate/no-default-active-elevate is an escape hatch so consumers of
+   * buttons/badges can remove the automatic brightness adjustment on interactions
+   * and program their own. */
+  .no-default-hover-elevate {}
+
+  .no-default-active-elevate {}
+
+
+  /**
+   * Toggleable backgrounds go behind the content. Hoverable/active goes on top.
+   * This way they can stack/compound. Both will overlap the parent's borders!
+   * So borders will be automatically adjusted both on toggle, and hover/active,
+   * and they will be compounded.
+   */
+  .toggle-elevate::before,
+  .toggle-elevate-2::before {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    z-index: -1;
+  }
+
+  .toggle-elevate.toggle-elevated::before {
+    background-color: var(--elevate-2);
+  }
+
+  /* If there's a 1px border, adjust the inset so that it covers that parent's border */
+  .border.toggle-elevate::before {
+    inset: -1px;
+  }
+
+  /* Does not work on elements with overflow:hidden! */
+  .hover-elevate:not(.no-default-hover-elevate),
+  .active-elevate:not(.no-default-active-elevate),
+  .hover-elevate-2:not(.no-default-hover-elevate),
+  .active-elevate-2:not(.no-default-active-elevate) {
+    position: relative;
+    z-index: 0;
+  }
+
+  .hover-elevate:not(.no-default-hover-elevate)::after,
+  .active-elevate:not(.no-default-active-elevate)::after,
+  .hover-elevate-2:not(.no-default-hover-elevate)::after,
+  .active-elevate-2:not(.no-default-active-elevate)::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    z-index: 999;
+  }
+
+  .hover-elevate:hover:not(.no-default-hover-elevate)::after,
+  .active-elevate:active:not(.no-default-active-elevate)::after {
+    background-color: var(--elevate-1);
+  }
+
+  .hover-elevate-2:hover:not(.no-default-hover-elevate)::after,
+  .active-elevate-2:active:not(.no-default-active-elevate)::after {
+    background-color: var(--elevate-2);
+  }
+
+  /* If there's a 1px border, adjust the inset so that it covers that parent's border */
+  .border.hover-elevate:not(.no-hover-interaction-elevate)::after,
+  .border.active-elevate:not(.no-active-interaction-elevate)::after,
+  .border.hover-elevate-2:not(.no-hover-interaction-elevate)::after,
+  .border.active-elevate-2:not(.no-active-interaction-elevate)::after,
+  .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
+    inset: -1px;
+  }
+}
+
+/* ==================== TikTok-Style FYP Feed ==================== */
+.fyp-feed-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
+
+.fyp-video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  scroll-snap-align: start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+.fyp-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+.fyp-video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.5) 100%);
+}
+
+.fyp-error-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  text-align: center;
+  font-size: 1.2rem;
+  z-index: 10;
+}
+
+.fyp-live-badge {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 0, 0, 0.9);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 20;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fyp-live-badge:hover {
+  background: rgba(255, 0, 0, 1);
+  transform: scale(1.05);
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.fyp-mute-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  transition: all 0.2s;
+}
+
+.fyp-mute-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.1);
+}
+
+.fyp-mute-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.fyp-video-description-section {
+  position: absolute;
+  bottom: 80px;
+  left: 20px;
+  right: 100px;
+  z-index: 15;
+  color: #fff;
+}
+
+.fyp-video-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.fyp-video-description {
+  font-size: 0.875rem;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.fyp-hashtags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.fyp-hashtag {
+  color: #00f2ea;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.fyp-creator-info {
+  position: absolute;
+  bottom: 230px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 15;
+  cursor: pointer;
+}
+
+.fyp-creator-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  object-fit: cover;
+}
+
+.fyp-creator-name {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.fyp-action-buttons {
+  position: absolute;
+  bottom: 180px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 15;
+}
+
+.fyp-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.fyp-action-btn:active {
+  transform: scale(0.9);
+}
+
+.fyp-action-btn svg {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+}
+
+.fyp-action-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.fyp-feed-empty {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.2rem;
+  background: #000;
+}
