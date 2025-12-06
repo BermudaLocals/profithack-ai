@@ -1,0 +1,173 @@
+// Premium Credit Packages - In-App Purchases
+// Credits are used for AI tools, premium features, and subscriptions
+
+export const CREDIT_PACKAGES = [
+  {
+    id: "credits_basic",
+    credits: 1000,
+    priceUSD: 4.99,
+    name: "Starter",
+    description: "Try premium features",
+    popular: false,
+    bonus: 0,
+    tier: "free",
+  },
+  {
+    id: "credits_plus",
+    credits: 2500,
+    priceUSD: 9.99,
+    name: "Plus",
+    description: "Perfect for regular use",
+    popular: false,
+    bonus: 100,
+    tier: "basic",
+  },
+  {
+    id: "credits_pro_25",
+    credits: 6000,
+    priceUSD: 25.00,
+    name: "Pro",
+    description: "Great for creators",
+    popular: true,
+    bonus: 500,
+    tier: "pro",
+  },
+  {
+    id: "credits_premium_50",
+    credits: 15000,
+    priceUSD: 50.00,
+    name: "Premium",
+    description: "Serious content creation",
+    popular: true,
+    bonus: 1500,
+    tier: "premium",
+  },
+  {
+    id: "credits_ultra_99",
+    credits: 35000,
+    priceUSD: 99.00,
+    name: "Ultra",
+    description: "Power users - best value",
+    popular: false,
+    bonus: 5000,
+    tier: "ultra",
+  },
+  {
+    id: "credits_enterprise_199",
+    credits: 80000,
+    priceUSD: 199.00,
+    name: "Enterprise",
+    description: "Unlimited potential + priority support",
+    popular: false,
+    bonus: 15000,
+    tier: "enterprise",
+  },
+] as const;
+
+// Subscription Tiers (Monthly)
+export const SUBSCRIPTION_TIERS = [
+  {
+    id: "sub_free",
+    name: "Free",
+    priceUSD: 0,
+    features: [
+      "5 videos/day",
+      "Basic AI chat",
+      "5 dating swipes/day",
+      "Ad-supported",
+    ],
+    limits: {
+      videosPerDay: 5,
+      aiChats: 10,
+      swipesPerDay: 5,
+      uploadLimit: 5,
+    },
+  },
+  {
+    id: "sub_pro_25",
+    name: "Pro",
+    priceUSD: 25.00,
+    features: [
+      "Unlimited videos",
+      "AI Chat (GPT-4, Claude)",
+      "50 dating swipes/day",
+      "AI Video Generator (10/mo)",
+      "No ads",
+      "Priority support",
+    ],
+    limits: {
+      videosPerDay: -1,
+      aiChats: 500,
+      swipesPerDay: 50,
+      uploadLimit: 50,
+      aiVideos: 10,
+    },
+  },
+  {
+    id: "sub_premium_50",
+    name: "Premium",
+    priceUSD: 50.00,
+    features: [
+      "Everything in Pro",
+      "AI Video Generator (50/mo)",
+      "AI Influencer Creator",
+      "Unlimited swipes",
+      "See who likes you",
+      "Verified badge",
+      "Live streaming",
+    ],
+    limits: {
+      videosPerDay: -1,
+      aiChats: -1,
+      swipesPerDay: -1,
+      uploadLimit: 200,
+      aiVideos: 50,
+    },
+  },
+  {
+    id: "sub_ultra_99",
+    name: "Ultra",
+    priceUSD: 99.00,
+    features: [
+      "Everything in Premium",
+      "AI Video Generator (Unlimited)",
+      "AI Influencer Creator (10 personas)",
+      "Battle priority matching",
+      "Analytics dashboard",
+      "API access",
+      "Custom watermarks",
+    ],
+    limits: {
+      videosPerDay: -1,
+      aiChats: -1,
+      swipesPerDay: -1,
+      uploadLimit: -1,
+      aiVideos: -1,
+    },
+  },
+  {
+    id: "sub_enterprise_199",
+    name: "Enterprise",
+    priceUSD: 199.00,
+    features: [
+      "Everything in Ultra",
+      "Multi-account management",
+      "Team collaboration",
+      "White-label options",
+      "Dedicated account manager",
+      "Custom AI training",
+      "SLA guarantee",
+    ],
+    limits: {
+      videosPerDay: -1,
+      aiChats: -1,
+      swipesPerDay: -1,
+      uploadLimit: -1,
+      aiVideos: -1,
+      teamMembers: 10,
+    },
+  },
+] as const;
+
+export type CreditPackage = typeof CREDIT_PACKAGES[number];
+export type SubscriptionTier = typeof SUBSCRIPTION_TIERS[number];
