@@ -1,0 +1,8 @@
+[build]
+nodeVersion = "20.11.1"
+
+[deploy]
+startCommand = "npm run build && npm start"
+
+[[phases]]
+name = "setup"
