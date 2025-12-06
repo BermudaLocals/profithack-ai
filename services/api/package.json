@@ -1,0 +1,12 @@
+{
+  "name": "profithackai-api",
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.19.2",
+    "prom-client": "^15.1.3",
+    "pg": "^8.11.5",
+    "ioredis": "^5.4.1",
+    "cors": "^2.8.5"
+  }
+}
