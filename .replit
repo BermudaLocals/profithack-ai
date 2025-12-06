@@ -1,0 +1,118 @@
+modules = ["nodejs-20", "web", "postgresql-16"]
+run = "npm run dev"
+hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
+
+[nix]
+channel = "stable-24_05"
+packages = ["imagemagick", "go", "protobuf", "protoc-gen-go", "protoc-gen-go-grpc", "unzip"]
+
+[deployment]
+deploymentTarget = "cloudrun"
+build = ["npm", "run", "build"]
+run = ["npm", "run", "start"]
+
+[env]
+PORT = "5000"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+waitForPort = 5000
+
+[agent]
+integrations = ["javascript_websocket:1.0.0", "javascript_object_storage:1.0.0", "javascript_openai_ai_integrations:1.0.0", "javascript_log_in_with_replit:1.0.0", "javascript_database:1.0.0", "javascript_stripe:1.0.0"]
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 40899
+externalPort = 3000
+
+[[ports]]
+localPort = 41405
+externalPort = 3002
+
+[[ports]]
+localPort = 44991
+externalPort = 9000
+
+[[ports]]
+localPort = 46525
+externalPort = 3001
+
+[[ports]]
+localPort = 50051
+externalPort = 3003
+
+[[ports]]
+localPort = 50052
+externalPort = 4200
+
+[[ports]]
+localPort = 50053
+externalPort = 5000
+
+[[ports]]
+localPort = 50054
+externalPort = 5173
+
+[[ports]]
+localPort = 50055
+externalPort = 6000
+
+[[ports]]
+localPort = 50056
+externalPort = 6800
+
+[[ports]]
+localPort = 50057
+externalPort = 8000
+
+[[ports]]
+localPort = 50058
+externalPort = 8008
+
+[[ports]]
+localPort = 50059
+externalPort = 8080
+
+[[ports]]
+localPort = 50060
+externalPort = 8081
+
+[[ports]]
+localPort = 50061
+externalPort = 8099
+
+[userenv]
+
+[userenv.production]
+APP_URL = "https://profithackai.com"
+
+[userenv.shared]
+DISABLE_REDIS_CACHE = "false"
+UPSTASH_REDIS_URL = "https://nearby-hen-27898.upstash.io"
+UPSTASH_REDIS_TOKEN = "AWz6AAIncDI5YmU5MDI0NzkwN2Y0MmZkODRlNzVmNzUwNmRjNDYwYXAyMjc4OTg"
+UPSTASH_REDIS_REST_URL = "https://nearby-hen-27898.upstash.io"
+UPSTASH_REDIS_REST_TOKEN = "AWz6AAIncDI5YmU5MDI0NzkwN2Y0MmZkODRlNzVmNzUwNmRjNDYwYXAyMjc4OTg"
+
+[userenv.development]
+APP_URL = "https://1787e76f-1cbc-4635-9d1a-f5ee00cfec30-00-vcltxx3w54ct.picard.replit.dev"

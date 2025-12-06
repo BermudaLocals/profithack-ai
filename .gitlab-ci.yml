@@ -1,0 +1,69 @@
+# File: .gitlab-ci.yml
+# GitLab CI/CD Pipeline for Building and Pushing Microservice Docker Images
+
+# Use the official Docker image with Docker-in-Docker (dind) support
+image: docker:latest
+services:
+  - docker:dind
+
+variables:
+  # Base registry URL (e.g., GitLab Registry, Docker Hub, ECR)
+  DOCKER_REGISTRY: $CI_REGISTRY 
+  # Use the commit SHA as the image tag for unique, traceable builds
+  IMAGE_TAG: $CI_COMMIT_SHORT_SHA 
+  # Project-specific variables
+  MODERATION_SERVICE_DIR: moderation_service
+  SECURITY_SERVICE_DIR: security_service
+
+stages:
+  - build
+  - push
+
+# --- Authentication Stage ---
+before_script:
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+# --- Build and Push Moderation Service (Python) ---
+build_moderation:
+  stage: build
+  script:
+    - echo "Building Moderation Service image..."
+    # Build the image, tagging it with the commit SHA
+    - docker build -t $DOCKER_REGISTRY/profithack/moderation-service:$IMAGE_TAG $MODERATION_SERVICE_DIR
+    - docker push $DOCKER_REGISTRY/profithack/moderation-service:$IMAGE_TAG
+  only:
+    # Only run if files in the moderation_service directory have changed
+    changes:
+      - moderation_service/**/*
+
+# --- Build and Push Security Service (Golang) ---
+build_security:
+  stage: build
+  script:
+    - echo "Building Security Service image..."
+    # Build the image, tagging it with the commit SHA
+    - docker build -t $DOCKER_REGISTRY/profithack/security-service:$IMAGE_TAG $SECURITY_SERVICE_DIR
+    - docker push $DOCKER_REGISTRY/profithack/security-service:$IMAGE_TAG
+  only:
+    # Only run if files in the security_service directory have changed
+    changes:
+      - security_service/**/*
+
+# --- Tag Latest Stage (Optional but Recommended for GitOps) ---
+# This job tags the successful build as 'latest' and pushes it, 
+# which can be used by the Helm chart for easy testing.
+tag_latest:
+  stage: push
+  script:
+    - echo "Tagging images as latest..."
+    # Tag Moderation Service
+    - docker pull $DOCKER_REGISTRY/profithack/moderation-service:$IMAGE_TAG
+    - docker tag $DOCKER_REGISTRY/profithack/moderation-service:$IMAGE_TAG $DOCKER_REGISTRY/profithack/moderation-service:latest
+    - docker push $DOCKER_REGISTRY/profithack/moderation-service:latest
+    # Tag Security Service
+    - docker pull $DOCKER_REGISTRY/profithack/security-service:$IMAGE_TAG
+    - docker tag $DOCKER_REGISTRY/profithack/security-service:$IMAGE_TAG $DOCKER_REGISTRY/profithack/security-service:latest
+    - docker push $DOCKER_REGISTRY/profithack/security-service:latest
+  when: manual # Set to manual to control when 'latest' is updated, or 'on_success' for automatic
+  only:
+    - main # Only run on the main branch
