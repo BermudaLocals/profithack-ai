@@ -1,0 +1,66 @@
+# File: helm/profithack-services/values.yaml
+# Consolidated Helm Chart values.yaml for Moderation and Security Services
+
+# --- Global Configuration ---
+global:
+  replicaCount: 2
+  image:
+    repository: profithack
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+
+# --- Moderation Service Configuration (Python/AI) ---
+moderationService:
+  enabled: true
+  name: moderation-service
+  image:
+    tag: latest # Should be replaced with a specific commit SHA in production
+  replicaCount: 3 # Higher replicas due to AI workload
+  service:
+    port: 50057
+    targetPort: 50057
+    name: grpc-moderation
+  resources:
+    limits:
+      cpu: "1000m"
+      memory: "2Gi"
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+  # Environment variables for the Python service
+  env:
+    - name: LOG_LEVEL
+      value: "INFO"
+    - name: AI_MODEL_VERSION
+      value: "v1.2.0"
+
+# --- Security Service Configuration (Golang/Zero Trust) ---
+securityService:
+  enabled: true
+  name: security-service
+  image:
+    tag: latest # Should be replaced with a specific commit SHA in production
+  replicaCount: 2 # Lower replicas due to Golang efficiency
+  service:
+    port: 50058
+    targetPort: 50058
+    name: grpc-security
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+    requests:
+      cpu: "250m"
+      memory: "256Mi"
+  # Environment variables for the Golang service
+  env:
+    - name: CA_ENDPOINT
+      value: "vault.internal.profithack.com"
+    - name: CERT_VALIDITY_DAYS
+      value: "90"
+
+# --- Common Configuration (Can be overridden by service-specific settings) ---
+# nodeSelector: {}
+# tolerations: []
+# affinity: {}

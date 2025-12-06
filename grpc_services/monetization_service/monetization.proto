@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package monetization;
+
+option go_package = "./monetization";
+
+// The Monetization Service definition.
+service MonetizationService {
+  // SendGift handles the transaction for sending a virtual gift.
+  rpc SendGift (SendGiftRequest) returns (SendGiftResponse);
+  // Subscribe handles the transaction for a user subscribing to a creator.
+  rpc Subscribe (SubscribeRequest) returns (SubscribeResponse);
+}
+
+// Message representing a virtual gift.
+message Gift {
+  string gift_id = 1;
+  string name = 2;
+  int32 cost_coins = 3;
+}
+
+// Request message for sending a gift.
+message SendGiftRequest {
+  string sender_user_id = 1;
+  string recipient_user_id = 2;
+  string gift_id = 3;
+  int32 quantity = 4;
+}
+
+// Response message for sending a gift.
+message SendGiftResponse {
+  bool success = 1;
+  int32 remaining_coins = 2;
+  string transaction_id = 3;
+}
+
+// Request message for subscribing to a creator.
+message SubscribeRequest {
+  string subscriber_user_id = 1;
+  string creator_user_id = 2;
+  string subscription_tier_id = 3;
+}
+
+// Response message for subscribing to a creator.
+message SubscribeResponse {
+  bool success = 1;
+  string transaction_id = 2;
+  string tier_name = 3;
+}

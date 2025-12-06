@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package acquisition;
+
+option go_package = "./acquisition";
+
+// The Content Acquisition Service definition.
+service AcquisitionService {
+  // ScrapeAndGenerate handles the full cycle: scrape, analyze, generate, and seed.
+  rpc ScrapeAndGenerate (AcquisitionRequest) returns (AcquisitionResponse);
+}
+
+// Request message for content acquisition.
+message AcquisitionRequest {
+  string founder_user_id = 1;
+  int32 count = 2;
+  string trend_topic = 3;
+}
+
+// Response message for content acquisition.
+message AcquisitionResponse {
+  string job_id = 1;
+  string status = 2; // PENDING, GENERATING, SEEDED
+  int32 videos_seeded = 3;
+}

@@ -1,0 +1,120 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: profithackai
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: x-streamer-secrets
+  namespace: profithackai
+type: Opaque
+stringData:
+  # Base64 encode these values or use external secret management (Sealed Secrets, External Secrets Operator)
+  X_BEARER_TOKEN: "YOUR_X_BEARER_TOKEN_HERE"
+  REDIS_URL: "YOUR_REDIS_URL_HERE"
+  DATABASE_URL: "YOUR_DATABASE_URL_HERE"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: x-streamer-config
+  namespace: profithackai
+data:
+  X_RULES: '["creator economy","digital products","chatgpt","viral ai","automation","side hustle","profithack","tiktok money","passive income"]'
+  X_QUEUE_KEY: "x_stream"
+  X_NS: "phx"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: x-streamer
+  namespace: profithackai
+  labels:
+    app: x-streamer
+    component: data-ingestion
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate  # Only one instance should run to avoid duplicate tweet processing
+  selector:
+    matchLabels:
+      app: x-streamer
+  template:
+    metadata:
+      labels:
+        app: x-streamer
+        component: data-ingestion
+    spec:
+      containers:
+      - name: x-streamer
+        image: ghcr.io/YOUR_GITHUB_USERNAME/x-streamer:latest
+        imagePullPolicy: Always
+        env:
+        - name: X_BEARER_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: x-streamer-secrets
+              key: X_BEARER_TOKEN
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: x-streamer-secrets
+              key: REDIS_URL
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: x-streamer-secrets
+              key: DATABASE_URL
+        - name: X_RULES
+          valueFrom:
+            configMapKeyRef:
+              name: x-streamer-config
+              key: X_RULES
+        - name: X_QUEUE_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: x-streamer-config
+              key: X_QUEUE_KEY
+        - name: X_NS
+          valueFrom:
+            configMapKeyRef:
+              name: x-streamer-config
+              key: X_NS
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          exec:
+            command:
+            - python3
+            - -c
+            - "import redis; r = redis.from_url('${REDIS_URL}'); r.ping()"
+          initialDelaySeconds: 30
+          periodSeconds: 60
+          timeoutSeconds: 10
+          failureThreshold: 3
+        restartPolicy: Always
+      imagePullSecrets:
+      - name: ghcr-login-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: x-streamer
+  namespace: profithackai
+  labels:
+    app: x-streamer
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: metrics
+  selector:
+    app: x-streamer

@@ -1,0 +1,61 @@
+# File: k8s/security_service.yaml
+# Kubernetes Deployment and Service for the Zero Trust Security Service (Golang)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: security-service-deployment
+  labels:
+    app: security-service
+spec:
+  replicas: 2 # Start with 2 replicas for high availability
+  selector:
+    matchLabels:
+      app: security-service
+  template:
+    metadata:
+      labels:
+        app: security-service
+        # Required for mTLS Zero Trust Architecture
+        version: v1 
+    spec:
+      containers:
+      - name: security-service
+        # Placeholder image - replace with your actual built image
+        image: profithack/security-service:latest 
+        ports:
+        - containerPort: 50058 # gRPC port
+        resources:
+          limits:
+            # Golang is highly efficient, so resource limits can be lower
+            cpu: "500m" 
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+        # Liveness and Readiness Probes are critical for production readiness
+        livenessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50058"]
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command: ["/bin/grpc_health_probe", "-addr=:50058"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: security-service
+spec:
+  selector:
+    app: security-service
+  ports:
+    - protocol: TCP
+      port: 50058 # Service port
+      targetPort: 50058 # Container port
+      name: grpc-security
+  # ClusterIP is used because this is an internal microservice
+  type: ClusterIP
