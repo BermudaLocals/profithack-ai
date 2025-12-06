@@ -1,0 +1,117 @@
+# PROFITHACK AI - Prometheus Monitoring Configuration
+# Production-ready observability for 100M+ users
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'profithack-production'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'alertmanager:9093'
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - "alert_rules.yml"
+
+# Scrape configuration for all microservices
+scrape_configs:
+  # ============================================================================
+  # Node.js API Gateway & Backend Services
+  # ============================================================================
+  - job_name: 'nodejs-api-gateway'
+    static_configs:
+      - targets: ['localhost:5000']
+    metrics_path: '/api/metrics/prometheus'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # ============================================================================
+  # Golang gRPC Feed Service (High-Performance)
+  # ============================================================================
+  - job_name: 'golang-feed-service'
+    static_configs:
+      - targets: ['localhost:50051']
+    metrics_path: '/metrics'
+    scrape_interval: 5s  # More frequent for critical service
+    scrape_timeout: 3s
+
+  # ============================================================================
+  # Python XAI Recommendation Engine
+  # ============================================================================
+  - job_name: 'python-xai-service'
+    static_configs:
+      - targets: ['localhost:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # ============================================================================
+  # Redis Cluster Metrics
+  # ============================================================================
+  - job_name: 'redis-cluster'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+    scrape_interval: 15s
+
+  # ============================================================================
+  # PostgreSQL Database Metrics
+  # ============================================================================
+  - job_name: 'postgresql'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+    scrape_interval: 15s
+
+  # ============================================================================
+  # Cassandra NoSQL Metrics (Time-series data)
+  # ============================================================================
+  - job_name: 'cassandra'
+    static_configs:
+      - targets: ['cassandra-exporter:9180']
+    scrape_interval: 30s
+
+  # ============================================================================
+  # Kafka Event Streaming Metrics
+  # ============================================================================
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['kafka-exporter:9308']
+    scrape_interval: 15s
+
+  # ============================================================================
+  # BullMQ Video Processing Queue
+  # ============================================================================
+  - job_name: 'bullmq-queue'
+    static_configs:
+      - targets: ['localhost:5000']
+    metrics_path: '/api/metrics/bullmq'
+    scrape_interval: 10s
+
+  # ============================================================================
+  # System-Level Metrics (Node Exporter)
+  # ============================================================================
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 15s
+
+  # ============================================================================
+  # Nginx Load Balancer Metrics
+  # ============================================================================
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx-exporter:9113']
+    scrape_interval: 15s
+
+# Remote write for long-term storage (optional)
+remote_write:
+  - url: "https://prometheus-remote-storage.example.com/api/v1/write"
+    queue_config:
+      capacity: 10000
+      max_shards: 5
+      max_samples_per_send: 1000
