@@ -1,0 +1,449 @@
+🚀 REPLIT INSTRUCTIONS: PROFITHACK AI - FREEMIUM SOCIAL ECOSYSTEM
+REPLIT BUILD DIRECTIVE: PROFITHACK AI - Viral Social Platform with Smart Monetization
+
+STRATEGY: Free tier drives viral growth, Premium features drive revenue
+TARGET: 10M users with 10% paid conversion ($100M+ annual revenue)
+
+FREEMIUM ARCHITECTURE:
+
+┌─────────────────────────────────────────────────────────────┐
+│                     PROFITHACK AI                           │
+├─────────────────────────────────────────────────────────────┤
+│  FREE TIER (90% of users)     │    PREMIUM TIER (10%)      │
+│  ─────────────────────────    │    ─────────────────────   │
+│  ✅ WhatsApp Messaging        │    ✅ Advanced AI Features  │
+│  ✅ TikTok Video Feed         │    ✅ Unlimited Video Calls │
+│  ✅ Facebook-style Timeline   │    ✅ Creator Analytics    │
+│  ✅ Basic Profile & Stories   │    ✅ Advanced Filters     │
+│  ✅ Limited Groups (10 max)   │    ✅ Unlimited Groups      │
+│  ✅ 100MB Storage             │    ✅ 100GB Storage        │
+│  ❌ Video Calls (2 min limit) │    ✅ HD Video Quality     │
+│  ❌ AI Tools (3 uses/day)     │    ✅ Unlimited AI Usage   │
+│  ❌ Analytics                 │    ✅ Revenue Optimization │
+│  ❌ Advanced Features         │    ✅ Priority Support     │
+└─────────────────────────────────────────────────────────────┘
+
+MONETIZATION LAYERS:
+1. AD REVENUE (Free Users)
+2. IN-APP PURCHASES (Micro-transactions)
+3. SUBSCRIPTIONS (Premium Tiers)
+4. COMMISSIONS (Creator Economy)
+5. ENTERPRISE (B2B Solutions)
+
+IMPLEMENTATION DIRECTIVE:
+
+=== PHASE 1: CORE SOCIAL FEATURES (FREE TIER) ===
+
+1. WHATSAPP-STYLE MESSAGING (FREE)
+├── Core Features
+│   ├── Unlimited text messaging
+│   ├── Photo/video sharing
+│   ├── Voice notes (5 min max)
+│   ├── Group chats (max 10 groups, 50 members each)
+│   ├── Status updates (24 hours, max 3 per day)
+│   ├── Basic emoji reactions
+│   └── Message forwarding (5 messages max)
+│
+├── Monetization Hooks
+│   ├── "Upgrade for unlimited groups" banner
+│   ├── Video calls limited to 2 minutes
+│   ├── Storage limit warning at 80MB
+│   ├── Voice notes >5min require Premium
+│   └── "Boost this message" ($0.99)
+│
+└── Implementation
+    ├── Socket.io real-time messaging
+    ├── PostgreSQL message storage
+    ├── Redis for presence tracking
+    ├── Basic end-to-end encryption
+    └── Push notifications (limited)
+
+2. TIKTOK-STYLE VIDEO PLATFORM (FREE)
+├── Core Features
+│   ├── 9:16 video upload (max 60 seconds)
+│   ├── Basic video editor (trim, filters, music)
+│   ├── Video feed with algorithm
+│   ├── Like/comment/share (limited to 50/day)
+│   ├── Basic profile (5 videos max)
+│   ├── Hashtag challenges
+│   └── Trending page
+│
+├── Monetization Hooks
+│   ├── "Upload longer videos with Premium"
+│   ├── "Access 10,000+ premium songs"
+│   ├── "See detailed analytics" → Premium
+│   ├── "Remove watermark" → $1.99
+│   └── "Boost video to trending" → $4.99
+│
+└── Implementation
+    ├── FFmpeg video processing
+    ├── AI content recommendation
+    ├── Redis caching for feed
+    ├── Cloudinary for video storage
+    └── Basic analytics tracking
+
+3. FACEBOOK-STYLE SOCIAL NETWORK (FREE)
+├── Core Features
+│   ├── Timeline/news feed
+│   ├── Friend connections (max 200)
+│   ├── Photo albums (max 3 albums)
+│   ├── Basic pages (create 1 page only)
+│   ├── Events (create max 2/month)
+│   ├── Groups (join max 5)
+│   └── Comments/reactions
+│
+├── Ad Integration
+│   ├── Native ads in feed (every 5 posts)
+│   ├── Story ads (every 3 stories)
+│   ├── Video ads (15 seconds, non-skippable)
+│   ├── Profile sidebar ads
+│   └── Marketplace ads (10% commission)
+│
+├── Monetization Hooks
+│   ├── "See who viewed your profile" → Premium
+│   ├── "Advanced page insights" → Premium
+│   ├── "Unlimited friends" → Premium
+│   ├── "No ads forever" → Premium
+│   └── "Verify your profile" → $9.99
+│
+└── Implementation
+    ├── Graph API for social graph
+    ├── Targeted ad delivery system
+    ├── Engagement tracking
+    ├── Content moderation AI
+    └── Revenue analytics dashboard
+
+=== PHASE 2: PREMIUM FEATURES (PAID TIERS) ===
+
+4. SUBSCRIPTION TIERS
+├── CREATOR PASS - $9.99/month
+│   ├── 500MB storage
+│   ├── 50 group chats
+│   ├── 15-minute video calls
+│   ├── 5-minute video uploads
+│   ├── Basic AI tools (10/day)
+│   ├── Profile verification badge
+│   └── No ads in messaging
+│
+├── PROFESSIONAL - $29.99/month
+│   ├── Everything in Creator
+│   ├── 50GB storage
+│   ├── Unlimited video calls
+│   ├── 30-minute videos
+│   ├── Advanced AI tools (100/day)
+│   ├── Creator analytics dashboard
+│   ├── Revenue optimization AI
+│   └── Priority support
+│
+└── ENTERPRISE - $99.99/month
+    ├── Everything in Professional
+    ├── 1TB storage
+    ├── Unlimited everything
+    ├── Custom AI training
+    ├── API access
+    ├── White-label options
+    ├── Dedicated account manager
+    └── Custom integrations
+
+5. IN-APP PURCHASES (MICRO-TRANSACTIONS)
+├── Virtual Currency: "PROFITS"
+│   ├── 100 PROFITS = $0.99
+│   ├── 500 PROFITS = $4.99 (10% bonus)
+│   ├── 1000 PROFITS = $9.99 (20% bonus)
+│   └── 5000 PROFITS = $39.99 (30% bonus)
+│
+├── Spend Options
+│   ├── Boost post: 50 PROFITS
+│   ├── Unlock premium filter: 20 PROFITS
+│   ├── Extra video minute: 30 PROFITS
+│   ├── Read receipts: 10 PROFITS
+│   ├── Profile view: 15 PROFITS
+│   ├── Custom emoji: 25 PROFITS
+│   └── Super reactions: 5 PROFITS
+│
+└── Implementation
+    ├── Stripe payments integration
+    ├── Virtual wallet system
+    ├── Transaction history
+    ├── Refund system
+    └── Fraud detection
+
+6. LIMITED FREE TRIALS (VIRAL MECHANICS)
+├── Premium Feature Trials
+│   ├── AI Video Generator: 3 free videos
+│   ├── HD Video Calls: 5 free calls (10 min)
+│   ├── Advanced Analytics: 7-day free trial
+│   ├── Creator Suite: 3 free projects
+│   └── Premium Filters: 10 free uses
+│
+├── Viral Trial Mechanics
+│   ├── "Share for 3 more AI credits"
+│   ├── "Refer friend → unlock Premium feature for 24h"
+│   ├── "Complete profile → get 50 PROFITS"
+│   ├── "Post 3 videos → unlock analytics for 7 days"
+│   └── "Invite 5 friends → 1 month Premium"
+│
+└── Implementation
+    ├── Trial tracking system
+    ├── Share reward mechanism
+    ├── Feature unlock animations
+    ├── Urgency timers
+    └── Conversion tracking
+
+=== PHASE 3: VIRAL GROWTH FEATURES ===
+
+7. ENGAGEMENT GAMIFICATION
+├── Streak System
+│   ├── Daily login streaks
+│   ├── Weekly milestones
+│   ├── Monthly leaderboards
+│   ├── "Share streak for bonus"
+│   └── Streak recovery (PROFITS)
+│
+├── Achievement Badges
+│   ├── "First Viral Video" badge
+│   ├── "100 Connections" badge
+│   ├── "AI Master" badge
+│   ├── "Top Creator" badge
+│   └── "Social Butterfly" badge
+│
+├── Challenges System
+│   ├── Daily challenges
+│   ├── Weekly competitions
+│   ├── Monthly themes
+│   ├── Creator battles
+│   └── Community goals
+│
+└── Implementation
+    ├── Real-time notifications
+    ├── Progress tracking
+    ├── Social sharing
+    ├── Reward distribution
+    └── Leaderboard system
+
+8. REFERRAL PROGRAM (EXPLOSIVE GROWTH)
+├── Multi-Level Referral System
+│   ├── Level 1: 100 PROFITS per referral
+│   ├── Level 2: 50 PROFITS per referral
+│   ├── Level 3: 25 PROFITS per referral
+│   ├── Level 4: 10 PROFITS per referral
+│   └── Level 5: 5 PROFITS per referral
+│
+├── Referral Rewards
+│   ├── 1 referral: 100 PROFITS
+│   ├── 5 referrals: 1 week Premium
+│   ├── 10 referrals: 1 month Premium
+│   ├── 25 referrals: Creator badge
+│   ├── 100 referrals: Yearly Premium
+│   └── 1000 referrals: Profit sharing
+│
+├── Viral Sharing Tools
+│   ├── Custom invite codes
+│   ├── Referral dashboard
+│   ├── Share images with codes
+│   ├── Auto-generated messages
+│   └── Social media integration
+│
+└── Implementation
+    ├── Referral tracking system
+    ├── Multi-level commission
+    ├── Fraud prevention
+    ├── Real-time notifications
+    └── Analytics dashboard
+
+=== PHASE 4: TECHNICAL IMPLEMENTATION ===
+
+9. DATABASE SCHEMA
+├── Users Table
+│   ├── id, email, username, avatar
+│   ├── subscription_tier, expires_at
+│   ├── profits_balance, total_earned
+│   ├── referral_count, referral_code
+│   ├── achievements, streak_data
+│   ├── preferences, privacy_settings
+│   └── created_at, last_active
+│
+├── Content Tables
+│   ├── posts (id, user_id, content, type)
+│   ├── videos (id, user_id, url, thumbnail, duration)
+│   ├── messages (id, sender, receiver, content)
+│   ├── comments (id, post_id, user_id, text)
+│   └── likes (id, user_id, content_id, type)
+│
+├── Monetization Tables
+│   ├── subscriptions (id, user_id, tier, status)
+│   ├── transactions (id, user_id, amount, type)
+│   ├── profits_spent (id, user_id, item_id, amount)
+│   ├── referral_rewards (id, referrer, referred, amount)
+│   └── ad_revenue (id, user_id, earnings, date)
+│
+└── Analytics Tables
+    ├── user_metrics (id, user_id, date, actions)
+    ├── content_performance (id, content_id, views, engagement)
+    ├── revenue_tracking (id, source, amount, date)
+    └── viral_metrics (id, user_id, shares, conversions)
+
+10. API ENDPOINTS
+├── Authentication
+│   ├── POST /api/auth/login
+│   ├── POST /api/auth/signup
+│   ├── POST /api/auth/subscribe
+│   └── POST /api/auth/cancel
+│
+├── Content
+│   ├── GET /api/feed (personalized)
+│   ├── POST /api/posts/create
+│   ├── POST /api/videos/upload
+│   └── GET /api/trending
+│
+├── Social
+│   ├── GET /api/messages/:chatId
+│   ├── POST /api/messages/send
+│   ├── GET /api/friends
+│   └── POST /api/friends/add
+│
+├── Monetization
+│   ├── GET /api/profits/balance
+│   ├── POST /api/profits/spend
+│   ├── GET /api/subscription/status
+│   └── POST /api/purchases/boost
+│
+└── Analytics
+    ├── GET /api/analytics/dashboard
+    ├── GET /api/analytics/content/:id
+    ├── GET /api/analytics/referrals
+    └── GET /api/analytics/revenue
+
+11. FRONTEND COMPONENTS
+├── Navigation
+│   ├── Bottom tab bar (messaging, feed, profile)
+│   ├── Sidebar (desktop)
+│   ├── Quick actions floating button
+│   └── Notifications center
+│
+├── Messaging
+│   ├── ChatWindow (with typing indicators)
+│   ├── MessageInput (rich text, media)
+│   ├── VideoCall (WebRTC)
+│   └── StatusStories (24h display)
+│
+├── Content Feed
+│   ├── VideoPlayer (looping, engagement)
+│   ├── PostCard (likes, comments, shares)
+│   ├── CreatorProfile (analytics CTA)
+│   └── TrendingPage (algorithm-driven)
+│
+├── Monetization UI
+│   ├── SubscriptionModal (tier comparison)
+│   ├── ProfitShop (virtual currency store)
+│   ├── BoostDialog (promote content)
+│   └── ReferralDashboard (earnings display)
+│
+└── Gamification
+    ├── AchievementModal (unlock animations)
+    ├── StreakDisplay (daily progress)
+    ├── Leaderboard (rankings)
+    └── ChallengeCard (participate)
+
+=== PHASE 5: LAUNCH STRATEGY ===
+
+12. LAUNCH SEQUENCE
+├── Week 1: Private Beta (1,000 users)
+│   ├── All features free
+│   ├── Gather feedback
+│   ├── Bug fixes
+│   └── Performance optimization
+│
+├── Week 2: Public Beta (10,000 users)
+│   ├── Enable monetization
+│   ├── Ad integration
+│   ├── Referral program
+│   └── Viral sharing
+│
+├── Week 3: Growth Phase
+│   ├── Marketing push
+│   ├── Influencer partnerships
+│   ├── Content challenges
+│   └── Community building
+│
+└── Week 4: Full Launch
+    ├── All systems live
+    ├── Paid campaigns
+    ├── PR launch
+    └── Scale infrastructure
+
+13. SUCCESS METRICS
+├── User Metrics
+│   ├── Daily Active Users: 1M+ by month 3
+│   ├── Signups: 10M+ by month 6
+│   ├── Retention: 70% day 1, 40% day 7, 20% day 30
+│   ├── Session Duration: 20+ minutes average
+│   └── Content Creation: 5+ posts/week/user
+│
+├── Monetization Metrics
+│   ├── Paid Conversion: 10% of active users
+│   ├── ARPU: $15/month average
+│   ├── Ad Revenue: $0.50/user/month
+│   ├── Transaction Volume: $1M+/month
+│   └── Revenue Growth: 20% month-over-month
+│
+├── Viral Metrics
+│   ├── Viral Coefficient: 1.5+
+│   ├── Referral Rate: 40% of new users
+│   ├── Share Rate: 3+ shares/user/month
+│   ├── Invite Conversion: 25%
+│   └── Network Effect: 2x growth/month
+
+=== EXECUTION INSTRUCTIONS ===
+
+IMMEDIATE ACTIONS:
+1. Create Replit project for PROFITHACK AI
+2. Set up PostgreSQL database with schema
+3. Configure Redis for real-time features
+4. Integrate Stripe for payments
+5. Set up Cloudinary for media storage
+6. Configure Twilio for messaging
+7. Deploy to production domain
+8. Set up analytics and monitoring
+
+DEVELOPMENT PRIORITY:
+Day 1-7: Core messaging and signup
+Day 8-14: Video platform and feed
+Day 15-21: Social network features
+Day 22-28: Monetization system
+Day 29-35: Viral and gamification
+Day 36-42: Analytics and optimization
+Day 43-49: Testing and bug fixes
+Day 50-56: Launch preparation
+
+CRITICAL SUCCESS FACTORS:
+✅ Free tier must be genuinely useful
+✅ Premium features must provide clear value
+✅ Onboarding must be frictionless
+✅ Viral mechanics must be compelling
+✅ Monetization must not harm user experience
+✅ Performance must be excellent
+✅ Safety and moderation must be robust
+
+LAUNCH CHECKLIST:
+[ ] All core features implemented
+[ ] Payment system tested
+[ ] Ad integration working
+[ ] Referral program active
+[ ] Analytics configured
+[ ] Safety systems deployed
+[ ] Mobile apps functional
+[ ] Customer support ready
+[ ] Legal compliance complete
+[ ] Scalability tested
+
+EXECUTE THIS PLAN EXACTLY AS DESIGNED. NO CUTS. ALL FEATURES MUST WORK TOGETHER TO CREATE A VIRAL, PROFITABLE SOCIAL ECOSYSTEM.
+This directive creates a comprehensive social platform where:
+
+WhatsApp features are free (but with smart limitations)
+TikTok-style content is free (with upgrade incentives)
+Facebook-style features are free (with ads)
+Premium features are compelling enough to drive 10%+ conversion
+Viral mechanics built into every aspect
+Multiple revenue streams for maximum profitability
+The key is making the free tier good enough to retain users but limited enough to drive upgrades, while viral features ensure exponential growth.

@@ -1,0 +1,405 @@
+The Creator Monetization Acceleration Program provides creators with AI-powered tools, trend predictions, and exclusive features to maximize their earnings. This comprehensive system drives creator engagement and platform revenue through content generation, analytics, and gamified rewards.
+
+---
+
+## PART 1: DATABASE SCHEMA
+
+Add to `shared/schema.ts`:
+
+```typescript
+import { pgTable, serial, integer, text, timestamp, varchar, boolean, index, decimal, jsonb } from 'drizzle-orm/pg-core';
+
+// Creator tier system
+export const creatorTiers = pgTable(
+  'creator_tiers',
+  {
+    id: serial('id').primaryKey(),
+    name: varchar('name', { length: 50 }).notNull().unique(),
+    level: integer('level').notNull().unique(),
+    minFollowers: integer('min_followers').notNull(),
+    minMonthlyRevenue: decimal('min_monthly_revenue', { precision: 10, scale: 2 }).notNull(),
+    description: text('description'),
+    benefits: jsonb('benefits').notNull(), // Array of feature names
+    badgeEmoji: varchar('badge_emoji', { length: 10 }),
+    badgeColor: varchar('badge_color', { length: 7 }),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    levelIdx: index('creator_tiers_level_idx').on(table.level),
+  })
+);
+
+// Creator profiles with tier info
+export const creatorProfiles = pgTable(
+  'creator_profiles',
+  {
+    id: serial('id').primaryKey(),
+    creatorId: integer('creator_id').notNull().unique().references(() => users.id),
+    tierId: integer('tier_id').notNull().references(() => creatorTiers.id),
+    monthlyRevenue: decimal('monthly_revenue', { precision: 10, scale: 2 }).default('0'),
+    totalEarnings: decimal('total_earnings', { precision: 12, scale: 2 }).default('0'),
+    followers: integer('followers').default(0),
+    engagementRate: decimal('engagement_rate', { precision: 5, scale: 2 }).default('0'),
+    contentQualityScore: decimal('content_quality_score', { precision: 5, scale: 2 }).default('0'),
+    verificationStatus: varchar('verification_status', { length: 20 }).default('pending'), // 'pending', 'verified', 'rejected'
+    bankAccount: jsonb('bank_account'), // Encrypted payment details
+    taxInfo: jsonb('tax_info'), // Encrypted tax information
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    creatorIdIdx: index('creator_profiles_creator_id_idx').on(table.creatorId),
+    tierIdIdx: index('creator_profiles_tier_id_idx').on(table.tierId),
+  })
+);
+
+// AI content generation credits
+export const aiGenerationCredits = pgTable(
+  'ai_generation_credits',
+  {
+    id: serial('id').primaryKey(),
+    creatorId: integer('creator_id').notNull().references(() => users.id),
+    creditType: varchar('credit_type', { length: 50 }).notNull(), // 'video_edit', 'thumbnail', 'script', 'voice_clone'
+    creditsAvailable: integer('credits_available').notNull().default(0),
+    creditsUsed: integer('credits_used').notNull().default(0),
+    monthlyAllowance: integer('monthly_allowance').notNull().default(0),
+    resetDate: timestamp('reset_date').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    creatorIdIdx: index('ai_generation_credits_creator_id_idx').on(table.creatorId),
+    creditTypeIdx: index('ai_generation_credits_credit_type_idx').on(table.creditType),
+  })
+);
+
+// Trend predictions
+export const trendPredictions = pgTable(
+  'trend_predictions',
+  {
+    id: serial('id').primaryKey(),
+    trendName: varchar('trend_name', { length: 100 }).notNull(),
+    category: varchar('category', { length: 50 }).notNull(), // 'hashtag', 'sound', 'format', 'topic'
+    growthScore: decimal('growth_score', { precision: 5, scale: 2 }).notNull(), // 0-100
+    momentum: decimal('momentum', { precision: 5, scale: 2 }).notNull(), // Growth rate
+    predictedPeakDate: timestamp('predicted_peak_date').notNull(),
+    currentPopularity: integer('current_popularity').notNull(), // 0-100
+    recommendedForCreators: jsonb('recommended_for_creators'), // Creator IDs
+    predictionAccuracy: decimal('prediction_accuracy', { precision: 5, scale: 2 }).default('0'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    trendNameIdx: index('trend_predictions_trend_name_idx').on(table.trendName),
+    categoryIdx: index('trend_predictions_category_idx').on(table.category),
+    growthScoreIdx: index('trend_predictions_growth_score_idx').on(table.growthScore),
+  })
+);
+
+// Creator collaboration requests
+export const collaborationRequests = pgTable(
+  'collaboration_requests',
+  {
+    id: serial('id').primaryKey(),
+    initiatorId: integer('initiator_id').notNull().references(() => users.id),
+    targetCreatorId: integer('target_creator_id').notNull().references(() => users.id),
+    collaborationType: varchar('collaboration_type', { length: 50 }).notNull(), // 'duet', 'collab_video', 'joint_stream'
+    description: text('description'),
+    proposedRevenueSplit: jsonb('proposed_revenue_split'), // {initiator: 50, target: 50}
+    status: varchar('status', { length: 20 }).default('pending'), // 'pending', 'accepted', 'rejected', 'completed'
+    completedAt: timestamp('completed_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    initiatorIdIdx: index('collaboration_requests_initiator_id_idx').on(table.initiatorId),
+    targetCreatorIdIdx: index('collaboration_requests_target_creator_id_idx').on(table.targetCreatorId),
+    statusIdx: index('collaboration_requests_status_idx').on(table.status),
+  })
+);
+
+// Creator achievements/badges
+export const creatorAchievements = pgTable(
+  'creator_achievements',
+  {
+    id: serial('id').primaryKey(),
+    creatorId: integer('creator_id').notNull().references(() => users.id),
+    achievementType: varchar('achievement_type', { length: 50 }).notNull(), // 'first_1k_followers', 'trending_video', 'viral_content'
+    achievementName: varchar('achievement_name', { length: 100 }).notNull(),
+    description: text('description'),
+    badgeEmoji: varchar('badge_emoji', { length: 10 }).notNull(),
+    rewardCredits: integer('reward_credits').default(0),
+    unlockedAt: timestamp('unlocked_at').defaultNow().notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    creatorIdIdx: index('creator_achievements_creator_id_idx').on(table.creatorId),
+    achievementTypeIdx: index('creator_achievements_achievement_type_idx').on(table.achievementType),
+  })
+);
+
+// Payout records
+export const creatorPayouts = pgTable(
+  'creator_payouts',
+  {
+    id: serial('id').primaryKey(),
+    creatorId: integer('creator_id').notNull().references(() => users.id),
+    amount: decimal('amount', { precision: 10, scale: 2 }).notNull(),
+    currency: varchar('currency', { length: 3 }).default('USD'),
+    paymentMethod: varchar('payment_method', { length: 50 }).notNull(), // 'stripe', 'paypal', 'bank_transfer'
+    status: varchar('status', { length: 20 }).default('pending'), // 'pending', 'processing', 'completed', 'failed'
+    transactionId: varchar('transaction_id', { length: 255 }),
+    periodStart: timestamp('period_start').notNull(),
+    periodEnd: timestamp('period_end').notNull(),
+    fees: decimal('fees', { precision: 10, scale: 2 }).default('0'),
+    netAmount: decimal('net_amount', { precision: 10, scale: 2 }).notNull(),
+    processedAt: timestamp('processed_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    creatorIdIdx: index('creator_payouts_creator_id_idx').on(table.creatorId),
+    statusIdx: index('creator_payouts_status_idx').on(table.status),
+    createdAtIdx: index('creator_payouts_created_at_idx').on(table.createdAt),
+  })
+);
+
+// Content generation jobs
+export const contentGenerationJobs = pgTable(
+  'content_generation_jobs',
+  {
+    id: serial('id').primaryKey(),
+    creatorId: integer('creator_id').notNull().references(() => users.id),
+    jobType: varchar('job_type', { length: 50 }).notNull(), // 'video_edit', 'thumbnail', 'script', 'voice_over'
+    inputData: jsonb('input_data').notNull(),
+    outputData: jsonb('output_data'),
+    status: varchar('status', { length: 20 }).default('pending'), // 'pending', 'processing', 'completed', 'failed'
+    creditsCost: integer('credits_cost').notNull(),
+    processingTime: integer('processing_time'), // seconds
+    quality: varchar('quality', { length: 20 }).default('standard'), // 'standard', 'premium', 'ultra'
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    completedAt: timestamp('completed_at'),
+  },
+  (table) => ({
+    creatorIdIdx: index('content_generation_jobs_creator_id_idx').on(table.creatorId),
+    statusIdx: index('content_generation_jobs_status_idx').on(table.status),
+    jobTypeIdx: index('content_generation_jobs_job_type_idx').on(table.jobType),
+  })
+);
+```
+
+### 1.2 Database Migration
+
+Create `migrations/004_creator_monetization_tables.sql`:
+
+```sql
+-- Creator tiers
+CREATE TABLE IF NOT EXISTS creator_tiers (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50) NOT NULL UNIQUE,
+  level INTEGER NOT NULL UNIQUE,
+  min_followers INTEGER NOT NULL,
+  min_monthly_revenue DECIMAL(10, 2) NOT NULL,
+  description TEXT,
+  benefits JSONB NOT NULL,
+  badge_emoji VARCHAR(10),
+  badge_color VARCHAR(7),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX creator_tiers_level_idx ON creator_tiers(level);
+
+-- Creator profiles
+CREATE TABLE IF NOT EXISTS creator_profiles (
+  id SERIAL PRIMARY KEY,
+  creator_id INTEGER NOT NULL UNIQUE REFERENCES users(id),
+  tier_id INTEGER NOT NULL REFERENCES creator_tiers(id),
+  monthly_revenue DECIMAL(10, 2) DEFAULT 0,
+  total_earnings DECIMAL(12, 2) DEFAULT 0,
+  followers INTEGER DEFAULT 0,
+  engagement_rate DECIMAL(5, 2) DEFAULT 0,
+  content_quality_score DECIMAL(5, 2) DEFAULT 0,
+  verification_status VARCHAR(20) DEFAULT 'pending',
+  bank_account JSONB,
+  tax_info JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX creator_profiles_creator_id_idx ON creator_profiles(creator_id);
+CREATE INDEX creator_profiles_tier_id_idx ON creator_profiles(tier_id);
+
+-- AI generation credits
+CREATE TABLE IF NOT EXISTS ai_generation_credits (
+  id SERIAL PRIMARY KEY,
+  creator_id INTEGER NOT NULL REFERENCES users(id),
+  credit_type VARCHAR(50) NOT NULL,
+  credits_available INTEGER NOT NULL DEFAULT 0,
+  credits_used INTEGER NOT NULL DEFAULT 0,
+  monthly_allowance INTEGER NOT NULL DEFAULT 0,
+  reset_date TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX ai_generation_credits_creator_id_idx ON ai_generation_credits(creator_id);
+CREATE INDEX ai_generation_credits_credit_type_idx ON ai_generation_credits(credit_type);
+
+-- Trend predictions
+CREATE TABLE IF NOT EXISTS trend_predictions (
+  id SERIAL PRIMARY KEY,
+  trend_name VARCHAR(100) NOT NULL,
+  category VARCHAR(50) NOT NULL,
+  growth_score DECIMAL(5, 2) NOT NULL,
+  momentum DECIMAL(5, 2) NOT NULL,
+  predicted_peak_date TIMESTAMP NOT NULL,
+  current_popularity INTEGER NOT NULL,
+  recommended_for_creators JSONB,
+  prediction_accuracy DECIMAL(5, 2) DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX trend_predictions_trend_name_idx ON trend_predictions(trend_name);
+CREATE INDEX trend_predictions_category_idx ON trend_predictions(category);
+CREATE INDEX trend_predictions_growth_score_idx ON trend_predictions(growth_score);
+
+-- Collaboration requests
+CREATE TABLE IF NOT EXISTS collaboration_requests (
+  id SERIAL PRIMARY KEY,
+  initiator_id INTEGER NOT NULL REFERENCES users(id),
+  target_creator_id INTEGER NOT NULL REFERENCES users(id),
+  collaboration_type VARCHAR(50) NOT NULL,
+  description TEXT,
+  proposed_revenue_split JSONB,
+  status VARCHAR(20) DEFAULT 'pending',
+  completed_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX collaboration_requests_initiator_id_idx ON collaboration_requests(initiator_id);
+CREATE INDEX collaboration_requests_target_creator_id_idx ON collaboration_requests(target_creator_id);
+CREATE INDEX collaboration_requests_status_idx ON collaboration_requests(status);
+
+-- Creator achievements
+CREATE TABLE IF NOT EXISTS creator_achievements (
+  id SERIAL PRIMARY KEY,
+  creator_id INTEGER NOT NULL REFERENCES users(id),
+  achievement_type VARCHAR(50) NOT NULL,
+  achievement_name VARCHAR(100) NOT NULL,
+  description TEXT,
+  badge_emoji VARCHAR(10) NOT NULL,
+  reward_credits INTEGER DEFAULT 0,
+  unlocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX creator_achievements_creator_id_idx ON creator_achievements(creator_id);
+CREATE INDEX creator_achievements_achievement_type_idx ON creator_achievements(achievement_type);
+
+-- Creator payouts
+CREATE TABLE IF NOT EXISTS creator_payouts (
+  id SERIAL PRIMARY KEY,
+  creator_id INTEGER NOT NULL REFERENCES users(id),
+  amount DECIMAL(10, 2) NOT NULL,
+  currency VARCHAR(3) DEFAULT 'USD',
+  payment_method VARCHAR(50) NOT NULL,
+  status VARCHAR(20) DEFAULT 'pending',
+  transaction_id VARCHAR(255),
+  period_start TIMESTAMP NOT NULL,
+  period_end TIMESTAMP NOT NULL,
+  fees DECIMAL(10, 2) DEFAULT 0,
+  net_amount DECIMAL(10, 2) NOT NULL,
+  processed_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX creator_payouts_creator_id_idx ON creator_payouts(creator_id);
+CREATE INDEX creator_payouts_status_idx ON creator_payouts(status);
+CREATE INDEX creator_payouts_created_at_idx ON creator_payouts(created_at);
+
+-- Content generation jobs
+CREATE TABLE IF NOT EXISTS content_generation_jobs (
+  id SERIAL PRIMARY KEY,
+  creator_id INTEGER NOT NULL REFERENCES users(id),
+  job_type VARCHAR(50) NOT NULL,
+  input_data JSONB NOT NULL,
+  output_data JSONB,
+  status VARCHAR(20) DEFAULT 'pending',
+  credits_cost INTEGER NOT NULL,
+  processing_time INTEGER,
+  quality VARCHAR(20) DEFAULT 'standard',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  completed_at TIMESTAMP
+);
+
+CREATE INDEX content_generation_jobs_creator_id_idx ON content_generation_jobs(creator_id);
+CREATE INDEX content_generation_jobs_status_idx ON content_generation_jobs(status);
+CREATE INDEX content_generation_jobs_job_type_idx ON content_generation_jobs(job_type);
+```
+
+---
+
+## PART 2: CREATOR MONETIZATION SERVICE
+
+Create `server/services/creator-monetization-service.ts`:
+
+```typescript
+import Anthropic from "@anthropic-ai/sdk";
+import { db } from "../storage";
+import {
+  creatorProfiles,
+  creatorTiers,
+  aiGenerationCredits,
+  trendPredictions,
+  creatorAchievements,
+  creatorPayouts,
+  contentGenerationJobs,
+  collaborationRequests,
+  users,
+  virtualGifts,
+} from "../../shared/schema";
+import { eq, gte, lte, and, sql } from "drizzle-orm";
+
+interface CreatorProfile {
+  creatorId: number;
+  monthlyRevenue: number;
+  totalEarnings: number;
+  followers: number;
+  engagementRate: number;
+  tier: string;
+}
+
+interface TrendRecommendation {
+  trendName: string;
+  growthScore: number;
+  momentum: number;
+  estimatedReach: number;
+  recommendedFormat: string;
+}
+
+export class CreatorMonetizationService {
+  private client: Anthropic;
+
+  constructor() {
+    this.client = new Anthropic();
+  }
+
+  /**
+   * Get or create creator profile
+   */
+  async getOrCreateCreatorProfile(creatorId: number): Promise<CreatorProfile> {
+    try {
+      // Check if profile exists
+      const existing = await db
+        .select()
+        .from(creatorProfiles)
+        .where(eq(creatorProfiles.creatorId, creatorId));
+
+      if (existing.length > 0) {
+        const profile = existing[0];
+        const tier = await db
+          .select({ name: creatorTiers.name })
+          .from(creatorTiers)
+          .where(eq(creatorTiers.i
+(Content truncated due to size limit. Use page ranges or line ranges to read remaining content)
+
+

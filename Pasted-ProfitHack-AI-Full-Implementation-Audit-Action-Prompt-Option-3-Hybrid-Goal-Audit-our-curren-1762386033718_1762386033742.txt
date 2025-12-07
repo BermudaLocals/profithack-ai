@@ -1,0 +1,136 @@
+ProfitHack AI – Full Implementation Audit & Action Prompt (Option 3 Hybrid)”
+
+Goal: Audit our current Vite/Express app + Option-3 Hybrid pack and confirm it fully implements the spec below. Do not remove or break existing features. Add missing modules, wire envs, and return a concise report with exact files/lines changed.
+
+Accept/Reject rule: If a feature exists and passes tests, mark YES. If missing/partial, implement it and then mark FIXED with commit diff.
+
+A. Infrastructure & Ops
+
+Redis (Upstash) client + TTL caching utilities ✅
+
+BullMQ queue + worker process ✅
+
+PostgreSQL migrations for: trending_topics, job_queue, api_metrics, audit_logs, competitor_accounts, migration_history ✅
+
+Health endpoints: /healthz, /readyz ✅
+
+Metrics: prom-client middleware + /metrics ✅
+
+Rate limiting (Redis-backed) applied to /auth + /api/jobs ✅
+
+Pino JSON logging + Sentry init hooks (env-gated) ✅
+
+OTEL trace init (env-gated) ✅
+
+Dockerfile + docker-compose for: api, worker, streamer, redis, postgres ✅
+
+B. Realtime Ingestion & Bots
+
+services/x-ingestor/x_ingestor.py connects to X Filtered Stream using X_BEARER_TOKEN, manages rules from X_RULES, dedupes, pushes to Redis x_stream, optional Postgres upserts ✅
+
+Worker handlers exist: summarize, repurpose, caption, post, schedule ✅
+
+Posting bots implemented & wired in workers/queue.js:
+
+pinterest_post (pins to board via v5 API)
+
+reddit_post (script app auth; self/text posts)
+
+instagram_post (Graph API create → publish)
+
+facebook_post (Page feed post)
+
+youtube_post (YouTube Data API v3 upload)
+
+Queue retries + exponential backoff + cron schedule examples ✅
+
+C. Product APIs & Pages
+
+/api/trending returns top topics from DB/Redis cache ✅
+
+/api/analytics/live emits WS updates every 5s ✅
+
+/api/competitors list with recency & engagement fields ✅
+
+/api/jobs/trigger enqueues typed jobs with payload ✅
+
+GDPR: GET /user/export?email= and DELETE /user ✅
+
+Frontend routes/pages exist: /trending, /analytics-live, /admin/metrics (basic UI okay) ✅
+
+D. Policy & UX
+
+5-strike policy with review implemented (DB table audit_logs or user_strikes, configurable thresholds). Actions: warn → temp mute → temp lock → perma-ban. Admin endpoints + simple UI. ✅
+
+Content moderation hook: a pre-publish queue flag that allows human approval when enabled. ✅
+
+Generated content includes a strong CTA by default (configurable). ✅
+
+Brand assets linked: favicon pack, logo, banners. Images default PNG. ✅
+
+E. Standalone Run
+
+Provide a RUN.md with:
+
+.env.example keys:
+POSTGRES_URL, REDIS_URL, X_BEARER_TOKEN, X_RULES, RATE_LIMIT_POINTS, RATE_LIMIT_DURATION, SENTRY_DSN?, OTEL_EXPORTER_OTLP_ENDPOINT?
+
+Commands:
+
+npm i
+npm run build
+node server/index.js        # API
+node workers/queue.js       # Bots
+python services/x-ingestor/x_ingestor.py   # Streamer
+
+
+Docker:
+
+docker compose up --build
+
+
+Confirm everything works without Replit-specific services.
+
+F. Acceptance Tests (run & report)
+
+/healthz returns { ok: true }
+
+/metrics exposes Prometheus counters & histograms
+
+Add a test job: POST /api/jobs/trigger { "type":"caption","payload":{"text":"Hello AI"}} → worker logs success
+
+Start x_ingestor.py with a valid token; verify Redis LLEN x_stream increases
+
+Visit /api/trending returns non-empty items after stream
+
+WS emits payloads to /analytics-live at ≤5s intervals
+
+GDPR export returns JSON; delete endpoint removes user data
+
+Rate-limit triggers on rapid /api/jobs calls (429)
+
+Strike policy: simulate 5 infractions → ban after review logged
+
+Docker compose: all services healthy within 90s
+
+Output format (required)
+
+Checklist with YES / FIXED per bullet above
+
+Diff summaries: file paths + line ranges changed
+
+Env report: which keys read and where
+
+Run log: commands executed + pass/fail for tests
+
+Rules:
+
+Keep all existing pages/content. No breaking changes.
+
+If a feature is missing, implement minimally, documented, and behind env flags when applicable.
+
+Prefer additive migrations.
+
+Default image output PNG.
+
+Respect branding (dark luxury fintech + neon; logo + tagline where relevant).

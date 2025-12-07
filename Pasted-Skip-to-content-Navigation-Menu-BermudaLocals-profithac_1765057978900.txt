@@ -1,0 +1,135 @@
+Skip to content
+Navigation Menu
+BermudaLocals
+profithack-ai
+
+Type / to search
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+Settings
+Uploading files to profithack-ai
+Breadcrumbsprofithack-ai/
+Upload files
+Drag additional files here to add them to your repository
+Or No file chosen
+.env.example
+.env.local
+.gitignore
+.gitlab-ci.yml
+.replit
+AGENT_ORCHESTRATOR_GUIDE.md
+API_CREDENTIALS_GUIDE.md
+API_DOCUMENTATION.md
+BOT_POSTING_SUMMARY.md
+BUSINESS_ANALYSIS.md
+COMPLETE_FEATURE_LIST.md
+components.json
+CONFIGURATION_STATUS.md
+CRYPTO_PAYMENTS.md
+CURRENT_LOGOS_INVENTORY.md
+CURRENT_STATUS_REPORT.md
+DAILY_COSTS_REVENUE_BREAKDOWN.md
+design_guidelines.md
+DISCORD_BOT_SETUP.md
+DISCORD_SERVER_SETUP.md
+DISCORD_WEBHOOK_SETUP.md
+DISCOUNT_GIVEAWAY_SYSTEM.md
+download-analysis.html
+download-server.js
+drizzle.config.ts
+FEATURE_IMPLEMENTATION_GUIDE.md
+FEATURE_INVENTORY.md
+FEATURE_ROADMAP.md
+FOUNDER_GUIDE.md
+FOUNDER_SITREP_2025-11-22.md
+FREE_VS_PAID_GUIDE.md
+GDPR_IMPLEMENTATION.md
+IMPLEMENTATION_GUIDE.md
+IMPLEMENTATION_SUMMARY.md
+INVITE_CODES.txt
+LAUNCH_READY_SUMMARY.md
+LIVE_PANEL_GUIDE.md
+MARKETING_AUTOMATION_SUCCESS_REPORT.md
+MARKETING_BOTS_GUIDE.md
+MARKETING_PACKAGE.md
+MICROSERVICES_ARCHITECTURE.md
+MIGRATION_GUIDE.md
+MONETIZATION_CHECKLIST.md
+mtn-setup.js
+OAUTH_SETUP_GUIDE.md
+OLD_vs_NEW_CODE_COMPARISON.md
+ONLYFANS_STREAMING_GUIDE.md
+package.json
+package-lock.json
+PDF_GENERATOR_README.md
+PLATFORM_CAPACITY_LIMITS.md
+PLATFORM_COMPARISON_2025.md
+PLATFORM_STATUS_REPORT_OLD.md
+postcss.config.js
+PRICING_GUIDE.md
+PRIVACY_POLICY.md
+Procfile
+PRODUCTION_READINESS_REPORT.md
+PROFITHACK_AI_COMPLETE_CODEBASE_GUIDE.md
+PROFITHACK_AI_Technical_Analysis.html
+PROFITHACK_API_DOCUMENTATION.md
+profithack-ai-complete-codebase.tar.gz
+PUBLIC_LAUNCH.md
+QUICK_START_OAUTH.md
+railway.json
+README-DEPLOYMENT.md
+REDDIT_PROMO_POSTS.md
+replit.md
+REPLIT_APIS_GUIDE.md
+RORK_API_INTEGRATION.md
+RORK_PROMPT_FULL.md
+ROTATING_ADS_IMPLEMENTATION.md
+SETUP.md
+SOCIAL_MEDIA_PROMO.md
+STATUS_REPORT.md
+SYSTEM_AUDIT_REPORT.html
+SYSTEM_AUDIT_TIKTOK_COMPARISON.md
+SYSTEM_STATUS_REPORT.md
+tailwind.config.ts
+TERMS_OF_SERVICE.md
+TIKTOK_API_SETUP_GUIDE.md
+TIKTOK_BOT_SETUP.md
+TIKTOK_FORM_FILL_GUIDE.md
+TIKTOK_LIVE_FLOW.md
+TON_INTEGRATION_SUMMARY.md
+TON_PAYMENT_GUIDE.md
+TOPGG_SUBMISSION.md
+TROUBLESHOOTING_GUIDE.md
+tsconfig.json
+USER_EXPERIENCE_AUDIT.md
+USERS_GUIDE.md
+VIRAL_ACTION_PLAN.md
+VIRAL_REVENUE_REPORT.md
+vite.config.ts
+VM_UPGRADE_GUIDE.md
+WHAT_TO_DO_NOW.md
+@BermudaLocals
+Commit changes
+Commit summary
+Add files via upload
+Optional extended description
+Add an optional extended description…
+ 
+Footer
+© 2025 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Community
+Docs
+Contact
+Manage cookies
+Do not share my personal information

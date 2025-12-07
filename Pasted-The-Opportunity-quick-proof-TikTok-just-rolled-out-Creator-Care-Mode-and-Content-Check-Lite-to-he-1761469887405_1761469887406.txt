@@ -1,0 +1,279 @@
+The Opportunity (quick proof)
+
+TikTok just rolled out Creator Care Mode and Content Check Lite to help with safety and eligibility, but it doesn’t rewrite your scripts or generate safe A/B hooks for you. 
+TikTok Newsroom
++1
+
+TikTok is pushing search-based ads + keywords, so creators need SEO-style titles/descriptions (and safe language). 
+Adweek
++1
+
+Policy/banned-word guidance exists, but creators still get flagged—there’s demand for a pre-post “compliance + rewrite” tool with A/B hook generation. 
+TikTok For Business
++1
+
+Build this on Replit: “TikTok Preflight — Safe Hook & Compliance Checker”
+
+A lightweight web app that:
+
+Scans your script/caption for likely policy triggers (absolute claims, sensitive phrases).
+
+Auto-rewrites problem lines into safer alternatives.
+
+Generates A/B hooks and search-friendly keywords.
+
+Works offline with heuristics, but can plug into any OpenAI-compatible LLM (optional) for smarter rewrites.
+
+📦 Files to create on Replit
+1) requirements.txt
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+openai>=1.40.0
+
+2) main.py
+import os, re
+from typing import List, Tuple
+from fastapi import FastAPI, Request, Form
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+
+# Optional LLM (OpenAI-compatible). If no key, we fall back to heuristics.
+from openai import OpenAI
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
+OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "").strip()  # optional for self-hosted
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")     # pick any available model
+
+client = None
+if OPENAI_API_KEY:
+    client = OpenAI(api_key=OPENAI_API_KEY, base_url=OPENAI_BASE_URL or None)
+
+app = FastAPI(title="TikTok Preflight")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
+
+# --- Heuristic policy triggers (expandable) ---
+BANNED_PATTERNS = [
+    r"\b100%\b", r"\bguarantee(d)?\b", r"\bpermanent\b", r"\bultra\b", r"\bultimate\b",
+    r"\b(get|earn)\s+\$\d+(?:,?\d+)*(?:\s+per\s+(day|week|month))?\b",
+    r"\bmost\s+(effective|powerful)\b",
+    r"\bfree\s+for\s+everyone\b",
+    r"\b(before|after)\s+photos?\b",
+    r"\bcure(s|d)?\b",
+    r"\bweight\s*loss\b", r"\bmake\s+money\s+fast\b",
+]
+
+# Safer replacements (examples)
+SOFTEN_MAP = {
+    "100%": "highly likely",
+    "guaranteed": "designed to help",
+    "permanent": "long-lasting",
+    "ultimate": "comprehensive",
+    "cure": "may help improve",
+    "free for everyone": "free for many users",
+    "make money fast": "start earning sooner with effort",
+}
+
+SENSITIVE_SECOND_PERSON = [
+    r"\b(you|your)\s*(?:(weight|income|health|appearance))",  # “your weight”, “your income”
+]
+
+def find_triggers(text: str) -> List[Tuple[str, str]]:
+    hits = []
+    for pat in BANNED_PATTERNS:
+        for m in re.finditer(pat, text, flags=re.IGNORECASE):
+            snippet = text[max(0, m.start()-20):m.end()+20]
+            hits.append((pat, snippet))
+    for pat in SENSITIVE_SECOND_PERSON:
+        for m in re.finditer(pat, text, flags=re.IGNORECASE):
+            snippet = text[max(0, m.start()-20):m.end()+20]
+            hits.append((pat, snippet))
+    return hits
+
+def soften_text(text: str) -> str:
+    out = text
+    for k, v in SOFTEN_MAP.items():
+        out = re.sub(rf"\b{k}\b", v, out, flags=re.IGNORECASE)
+    # Avoid “you + sensitive attribute”
+    out = re.sub(r"\byour (weight|income|health|appearance)\b",
+                 r"people's \1", out, flags=re.IGNORECASE)
+    # Tone-down absolutes
+    out = re.sub(r"\b(always|never|best|#1)\b", "often", out, flags=re.IGNORECASE)
+    return out
+
+def llm_rewrite(prompt: str, system: str) -> str:
+    if not client:
+        return soften_text(prompt)
+    msg = [
+        {"role": "system", "content": system},
+        {"role": "user", "content": prompt}
+    ]
+    resp = client.chat.completions.create(model=OPENAI_MODEL, messages=msg, temperature=0.4)
+    return resp.choices[0].message.content.strip()
+
+def gen_hooks(topic: str) -> List[str]:
+    base_templates = [
+        "Hook: What nobody tells {audience} about {topic}…",
+        "Myth vs. Reality: {topic} in 15s",
+        "I tested {topic} so you don’t have to—results inside",
+        "Before you post: 3 checks for {topic}",
+        "Do this instead if {topic} keeps flopping",
+    ]
+    out = [t.format(audience="creators", topic=topic) for t in base_templates]
+    if client:
+        sys = ("You generate 5 short, compliant TikTok hooks (max 12 words, no absolutes,"
+               " no personal attributes).")
+        hooks = llm_rewrite(f"Topic: {topic}\nReturn list only.", sys)
+        # Split lines if LLM used
+        extra = [h.strip("-• ").strip() for h in hooks.split("\n") if h.strip()]
+        out = extra[:5] or out
+    return out[:5]
+
+def seo_keywords(topic: str) -> List[str]:
+    # Simple seed + long-tails. LLM improves them if available.
+    seeds = [
+        f"{topic} tips", f"{topic} tutorial", f"{topic} for beginners",
+        f"{topic} mistakes", f"{topic} checklist"
+    ]
+    if client:
+        sys = ("Generate 8 TikTok search keywords for the topic. Keep 2–4 words each,"
+               " no hashtags, no claims.")
+        kws = llm_rewrite(f"Topic: {topic}", sys)
+        seeds = [k.strip("-• ").lower() for k in kws.split("\n") if k.strip()]
+    return seeds[:8]
+
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request, "result": None})
+
+@app.post("/analyze", response_class=HTMLResponse)
+def analyze(request: Request,
+            topic: str = Form(...),
+            text: str = Form(...)):
+    triggers = find_triggers(text)
+    safe_suggestion = llm_rewrite(
+        f"Rewrite safely for TikTok ads/community guidelines. Keep meaning.\n\n{text}",
+        ("You are a policy-aware copy editor. Remove absolutes, avoid sensitive attributes,"
+         " keep claims soft and add disclaimers where apt.")
+    )
+    hooks = gen_hooks(topic)
+    keywords = seo_keywords(topic)
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "result": {
+            "triggers": triggers,
+            "safe": safe_suggestion,
+            "hooks": hooks,
+            "keywords": keywords
+        },
+        "topic": topic,
+        "text": text
+    })
+
+# Replit: uvicorn main:app --host 0.0.0.0 --port 3000
+
+3) templates/index.html
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TikTok Preflight — Safe Hook & Compliance Checker</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <style>
+    .hit { background:#fff6d6; border-left:4px solid #f5b301; padding:.5rem; margin:.25rem 0; font-family:ui-monospace,Menlo,monospace;}
+    .code { font-family:ui-monospace,Menlo,monospace; background:#f6f6f9; padding:.5rem; border-radius:6px;}
+  </style>
+</head>
+<body>
+<main class="container">
+  <h1>🎯 TikTok Preflight</h1>
+  <p>Scan, rewrite, and generate A/B hooks + search keywords before you post.</p>
+
+  <form action="/analyze" method="post">
+    <label>Topic / Niche
+      <input name="topic" placeholder="e.g., digital product side hustle" required />
+    </label>
+    <label>Your script or caption
+      <textarea name="text" rows="8" placeholder="Paste your TikTok script/caption…" required></textarea>
+    </label>
+    <button type="submit">Run Preflight</button>
+  </form>
+
+  {% if result %}
+  <hr>
+  <h3>🚨 Potential Triggers</h3>
+  {% if result.triggers and result.triggers|length > 0 %}
+    {% for pat, snip in result.triggers %}
+      <div class="hit"><strong>Rule:</strong> <code>{{ pat }}</code><br/>
+      <strong>Context:</strong> {{ snip }}</div>
+    {% endfor %}
+  {% else %}
+    <p>No obvious triggers found (still use good judgment).</p>
+  {% endif %}
+
+  <h3>✅ Safer Rewrite</h3>
+  <div class="code">{{ result.safe }}</div>
+
+  <h3>🧪 A/B Hooks</h3>
+  <ul>
+    {% for h in result.hooks %}<li>{{ h }}</li>{% endfor %}
+  </ul>
+
+  <h3>🔎 Search-Friendly Keywords</h3>
+  <p>{{ result.keywords | join(", ") }}</p>
+  {% endif %}
+
+  <footer><small>Heads-up: This tool gives guidance, not legal approval. Check the latest TikTok policies.</small></footer>
+</main>
+</body>
+</html>
+
+4) (optional) static/ folder
+
+No required files—CSS is via CDN.
+
+▶️ Run on Replit
+
+Create Repl → Python (FastAPI) (or plain Python).
+
+Add the four files above.
+
+Set Secrets (optional for AI):
+
+OPENAI_API_KEY = your key
+
+OPENAI_MODEL (e.g., gpt-4o-mini), OPENAI_BASE_URL if using a self-hosted compatible server.
+
+Shell:
+
+pip install -r requirements.txt
+uvicorn main:app --host 0.0.0.0 --port 3000
+
+
+Replit will open your web URL.
+
+Why this will be used (and shared)
+
+Directly addresses policy triggers (absolutes, sensitive attributes) that get posts/ad accounts limited. 
+TikTok For Business
++1
+
+Adds search-optimized keywords aligned with TikTok’s new Search Ads push. 
+Adweek
++1
+
+Complements, rather than duplicates, TikTok’s new creator safety features (you control the rewrite + hooks). 
+TikTok Newsroom
++1
+
+Want me to extend it with:
+
+Multi-platform checks (FB/IG/YouTube Shorts “trigger words”),
+
+Export to CSV/Notion,
+
+or a one-click “repurpose variants” page

@@ -1,0 +1,128 @@
+// private_call_client.ts - Frontend WebRTC Client with Payment Enforcement
+
+// NOTE: This code assumes you have a base SFUClient class that handles the standard WebRTC logic
+// and a signaling channel (e.g., WebSocket or gRPC stream) that receives messages from the backend.
+
+// --- Conceptual Base Classes (for context) ---
+// Assume these are defined elsewhere (e.g., in frontend_sfu_client.ts)
+class CameraService {
+    stopCamera(): void { console.log("Camera stopped."); }
+}
+
+class SFUClient {
+    protected signalingChannel: any; // The channel that receives messages from the backend
+    protected cameraService: CameraService;
+    
+    constructor(signalingChannel: any, cameraService: CameraService) {
+        this.signalingChannel = signalingChannel;
+        this.cameraService = cameraService;
+        this.signalingChannel.onmessage = (event: MessageEvent) => this.handleIncomingSignal(event.data);
+    }
+    
+    // Placeholder for standard WebRTC signaling logic
+    protected handleIncomingSignal(data: string): void {
+        const signal = JSON.parse(data);
+        if (signal.type !== 'TERMINATE_CALL') {
+            // Process standard WebRTC signals (SDP, ICE, etc.)
+            console.log("Processing standard WebRTC signal:", signal.type);
+        }
+    }
+    
+    public close(): void {
+        this.cameraService.stopCamera();
+        console.log("SFU Client connection closed.");
+    }
+}
+// --- End Conceptual Base Classes ---
+
+interface TerminationSignal {
+    type: 'TERMINATE_CALL';
+    reason: string;
+    redirectUrl: string;
+}
+
+/**
+ * Extends the SFUClient to handle the server-enforced termination signal.
+ */
+export class PrivateCallClient extends SFUClient {
+    private videoElement: HTMLVideoElement | null = null;
+    private audioElement: HTMLAudioElement | null = null;
+
+    // New method to attach the elements that display the remote stream
+    public attachStreamElements(videoEl: HTMLVideoElement, audioEl: HTMLAudioElement): void {
+        this.videoElement = videoEl;
+        this.audioElement = audioEl;
+    }
+
+    /**
+     * Overrides the base handler to specifically look for the TERMINATE_CALL signal.
+     */
+    protected override handleIncomingSignal(data: string): void {
+        try {
+            const signal: TerminationSignal | any = JSON.parse(data);
+            
+            if (signal.type === 'TERMINATE_CALL') {
+                this.handleTermination(signal as TerminationSignal);
+            } else {
+                // Pass to the base class for standard WebRTC processing
+                super.handleIncomingSignal(data);
+            }
+        } catch (e) {
+            console.error("Error parsing incoming signal:", e);
+        }
+    }
+
+    /**
+     * Executes the required actions upon receiving the termination signal.
+     */
+    private handleTermination(signal: TerminationSignal): void {
+        console.warn(`Call terminated by server. Reason: ${signal.reason}. Redirecting to ${signal.redirectUrl}`);
+
+        // 1. Cut Video (Screen goes black)
+        if (this.videoElement) {
+            // Stop displaying the remote stream
+            this.videoElement.srcObject = null; 
+            // Set background to black to fulfill the requirement
+            this.videoElement.style.backgroundColor = 'black'; 
+        }
+
+        // 2. Cut Audio (No sound)
+        if (this.audioElement) {
+            this.audioElement.srcObject = null;
+            this.audioElement.muted = true;
+        }
+        
+        // 3. Stop the WebRTC connection cleanly
+        this.close(); 
+
+        // 4. Display a message and redirect
+        const reasonText = signal.reason.replace('_', ' ');
+        alert(`Your private call has ended. Reason: ${reasonText}. Redirecting to the models page.`);
+        
+        // Redirect after a short delay for the user to read the alert
+        setTimeout(() => {
+            window.location.href = signal.redirectUrl;
+        }, 1000);
+    }
+}
+
+// Example Usage in a Private Call Component:
+/*
+// 1. Initialize dependencies
+const cameraService = new CameraService();
+const signalingChannel = new WebSocket('wss://your-rtc-signaling-server'); // Or gRPC stream
+
+// 2. Initialize the client
+const privateCallClient = new PrivateCallClient(signalingChannel, cameraService);
+
+// 3. Attach the elements
+const videoEl = document.getElementById('remote-video') as HTMLVideoElement;
+const audioEl = document.getElementById('remote-audio') as HTMLAudioElement;
+privateCallClient.attachStreamElements(videoEl, audioEl);
+
+// 4. Start the call logic (e.g., joinAsParticipant)
+// ...
+
+// If the backend sends: {"type": "TERMINATE_CALL", "reason": "TIME_EXPIRED", "redirectUrl": "/models"}
+// The handleTermination method will automatically execute the blackout and redirect.
+*/

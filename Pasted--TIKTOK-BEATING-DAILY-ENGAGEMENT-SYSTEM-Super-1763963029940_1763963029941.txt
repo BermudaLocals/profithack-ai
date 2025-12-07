@@ -1,0 +1,398 @@
+// ============================================
+// TIKTOK-BEATING DAILY ENGAGEMENT SYSTEM
+// Superior Mechanics | Psychology-Driven | Monetization-Optimized
+// ProfitHack AI - "Daily Nexus"
+// ============================================
+
+import React, { useState, useEffect } from "react";
+import "./tiktok-beating-daily.css";
+
+// ============================================
+// TYPES
+// ============================================
+
+interface DailyNexusState {
+  userId: string;
+  streak: number;
+  totalRewards: number;
+  todayRewards: number;
+  nextClaimTime: number;
+  multiplier: number;
+  level: number;
+  experience: number;
+  predictions: {
+    timeUntilNext: number;
+    expectedReward: number;
+    rarity: string;
+  };
+  socialStats: {
+    friendsOnStreak: number;
+    friendsBeatenToday: number;
+    leaderboardPosition: number;
+  };
+  challenges: Challenge[];
+  bonuses: Bonus[];
+}
+
+interface Challenge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  progress: number;
+  maxProgress: number;
+  reward: number;
+  completed: boolean;
+  endsAt: number;
+}
+
+interface Bonus {
+  id: string;
+  type: "streak" | "social" | "challenge" | "time";
+  multiplier: number;
+  expiresAt: number;
+  reason: string;
+}
+
+// ============================================
+// DAILY NEXUS - MAIN COMPONENT
+// ============================================
+
+const DailyNexus: React.FC<{ userId: string }> = ({ userId }) => {
+  const [state, setState] = useState<DailyNexusState | null>(null);
+  const [claiming, setClaiming] = useState(false);
+  const [showPrediction, setShowPrediction] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<string>("");
+  const [animatingReward, setAnimatingReward] = useState(false);
+  const [lastReward, setLastReward] = useState<any>(null);
+
+  useEffect(() => {
+    fetchDailyState();
+    const interval = setInterval(fetchDailyState, 30000); // Update every 30 seconds
+    return () => clearInterval(interval);
+  }, [userId]);
+
+  useEffect(() => {
+    if (!state) return;
+
+    const timer = setInterval(() => {
+      const now = Date.now();
+      const diff = Math.max(0, state.nextClaimTime - now);
+
+      if (diff === 0) {
+        setTimeLeft("Claim Now!");
+      } else {
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        setTimeLeft(
+          hours > 0
+            ? `${hours}h ${minutes}m`
+            : minutes > 0
+            ? `${minutes}m ${seconds}s`
+            : `${seconds}s`
+        );
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [state]);
+
+  const fetchDailyState = async () => {
+    try {
+      const response = await fetch(`/api/daily-nexus/${userId}`);
+      const data = await response.json();
+      setState(data);
+    } catch (error) {
+      console.error("Fetch error", error);
+    }
+  };
+
+  const claimReward = async () => {
+    if (claiming || !state || Date.now() < state.nextClaimTime) return;
+
+    setClaiming(true);
+
+    try {
+      const response = await fetch(`/api/daily-nexus/${userId}/claim`, {
+        method: "POST",
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setLastReward(data.reward);
+        setAnimatingReward(true);
+
+        // Trigger animations
+        triggerConfetti();
+        triggerParticles();
+
+        // Update state
+        setState(data.state);
+
+        // Show notification
+        showNotification(data.message);
+
+        setTimeout(() => setAnimatingReward(false), 3000);
+      }
+    } catch (error) {
+      console.error("Claim error", error);
+    } finally {
+      setClaiming(false);
+    }
+  };
+
+  const triggerConfetti = () => {
+    for (let i = 0; i < 100; i++) {
+      const confetti = document.createElement("div");
+      confetti.className = "confetti-particle";
+      confetti.style.left = Math.random() * 100 + "%";
+      confetti.style.animation = `confetti-fall ${2 + Math.random()}s ease-in forwards`;
+      document.querySelector(".daily-nexus-main")?.appendChild(confetti);
+      setTimeout(() => confetti.remove(), 3000);
+    }
+  };
+
+  const triggerParticles = () => {
+    for (let i = 0; i < 30; i++) {
+      const particle = document.createElement("div");
+      particle.className = "reward-particle";
+      particle.innerHTML = "✨";
+      particle.style.left = Math.random() * 100 + "%";
+      particle.style.top = Math.random() * 100 + "%";
+      particle.style.animation = `particle-burst ${1 + Math.random()}s ease-out forwards`;
+      document.querySelector(".claim-button-wrapper")?.appendChild(particle);
+      setTimeout(() => particle.remove(), 2000);
+    }
+  };
+
+  const showNotification = (message: string) => {
+    const notification = document.createElement("div");
+    notification.className = "notification";
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 3000);
+  };
+
+  if (!state) {
+    return <div className="loading">Loading Daily Nexus...</div>;
+  }
+
+  const canClaim = Date.now() >= state.nextClaimTime;
+  const totalMultiplier = state.multiplier * state.bonuses.reduce((acc, b) => acc * b.multiplier, 1);
+  const expectedReward = Math.floor(50 * totalMultiplier);
+
+  return (
+    <div className="daily-nexus-main">
+      {/* Header with Social Stats */}
+      <div className="nexus-header">
+        <div className="header-left">
+          <h1>Daily Nexus</h1>
+          <p>Your daily engagement hub</p>
+        </div>
+        <div className="header-right">
+          <div className="social-stat">
+            <span className="stat-icon">🔥</span>
+            <span className="stat-value">{state.streak}</span>
+            <span className="stat-label">Streak</span>
+          </div>
+          <div className="social-stat">
+            <span className="stat-icon">👥</span>
+            <span className="stat-value">{state.socialStats.leaderboardPosition}</span>
+            <span className="stat-label">Rank</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Claim Button with Predictions */}
+      <div className="claim-section">
+        <div className="claim-button-wrapper">
+          <button
+            className={`claim-button ${canClaim ? "ready" : "cooldown"} ${
+              animatingReward ? "claimed" : ""
+            }`}
+            onClick={claimReward}
+            disabled={!canClaim || claiming}
+          >
+            <div className="button-content">
+              <div className="reward-icon">💰</div>
+              <div className="reward-text">
+                {canClaim ? (
+                  <>
+                    <div className="claim-label">CLAIM REWARD</div>
+                    <div className="reward-amount">+{expectedReward}</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="cooldown-label">Next in</div>
+                    <div className="time-display">{timeLeft}</div>
+                  </>
+                )}
+              </div>
+            </div>
+            <div className="button-glow"></div>
+          </button>
+
+          {/* Prediction Tooltip */}
+          {canClaim && (
+            <div className="prediction-tooltip">
+              <span className="tooltip-icon">💡</span>
+              <span className="tooltip-text">
+                Expected: {expectedReward} coins ({state.predictions.rarity})
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Reward Animation */}
+        {animatingReward && lastReward && (
+          <div className="reward-popup">
+            <div className="popup-icon">{lastReward.icon}</div>
+            <div className="popup-name">{lastReward.name}</div>
+            <div className="popup-amount">+{lastReward.amount}</div>
+            {lastReward.bonus && (
+              <div className="popup-bonus">Bonus: {lastReward.bonus}</div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Multiplier Display */}
+      <div className="multiplier-section">
+        <div className="multiplier-card">
+          <div className="multiplier-label">Current Multiplier</div>
+          <div className="multiplier-value">x{totalMultiplier.toFixed(1)}</div>
+          <div className="multiplier-breakdown">
+            <div className="breakdown-item">
+              <span>Streak Bonus</span>
+              <span>x{state.multiplier}</span>
+            </div>
+            {state.bonuses.map((bonus) => (
+              <div key={bonus.id} className="breakdown-item">
+                <span>{bonus.reason}</span>
+                <span>x{bonus.multiplier}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Active Challenges */}
+      {state.challenges.length > 0 && (
+        <div className="challenges-section">
+          <h3>Today's Challenges</h3>
+          <div className="challenges-grid">
+            {state.challenges.map((challenge) => (
+              <div
+                key={challenge.id}
+                className={`challenge-card ${challenge.completed ? "completed" : ""}`}
+              >
+                <div className="challenge-icon">{challenge.icon}</div>
+                <div className="challenge-info">
+                  <div className="challenge-name">{challenge.name}</div>
+                  <div className="challenge-progress">
+                    <div className="progress-bar">
+                      <div
+                        className="progress-fill"
+                        style={{
+                          width: `${(challenge.progress / challenge.maxProgress) * 100}%`,
+                        }}
+                      ></div>
+                    </div>
+                    <span className="progress-text">
+                      {challenge.progress}/{challenge.maxProgress}
+                    </span>
+                  </div>
+                  <div className="challenge-reward">+{challenge.reward}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Level & Experience */}
+      <div className="level-section">
+        <div className="level-card">
+          <div className="level-display">
+            <div className="level-number">LVL {state.level}</div>
+            <div className="level-title">Daily Master</div>
+          </div>
+          <div className="experience-bar">
+            <div
+              className="experience-fill"
+              style={{
+                width: `${((state.experience % 1000) / 1000) * 100}%`,
+              }}
+            ></div>
+          </div>
+          <div className="experience-text">
+            {state.experience % 1000} / 1000 XP to next level
+          </div>
+        </div>
+      </div>
+
+      {/* Social Leaderboard Preview */}
+      <div className="social-section">
+        <h3>Friends on Streak</h3>
+        <div className="friends-count">
+          <span className="count-number">{state.socialStats.friendsOnStreak}</span>
+          <span className="count-label">friends maintaining streaks</span>
+        </div>
+        <button className="view-leaderboard-btn">View Full Leaderboard →</button>
+      </div>
+
+      {/* Time-Based Bonuses */}
+      {state.bonuses.length > 0 && (
+        <div className="bonuses-section">
+          <h3>Active Bonuses</h3>
+          <div className="bonuses-list">
+            {state.bonuses.map((bonus) => (
+              <div key={bonus.id} className="bonus-item">
+                <span className="bonus-reason">{bonus.reason}</span>
+                <span className="bonus-multiplier">x{bonus.multiplier}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Daily Stats */}
+      <div className="stats-section">
+        <div className="stat-card">
+          <span className="stat-icon">💎</span>
+          <div className="stat-info">
+            <span className="stat-label">Today's Rewards</span>
+            <span className="stat-value">{state.todayRewards}</span>
+          </div>
+        </div>
+        <div className="stat-card">
+          <span className="stat-icon">🏆</span>
+          <div className="stat-info">
+            <span className="stat-label">Total Rewards</span>
+            <span className="stat-value">{state.totalRewards}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Streak Loss Warning */}
+      {state.streak > 0 && state.nextClaimTime - Date.now() > 82800000 && (
+        <div className="warning-banner">
+          <span className="warning-icon">⚠️</span>
+          <span className="warning-text">
+            Your {state.streak}-day streak ends in 1 hour! Claim now to keep it alive.
+          </span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================
+// EXPORT
+// ============================================
+
+export default DailyNexus;
+export { DailyNexus };

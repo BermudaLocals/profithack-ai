@@ -1,0 +1,168 @@
+The errors indicate multiple issues with your Docker build:
+
+## Main Issues:
+
+1. **Node.js version mismatch** - Multiple packages require Node.js >=20 but you're using v18.20.5
+2. **Missing bzip2 package** - Needed for extracting phantomjs archive
+3. **Outdated/deprecated packages**
+
+## Solutions:
+
+### 1. Update your Dockerfile base image
+
+Replace your current Node.js base image with Node.js 20 or later:
+
+```dockerfile
+# Use Node.js 20 LTS or later
+FROM node:20-alpine AS stage-0
+# or FROM node:20-bullseye if you prefer Debian
+```
+
+### 2. Install required system dependencies
+
+If using Alpine base image:
+```dockerfile
+FROM node:20-alpine AS stage-0
+
+# Install system dependencies
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    bzip2 \
+    git
+```
+
+If using Debian-based image:
+```dockerfile
+FROM node:20-bullseye AS stage-0
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    bzip2 \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+```
+
+### 3. Update npm dependencies (recommended)
+
+Check your `package.json` and consider:
+- **Update or remove deprecated packages**:
+  - Replace `phantomjs-prebuilt` with `puppeteer` or remove if not needed
+  - Update `rimraf` to version 4 or later
+  - Update `uuid` to version 8 or later
+  - Update other deprecated packages
+
+### 4. Add engine specification
+
+In your `package.json`, add:
+```json
+{
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  }
+}
+```
+
+### 5. Complete example Dockerfile:
+
+```dockerfile
+# Stage 0: Dependencies
+FROM node:20-alpine AS stage-0
+
+# Install system dependencies
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    bzip2 \
+    git
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --omit=dev
+
+# Copy application code
+COPY . .
+
+# Build your application if needed
+# RUN npm run build
+
+# Stage 1: Production image
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy from build stage
+COPY --from=stage-0 /app .
+
+# Start application
+CMD ["npm", "start"]
+```
+
+### 6. Alternative: Use nvm to manage Node version
+
+If you need multiple Node.js versions:
+
+```dockerfile
+FROM ubuntu:22.04
+
+# Install nvm and Node.js 20
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    build-essential \
+    bzip2 \
+    && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash \
+    && export NVM_DIR="$HOME/.nvm" \
+    && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" \
+    && nvm install 20 \
+    && nvm use 20
+
+WORKDIR /app
+COPY . .
+RUN npm ci
+```
+
+### 7. If you cannot upgrade Node.js
+
+If you absolutely must use Node.js 18, try forcing installation:
+
+```dockerfile
+FROM node:18-alpine
+
+# Install system dependencies
+RUN apk add --no-cache bzip2
+
+# Set npm config to ignore engine checks
+RUN npm config set ignore-engines true
+
+WORKDIR /app
+COPY . .
+RUN npm ci --ignore-scripts
+```
+
+**Note**: This is not recommended as it may cause runtime issues with packages that actually require Node.js 20 features.
+
+## Quick Fix:
+
+For the immediate build failure, the minimum change is:
+
+```dockerfile
+FROM node:20-alpine AS stage-0
+
+# Add bzip2
+RUN apk add --no-cache bzip2
+
+# ... rest of your Dockerfile
+```
+
+Then rebuild your Docker image. The Node.js 20 upgrade is essential for mediasoup and other packages that require newer Node.js features.

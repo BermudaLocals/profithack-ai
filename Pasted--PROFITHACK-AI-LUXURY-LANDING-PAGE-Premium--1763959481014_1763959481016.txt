@@ -1,0 +1,606 @@
+// ============================================
+// PROFITHACK AI - LUXURY LANDING PAGE
+// Premium Super-App Showcase
+// Mobile-First | Luxury Design | All 18+ Features
+// ============================================
+
+import React, { useState, useEffect } from "react";
+import "./landing-page.css";
+
+// ============================================
+// HERO SECTION
+// ============================================
+
+const HeroSection: React.FC = () => {
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <section className="hero" style={{ transform: `translateY(${scrollY * 0.5}px)` }}>
+      <div className="hero-background">
+        <div className="gradient-orb orb-1"></div>
+        <div className="gradient-orb orb-2"></div>
+        <div className="gradient-orb orb-3"></div>
+      </div>
+
+      <div className="hero-content">
+        <div className="hero-badge">
+          <span className="badge-icon">✨</span>
+          <span>The Luxury Super-App</span>
+        </div>
+
+        <h1 className="hero-title">
+          One App.
+          <br />
+          <span className="gradient-text">18+ Platforms.</span>
+          <br />
+          Infinite Possibilities.
+        </h1>
+
+        <p className="hero-subtitle">
+          TikTok + Instagram + YouTube + OnlyFans + WhatsApp + Replit + AI Video Gen +
+          P2P + Marketplace + Dating + Live Streaming + Battle Rooms + AI Influencer +
+          Manus.im + Cluely + And More...
+        </p>
+
+        <div className="hero-cta">
+          <button className="btn btn-primary">
+            <span>🚀 Launch App</span>
+          </button>
+          <button className="btn btn-secondary">
+            <span>📺 Watch Demo</span>
+          </button>
+        </div>
+
+        <div className="hero-stats">
+          <div className="stat">
+            <div className="stat-value">18+</div>
+            <div className="stat-label">Platforms Integrated</div>
+          </div>
+          <div className="stat">
+            <div className="stat-value">$63M</div>
+            <div className="stat-label">Monthly Revenue Potential</div>
+          </div>
+          <div className="stat">
+            <div className="stat-value">100x</div>
+            <div className="stat-label">Better Than Competition</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="hero-phone">
+        <div className="phone-frame">
+          <div className="phone-screen">
+            <div className="screen-content">
+              <div className="video-preview">
+                <div className="video-overlay">
+                  <div className="user-badge">@profithackai</div>
+                  <div className="action-icons">
+                    <div className="icon">❤️</div>
+                    <div className="icon">💬</div>
+                    <div className="icon">↗️</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ============================================
+// FEATURES SHOWCASE
+// ============================================
+
+interface Feature {
+  icon: string;
+  title: string;
+  description: string;
+  category: string;
+  color: string;
+}
+
+const features: Feature[] = [
+  {
+    icon: "🎬",
+    title: "TikTok-Style Feed",
+    description: "Full-screen vertical video with swipe navigation",
+    category: "Content",
+    color: "#FF007F",
+  },
+  {
+    icon: "🤖",
+    title: "AI Content Agents",
+    description: "Autonomous content creation & scheduling",
+    category: "AI",
+    color: "#00FFFF",
+  },
+  {
+    icon: "💰",
+    title: "Monetization Suite",
+    description: "55/45 revenue split, 8 payment gateways",
+    category: "Money",
+    color: "#FFD700",
+  },
+  {
+    icon: "💎",
+    title: "Virtual Gifts",
+    description: "Large animated gift displays with real-time tracking",
+    category: "Engagement",
+    color: "#FF007F",
+  },
+  {
+    icon: "📱",
+    title: "OnlyFans Integration",
+    description: "Private content with payment enforcement",
+    category: "Content",
+    color: "#00FFFF",
+  },
+  {
+    icon: "🎥",
+    title: "Sora 2 AI Video Gen",
+    description: "Text-to-video generation with custom styles",
+    category: "AI",
+    color: "#FF007F",
+  },
+  {
+    icon: "💬",
+    title: "WhatsApp-Style DMs",
+    description: "E2E encrypted messaging with file sharing",
+    category: "Communication",
+    color: "#00FFFF",
+  },
+  {
+    icon: "⚔️",
+    title: "Battle Rooms",
+    description: "Real-time competitive gaming with leaderboards",
+    category: "Gaming",
+    color: "#FFD700",
+  },
+  {
+    icon: "💑",
+    title: "Dating App",
+    description: "AI-powered matching with XAI explanations",
+    category: "Social",
+    color: "#FF007F",
+  },
+  {
+    icon: "🔴",
+    title: "Live Streaming",
+    description: "Multi-platform live streaming with analytics",
+    category: "Content",
+    color: "#00FFFF",
+  },
+  {
+    icon: "🛍️",
+    title: "Marketplace",
+    description: "P2P commerce with escrow & ratings",
+    category: "Commerce",
+    color: "#FFD700",
+  },
+  {
+    icon: "👥",
+    title: "AI Influencer Builder",
+    description: "Create AI twins with custom personalities",
+    category: "AI",
+    color: "#FF007F",
+  },
+  {
+    icon: "🧠",
+    title: "XAI Engine",
+    description: "Explainable AI for recommendations",
+    category: "AI",
+    color: "#00FFFF",
+  },
+  {
+    icon: "📊",
+    title: "Creator Analytics",
+    description: "Real-time engagement tracking & insights",
+    category: "Analytics",
+    color: "#FFD700",
+  },
+  {
+    icon: "🎓",
+    title: "Replit Integration",
+    description: "Code editor & terminal in-app",
+    category: "Dev",
+    color: "#FF007F",
+  },
+  {
+    icon: "🎵",
+    title: "Trending Sounds",
+    description: "Curated music library with licensing",
+    category: "Content",
+    color: "#00FFFF",
+  },
+  {
+    icon: "🤝",
+    title: "P2P Payments",
+    description: "Instant transfers with minimal fees",
+    category: "Money",
+    color: "#FFD700",
+  },
+  {
+    icon: "⚡",
+    title: "Lightning Fast",
+    description: "Sub-100ms latency, 100x scalability",
+    category: "Performance",
+    color: "#FF007F",
+  },
+];
+
+const FeaturesSection: React.FC = () => {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const categories = ["All", ...new Set(features.map((f) => f.category))];
+  const filteredFeatures =
+    selectedCategory === "All"
+      ? features
+      : features.filter((f) => f.category === selectedCategory);
+
+  return (
+    <section className="features">
+      <div className="section-header">
+        <h2>18+ Integrated Platforms</h2>
+        <p>Everything you need in one luxury super-app</p>
+      </div>
+
+      <div className="category-filter">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            className={`category-btn ${selectedCategory === cat ? "active" : ""}`}
+            onClick={() => setSelectedCategory(cat)}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      <div className="features-grid">
+        {filteredFeatures.map((feature, index) => (
+          <div
+            key={index}
+            className="feature-card"
+            style={{
+              borderColor: feature.color,
+              boxShadow: `0 0 20px ${feature.color}33`,
+            }}
+          >
+            <div className="feature-icon">{feature.icon}</div>
+            <h3>{feature.title}</h3>
+            <p>{feature.description}</p>
+            <div className="feature-category">{feature.category}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
+
+// ============================================
+// ALGORITHM SHOWCASE
+// ============================================
+
+const AlgorithmSection: React.FC = () => {
+  return (
+    <section className="algorithm">
+      <div className="section-header">
+        <h2>TikTok Algorithm + AI Agents</h2>
+        <p>Powered by advanced machine learning</p>
+      </div>
+
+      <div className="algorithm-grid">
+        <div className="algo-card">
+          <div className="algo-icon">🧠</div>
+          <h3>Smart Ranking</h3>
+          <p>
+            Completion rate is KING. 90%+ watched = 1.5x boost. Freshness, engagement,
+            and personalization combined.
+          </p>
+          <div className="algo-formula">
+            Score = (Engagement × Completion × Freshness) + Personalization
+          </div>
+        </div>
+
+        <div className="algo-card">
+          <div className="algo-icon">🤖</div>
+          <h3>AI Content Agents</h3>
+          <p>
+            5 specialized agents work in parallel: Script Writer, Caption Writer, Hashtag
+            Generator, Thumbnail Prompt, Music Suggester.
+          </p>
+          <div className="algo-formula">Topic → Script → Caption → Hashtags → Music</div>
+        </div>
+
+        <div className="algo-card">
+          <div className="algo-icon">📅</div>
+          <h3>Smart Scheduling</h3>
+          <p>
+            Weekly content planning with optimal posting times. Auto-publish based on
+            timezone and audience behavior.
+          </p>
+          <div className="algo-formula">Plan → Distribute → Schedule → Auto-Publish</div>
+        </div>
+
+        <div className="algo-card">
+          <div className="algo-icon">📊</div>
+          <h3>Real-Time Analytics</h3>
+          <p>
+            Track every metric: views, likes, shares, comments, completion rate, and
+            engagement predictions.
+          </p>
+          <div className="algo-formula">Metrics → Insights → Optimization</div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ============================================
+// MONETIZATION SHOWCASE
+// ============================================
+
+const MonetizationSection: React.FC = () => {
+  return (
+    <section className="monetization">
+      <div className="section-header">
+        <h2>$63M Monthly Revenue Potential</h2>
+        <p>Multiple revenue streams, 55/45 creator split</p>
+      </div>
+
+      <div className="monetization-grid">
+        <div className="revenue-card">
+          <div className="revenue-icon">💎</div>
+          <h3>Virtual Gifts</h3>
+          <div className="revenue-amount">$25M/month</div>
+          <p>Rose, Diamond, Crown, Rocket, Unicorn, Dragon</p>
+        </div>
+
+        <div className="revenue-card">
+          <div className="revenue-icon">🔐</div>
+          <h3>OnlyFans Subscriptions</h3>
+          <div className="revenue-amount">$20M/month</div>
+          <p>Premium content with payment enforcement</p>
+        </div>
+
+        <div className="revenue-card">
+          <div className="revenue-icon">🛍️</div>
+          <h3>Marketplace Commissions</h3>
+          <div className="revenue-amount">$12M/month</div>
+          <p>P2P commerce with 5% platform fee</p>
+        </div>
+
+        <div className="revenue-card">
+          <div className="revenue-icon">🎮</div>
+          <h3>Battle Rooms & Gaming</h3>
+          <div className="revenue-amount">$4M/month</div>
+          <p>Entry fees, tournaments, leaderboards</p>
+        </div>
+
+        <div className="revenue-card">
+          <div className="revenue-icon">🎬</div>
+          <h3>Premium Features</h3>
+          <div className="revenue-amount">$1.5M/month</div>
+          <p>Advanced analytics, custom branding</p>
+        </div>
+
+        <div className="revenue-card">
+          <div className="revenue-icon">📢</div>
+          <h3>Advertising</h3>
+          <div className="revenue-amount">$0.5M/month</div>
+          <p>Sponsored content, brand partnerships</p>
+        </div>
+      </div>
+
+      <div className="payment-gateways">
+        <h3>8 Payment Gateways Integrated</h3>
+        <div className="gateway-list">
+          <div className="gateway">Stripe</div>
+          <div className="gateway">PayPal</div>
+          <div className="gateway">Square</div>
+          <div className="gateway">Razorpay</div>
+          <div className="gateway">Crypto (Bitcoin, Ethereum)</div>
+          <div className="gateway">Apple Pay</div>
+          <div className="gateway">Google Pay</div>
+          <div className="gateway">Bank Transfer</div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ============================================
+// TECH STACK
+// ============================================
+
+const TechStackSection: React.FC = () => {
+  return (
+    <section className="tech-stack">
+      <div className="section-header">
+        <h2>Enterprise-Grade Tech Stack</h2>
+        <p>Production-ready, scalable, secure</p>
+      </div>
+
+      <div className="tech-grid">
+        <div className="tech-card">
+          <h3>Frontend</h3>
+          <ul>
+            <li>React 18 + TypeScript</li>
+            <li>Tailwind CSS</li>
+            <li>Mobile-first responsive</li>
+            <li>Neon branding system</li>
+          </ul>
+        </div>
+
+        <div className="tech-card">
+          <h3>Backend</h3>
+          <ul>
+            <li>11 gRPC Microservices</li>
+            <li>Golang + Python</li>
+            <li>PostgreSQL + Redis</li>
+            <li>Sub-100ms latency</li>
+          </ul>
+        </div>
+
+        <div className="tech-card">
+          <h3>AI/ML</h3>
+          <ul>
+            <li>Claude API (Anthropic)</li>
+            <li>Sora 2 Video Generation</li>
+            <li>ElevenLabs Voice Cloning</li>
+            <li>XAI Explainability Engine</li>
+          </ul>
+        </div>
+
+        <div className="tech-card">
+          <h3>Infrastructure</h3>
+          <ul>
+            <li>Kubernetes + Docker</li>
+            <li>GitOps (ArgoCD)</li>
+            <li>Prometheus + Grafana</li>
+            <li>Chaos Engineering</li>
+          </ul>
+        </div>
+
+        <div className="tech-card">
+          <h3>Security</h3>
+          <ul>
+            <li>Zero Trust mTLS</li>
+            <li>E2E Encryption</li>
+            <li>Rate Limiting</li>
+            <li>DDoS Protection</li>
+          </ul>
+        </div>
+
+        <div className="tech-card">
+          <h3>Deployment</h3>
+          <ul>
+            <li>Replit (Development)</li>
+            <li>AWS/GCP/Azure</li>
+            <li>CI/CD Pipeline</li>
+            <li>Auto-scaling</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ============================================
+// PRICING SECTION
+// ============================================
+
+const PricingSection: React.FC = () => {
+  return (
+    <section className="pricing">
+      <div className="section-header">
+        <h2>Simple, Transparent Pricing</h2>
+        <p>Start free, scale as you grow</p>
+      </div>
+
+      <div className="pricing-grid">
+        <div className="pricing-card">
+          <div className="pricing-tier">Creator</div>
+          <div className="pricing-price">
+            <span className="currency">$</span>
+            <span className="amount">0</span>
+            <span className="period">/month</span>
+          </div>
+          <ul className="pricing-features">
+            <li>✅ Unlimited videos</li>
+            <li>✅ TikTok-style feed</li>
+            <li>✅ Basic analytics</li>
+            <li>✅ AI content generation</li>
+            <li>❌ Advanced features</li>
+          </ul>
+          <button className="btn btn-secondary">Get Started</button>
+        </div>
+
+        <div className="pricing-card featured">
+          <div className="pricing-badge">Most Popular</div>
+          <div className="pricing-tier">Pro Creator</div>
+          <div className="pricing-price">
+            <span className="currency">$</span>
+            <span className="amount">9.99</span>
+            <span className="period">/month</span>
+          </div>
+          <ul className="pricing-features">
+            <li>✅ Everything in Creator</li>
+            <li>✅ Advanced analytics</li>
+            <li>✅ Weekly scheduling</li>
+            <li>✅ Custom branding</li>
+            <li>✅ Priority support</li>
+          </ul>
+          <button className="btn btn-primary">Start Free Trial</button>
+        </div>
+
+        <div className="pricing-card">
+          <div className="pricing-tier">Enterprise</div>
+          <div className="pricing-price">
+            <span className="currency">$</span>
+            <span className="amount">Custom</span>
+            <span className="period">/month</span>
+          </div>
+          <ul className="pricing-features">
+            <li>✅ Everything in Pro</li>
+            <li>✅ Dedicated support</li>
+            <li>✅ Custom integrations</li>
+            <li>✅ White-label options</li>
+            <li>✅ SLA guarantee</li>
+          </ul>
+          <button className="btn btn-secondary">Contact Sales</button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ============================================
+// CTA SECTION
+// ============================================
+
+const CTASection: React.FC = () => {
+  return (
+    <section className="cta">
+      <div className="cta-content">
+        <h2>Ready to Join the Luxury Super-App Revolution?</h2>
+        <p>
+          Start creating, monetizing, and dominating your niche today. No credit card
+          required.
+        </p>
+        <div className="cta-buttons">
+          <button className="btn btn-primary btn-large">🚀 Launch Now</button>
+          <button className="btn btn-secondary btn-large">📧 Get Updates</button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ============================================
+// MAIN LANDING PAGE COMPONENT
+// ============================================
+
+const LandingPage: React.FC = () => {
+  return (
+    <div className="landing-page">
+      <HeroSection />
+      <FeaturesSection />
+      <AlgorithmSection />
+      <MonetizationSection />
+      <TechStackSection />
+      <PricingSection />
+      <CTASection />
+    </div>
+  );
+};
+
+export default LandingPage;

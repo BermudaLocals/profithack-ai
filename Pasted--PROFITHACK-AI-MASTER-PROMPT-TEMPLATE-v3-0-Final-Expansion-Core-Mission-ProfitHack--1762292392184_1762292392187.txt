@@ -1,0 +1,201 @@
+# PROFITHACK AI — MASTER PROMPT TEMPLATE v3.0 (Final Expansion)
+
+## 🎯 Core Mission
+
+ProfitHack AI is the all‑in‑one **Creator SuperApp** where users can **Create → Connect → Earn** using AI automation. The v3.0 MPT integrates all previous modules and adds full‑scale hosting portability, 100+ agent orchestration, official‑API content ingestion (e.g., X/Twitter), and new AI business extensions.
+
+---
+
+## 🧱 Platform Overview
+
+ProfitHack AI now unifies:
+
+1. **Social Core:** TikTok/Instagram/YouTube parity (feed, stories, reels, DMs, notifications).
+2. **Live + Gifts:** TikTok‑style overlays, coins, leaderboards.
+3. **Subscriptions & Marketplace:** Fansbase/OnlyFans features, plus digital/physical goods.
+4. **AI Influencer Creator:** Full‑body avatars, voice clone, mocap, safe content filters.
+5. **Video + Course Builders:** Timeline editor, SCORM/xAPI, certificates.
+6. **Low‑Code App Builder:** Edge deploy, rollback, templates (Replit++).
+7. **Live DJ Battles:** iRig input, FX racks, low latency.
+8. **Plugin Store:** Sandbox, signing, revenue share.
+9. **Affiliate + Referral Center:** 4‑code invites, payouts, leaderboard.
+10. **Analytics + Observability:** Real‑time metrics, dashboards.
+11. **5‑Strike Moderation w/ Human Review** before permanent ban.
+12. **Multi‑agent AI Framework** (100+ bots) for automation and content generation.
+
+---
+
+## 🧠 v3.0 New Modules
+
+### 1️⃣ AI Personal Brand Engine
+
+* Auto‑generate brand identity (logo, colors, tone).
+* Brand‑consistency check across posts.
+* Exports brand kit for all products.
+
+### 2️⃣ AI Sales Copilot / DM Assistant
+
+* Conversational agent handling FAQs, links, sales.
+* Integrates with in‑app chat, WhatsApp Business, Instagram Messaging API.
+* Human handoff + analytics.
+
+### 3️⃣ Affiliate Marketplace & Creator Store
+
+* Public directory for digital assets, templates, plugins.
+* Built‑in affiliate splits and payouts.
+* Search + rating system.
+
+### 4️⃣ CreatorCoin Reward System
+
+* Off‑chain token for tips, perks, level‑ups.
+* Optional blockchain bridge later.
+* Transparent wallet dashboard.
+
+### 5️⃣ Learning & Certification Hub
+
+* Courses teaching users to monetize with AI.
+* Certificates, shareable badges, affiliate bonuses.
+
+### 6️⃣ AI Search + Discovery Engine
+
+* LLM semantic search across creators, products, and content.
+* “Trending in your niche” insights.
+
+### 7️⃣ Desktop Creator Studio
+
+* Full analytics, editing, live tools.
+* Multi‑monitor & keyboard shortcuts.
+
+### 8️⃣ Content Planner + Auto‑Scheduler
+
+* Calendar + AI post‑time predictor.
+* Cross‑post to TikTok/IG/YT/X.
+
+### 9️⃣ Collaboration Rooms / Teams
+
+* Shared projects, permissions, revenue splits.
+* Real‑time editing + comments.
+
+### 🔟 AI Legal + Finance Tools
+
+* Auto‑contracts (NDAs, collabs).
+* Invoice & tax dashboard.
+* Revenue forecasting.
+
+### 11️⃣ Localization + Translation Layer
+
+* Translate content into 130+ languages.
+* Currency conversion & local payments.
+
+### 12️⃣ Podcast & Voice Studio
+
+* Record/edit podcasts, clean audio, distribute.
+* Monetize via tips + sponsorships.
+
+### 13️⃣ Gamification & Rewards
+
+* XP, streaks, badges, leaderboards.
+* Reward milestones for uploads, referrals, sales.
+
+### 14️⃣ AI Trend Predictor & Idea Generator
+
+* Scans TikTok/YouTube/X trends.
+* Suggests scripts, hooks, hashtags.
+
+---
+
+## ⚙️ Hosting & Infrastructure
+
+* **Containers:** Docker + Kubernetes (GKE/EKS/AKS).
+* **Queue/Agents:** Redis Streams/RabbitMQ/Kafka; autoscale via HPA.
+* **Data:** Postgres + Redis + S3.
+* **CI/CD:** GitHub Actions → Helm deploy → blue/green.
+* **Observability:** OpenTelemetry → Prometheus + Grafana + Loki.
+* **Security:** Vault/Secrets Manager, JWT short TTL, HTTPS only.
+* **Makefile Targets:** build, test, deploy, rollback, logs.
+
+---
+
+## 🧰 Replit‑to‑Cloud Portability
+
+Replit AI must produce:
+
+1. Dockerfile (multi‑stage, non‑root, healthchecks).
+2. docker‑compose.yml (api, worker, redis, postgres).
+3. Helm chart `/deploy/helm/profithackai` (Ingress, HPA, secrets).
+4. Terraform infra (cluster, DB, Redis, S3, DNS, SSL).
+5. CI/CD pipeline (GitHub Actions → registry → Helm deploy).
+6. `/docs/DEPLOY.md` step‑by‑step.
+7. Metrics endpoints `/healthz`, `/readyz`, `/metrics`.
+
+---
+
+## 🤖 Multi‑Agent Architecture
+
+* Each agent subscribes to task queues (content_ingest, generation, trend_watch, outreach).
+* HPA based on queue depth.
+* Dedup by content hash.
+* Rate‑limit guards.
+* Logs + metrics per agent.
+
+---
+
+## 🐦 X (Twitter) Ingestor Service (Compliant)
+
+* Use **official X Filtered Stream API** + Search fallback.
+* Configurable rules (handles, hashtags, keywords).
+* Normalized output → `x_stream` queue.
+* Dedup by tweet_id.
+* Metrics: events/sec, reconnects, drops.
+* Strict ToS compliance; no scraping.
+
+---
+
+## 🔐 Security & Legal
+
+* Secrets rotation quarterly.
+* PII encrypted at rest + in transit.
+* DMCA takedown + 5‑strike review.
+* Age‑gating & KYC for paid creators.
+* Refund policy (14‑day default).
+* ToS + Privacy pages auto‑linked.
+
+---
+
+## 🌍 Rollout Phases
+
+**Phase 1:** Port to Kubernetes, Live + Gifts, Analytics.
+**Phase 2:** Subscriptions, Marketplace, Course & Video Builders.
+**Phase 3:** AI Influencer, App Builder, DJ Battles, Plugins.
+**Phase 4:** Brand Engine, Sales Copilot, CreatorCoins, API store.
+**Phase 5:** Trend Engine, Localization, Gamification, Legal/Finance.
+
+---
+
+## ✅ Developer PR Checklist
+
+* [ ] Feature flag + kill‑switch
+* [ ] Strict typing/lint/tests ≥85%
+* [ ] Docs + metrics updated
+* [ ] CTA present in new UI
+* [ ] Rollback plan included
+
+---
+
+## 📢 CTA Copy Library
+
+* “Stop Scrolling. Start Building. ProfitHackAI.com”
+* “Ideas Don’t Pay. Systems Do.”
+* “Join the AI Creator Revolution → ProfitHackAI.com”
+* “Create. Connect. Earn.”
+* “Your Time Is Now — ProfitHackAI.com”
+
+---
+
+## 🧭 Continuity Rule
+
+Never remove functioning content or UX. All changes must be additive or versioned. Maintain backward compatibility and user trust.
+
+---
+
+**End of ProfitHack AI MPT v3.0 – Use this as the master directive for all AI agents, developers, and infrastructure builds.**

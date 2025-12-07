@@ -1,0 +1,133 @@
+// spectator_stream_service.ts - Conceptual Backend Service for Spectator Streams
+
+// This service would likely run as part of or alongside the Video Processing Service (Port 50051)
+// or as a dedicated Transcoding Microservice.
+
+import { SFUStreamManager } from './sfu_stream_manager'; // Conceptual module to interact with the SFU
+import { CDNManager } from './cdn_manager'; // Conceptual module to interact with the CDN
+
+// Configuration for the streaming output
+const STREAM_CONFIG = {
+    // Output format: HLS is generally preferred for live streaming
+    format: 'HLS', 
+    // Bitrates for adaptive streaming (ABR)
+    bitrates: [
+        { resolution: '1280x720', bitrate: '2500k' },
+        { resolution: '854x480', bitrate: '1000k' },
+        { resolution: '426x240', bitrate: '400k' },
+    ],
+    // Segment duration for HLS
+    segmentDuration: 2, // seconds
+};
+
+/**
+ * Manages the transcoding and delivery of a room's video streams to unlimited spectators.
+ */
+export class SpectatorStreamService {
+    private activeRooms: Map<string, { transcoderProcess: any, streamUrl: string }> = new Map();
+
+    /**
+     * Starts the transcoding process for a given room.
+     * This is called when the first spectator joins or when the room is created.
+     * @param roomId The ID of the room (Battle Room or Panel).
+     * @returns The public HLS/DASH stream URL.
+     */
+    public async startRoomStream(roomId: string): Promise<string> {
+        if (this.activeRooms.has(roomId)) {
+            return this.activeRooms.get(roomId)!.streamUrl;
+        }
+
+        // 1. Get the combined input stream from the SFU
+        // The SFU must provide a single, combined stream (e.g., a mixed video feed) 
+        // or individual streams that we can mix here.
+        const sfuInputUrl = SFUStreamManager.getCombinedStreamInput(roomId);
+
+        // 2. Start the FFmpeg Transcoding Process
+        // This is the core logic, which would run FFmpeg or a similar tool.
+        const transcoderProcess = this.runFFmpegTranscoder(roomId, sfuInputUrl);
+
+        // 3. Generate the public CDN URL
+        const streamUrl = CDNManager.generatePublicStreamUrl(roomId, STREAM_CONFIG.format);
+
+        // 4. Store and return
+        this.activeRooms.set(roomId, { transcoderProcess, streamUrl });
+        console.log(`Started spectator stream for room ${roomId}. URL: ${streamUrl}`);
+        
+        return streamUrl;
+    }
+
+    /**
+     * Stops the transcoding process for a room.
+     * This is called when the room ends or the last spectator leaves.
+     * @param roomId The ID of the room.
+     */
+    public async stopRoomStream(roomId: string): Promise<void> {
+        const roomData = this.activeRooms.get(roomId);
+        if (roomData) {
+            // Terminate the FFmpeg process
+            roomData.transcoderProcess.kill('SIGINT'); 
+            
+            // Clean up CDN resources (e.g., delete HLS segments)
+            await CDNManager.cleanupStream(roomId);
+            
+            this.activeRooms.delete(roomId);
+            console.log(`Stopped and cleaned up spectator stream for room ${roomId}.`);
+        }
+    }
+
+    /**
+     * Conceptual FFmpeg command execution.
+     * @param roomId The room ID.
+     * @param inputUrl The input stream URL from the SFU.
+     * @returns A conceptual process object.
+     */
+    private runFFmpegTranscoder(roomId: string, inputUrl: string): any {
+        const outputDir = `/mnt/transcoding/live/${roomId}`;
+        const outputManifest = `${outputDir}/master.m3u8`;
+        
+        // This is a highly simplified conceptual FFmpeg command.
+        // The actual command would be much longer to handle ABR and segmenting.
+        const ffmpegCommand = `
+            ffmpeg -i ${inputUrl} 
+            -c:v libx264 -preset veryfast -g 48 -sc_threshold 0 
+            -map 0:v:0 -map 0:a:0 
+            -f hls -hls_time ${STREAM_CONFIG.segmentDuration} -hls_playlist_type event 
+            -hls_segment_filename ${outputDir}/%03d.ts 
+            ${outputManifest}
+        `;
+        
+        console.log(`Executing FFmpeg for room ${roomId}: ${ffmpegCommand}`);
+        // In a real system, this would be a child_process.spawn() call.
+        return { kill: (signal: string) => console.log(`Simulating kill signal ${signal} for FFmpeg process.`) };
+    }
+    
+    /**
+     * Returns the stream URL for the signaling service.
+     * @param roomId The ID of the room.
+     * @returns The public stream URL.
+     */
+    public getStreamUrl(roomId: string): string | null {
+        return this.activeRooms.get(roomId)?.streamUrl || null;
+    }
+}
+
+// --- Conceptual CDN Manager Module ---
+class CDNManager {
+    static generatePublicStreamUrl(roomId: string, format: string): string {
+        // This URL is what the spectator's HLS player will use.
+        return `https://cdn.profithack.ai/live/${roomId}/master.m3u8`;
+    }
+    
+    static async cleanupStream(roomId: string): Promise<void> {
+        // Logic to send API call to CDN to purge/delete files
+        console.log(`CDN cleanup initiated for room ${roomId}.`);
+    }
+}
+
+// --- Conceptual SFU Stream Manager Module ---
+class SFUStreamManager {
+    static getCombinedStreamInput(roomId: string): string {
+        // This URL/path is the internal stream endpoint provided by the SFU server.
+        return `rtmp://sfu-internal-ip/live/${roomId}`;
+    }
+}

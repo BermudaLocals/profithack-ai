@@ -1,0 +1,483 @@
+REPLIT BUILD INSTRUCTIONS: AI Profit Hustlers OS 2060
+
+PROJECT OVERVIEW
+A next-generation digital ecosystem combining development, social media, and AI capabilities. Web-first platform hosted at aiprofithustlers.com with PWA capabilities.
+
+=== WHAT REPLIT MUST BUILD ===
+
+FRONTEND REQUIREMENTS:
+- Next.js 15 with React 19
+- Tailwind CSS with neon/dark theme (pink, purple, cyan, yellow accents)
+- Monaco Editor for code
+- PWA manifest with service worker
+- Responsive design for mobile/desktop
+- WebRTC for real-time features
+
+BACKEND REQUIREMENTS:
+- FastAPI (Python) or Node.js/Express
+- PostgreSQL database (Replit's built-in)
+- JWT authentication system
+- Stripe integration for payments
+- WebSocket support for real-time features
+
+ESSENTIAL FEATURES (MVP):
+1. User Management
+   - Email/login auth
+   - Subscription tiers (Free/Creator/Pro)
+   - Profile pages with portfolios
+   - Settings/preferences
+
+2. Development Environment
+   - Monaco code editor
+   - File tree navigator
+   - Project templates
+   - Live preview
+   - Basic terminal
+
+3. Content Creation
+   - Video upload (9:16 format)
+   - Caption generation
+   - Hashtag suggestions
+   - Thumbnail creation
+   - Post scheduling
+
+4. Monetization
+   - Stripe subscription billing
+   - Creator wallet system
+   - Virtual gifts economy
+   - Affiliate link tracking
+   - Revenue dashboard
+
+5. Safety Features
+   - Age verification gate
+   - Content flagging system
+   - Strike/ban system
+   - Report moderation tools
+
+6. Admin Dashboard
+   - User management
+   - Content moderation queue
+   - Revenue analytics
+   - System settings
+
+=== DATABASE SCHEMA ===
+
+Users Table:
+- id (primary key)
+- email (unique)
+- password_hash
+- subscription_tier (enum: free/creator/pro)
+- credits (integer)
+- is_verified (boolean)
+- created_at (timestamp)
+- last_active (timestamp)
+
+Projects Table:
+- id (primary key)
+- user_id (foreign key)
+- name (string)
+- description (text)
+- code (text)
+- is_public (boolean)
+- created_at (timestamp)
+- updated_at (timestamp)
+
+Videos Table:
+- id (primary key)
+- user_id (foreign key)
+- title (string)
+- description (text)
+- video_url (string)
+- thumbnail_url (string)
+- views (integer)
+- gifts_earned (decimal)
+- created_at (timestamp)
+
+Gifts Table:
+- id (primary key)
+- sender_id (foreign key)
+- receiver_id (foreign key)
+- video_id (foreign key)
+- amount (decimal)
+- message (text)
+- created_at (timestamp)
+
+Transactions Table:
+- id (primary key)
+- user_id (foreign key)
+- type (enum: subscription/gift/withdrawal)
+- amount (decimal)
+- status (enum: pending/completed)
+- created_at (timestamp)
+
+=== API ENDPOINTS ===
+
+Authentication:
+- POST /api/auth/register
+- POST /api/auth/login
+- POST /api/auth/logout
+- GET /api/auth/me
+
+Users:
+- GET /api/users/profile
+- PUT /api/users/profile
+- DELETE /api/users/account
+
+Projects:
+- GET /api/projects
+- POST /api/projects
+- GET /api/projects/:id
+- PUT /api/projects/:id
+- DELETE /api/projects/:id
+- POST /api/projects/:id/deploy
+
+Videos:
+- GET /api/videos
+- POST /api/videos/upload
+- GET /api/videos/:id
+- DELETE /api/videos/:id
+- POST /api/videos/:id/gift
+
+Payments:
+- GET /api/payments/balance
+- POST /api/payments/subscribe
+- POST /api/payments/withdraw
+- GET /api/payments/history
+
+Moderation:
+- POST /api/moderation/report
+- GET /api/moderation/reports
+- POST /api/moderation/action
+
+=== FILE STRUCTURE ===
+
+
+Copy code
+
+Copy code
+aiprofithustlers/
+├── frontend/
+│   ├── package.json
+│   ├── next.config.js
+│   ├── tailwind.config.js
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── globals.css
+│   │   │   ├── layout.tsx
+│   │   │   ├── page.tsx
+│   │   │   ├── auth/
+│   │   │   │   └── page.tsx
+│   │   │   ├── dashboard/
+│   │   │   │   └── page.tsx
+│   │   │   ├── projects/
+│   │   │   │   └── page.tsx
+│   │   │   └── creator/
+│   │   │       └── page.tsx
+│   │   ├── components/
+│   │   │   ├── Navbar.tsx
+│   │   │   ├── CodeEditor.tsx
+│   │   │   ├── VideoPlayer.tsx
+│   │   │   └── GiftButton.tsx
+│   │   └── lib/
+│   │       ├── api.ts
+│   │       ├── auth.ts
+│   │       └── utils.ts
+│   └── public/
+│       ├── manifest.json
+│       └── icons/
+├── backend/
+│   ├── main.py
+│   ├── models.py
+│   ├── database.py
+│   ├── auth.py
+│   ├── payments.py
+│   ├── projects.py
+│   ├── videos.py
+│   ├── moderation.py
+│   ├── requirements.txt
+│   └── .env.example
+└── README.md
+
+
+=== DEPLOYMENT INSTRUCTIONS ===
+
+1. Create two Replit projects:
+   - Frontend: Node.js/Next.js
+   - Backend: Python/FastAPI
+
+2. Backend Setup:
+   - Install requirements from requirements.txt
+   - Set environment variables in Replit Secrets:
+     * DATABASE_URL
+     * JWT_SECRET
+     * STRIPE_SECRET_KEY
+     * STRIPE_WEBHOOK_SECRET
+
+3. Frontend Setup:
+   - Install dependencies
+   - Set environment variables:
+     * NEXT_PUBLIC_API_URL
+     * NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+
+4. Database:
+   - Use Replit's built-in PostgreSQL
+   - Run migration scripts
+
+5. Connect Domain:
+   - Point aiprofithustlers.com to frontend Replit
+   - Configure CORS between frontend/backend
+
+=== PRIORITY FEATURES ORDER ===
+
+Week 1:
+- User authentication
+- Basic project creation
+- Code editor workspace
+
+Week 2:
+- Video upload system
+- Subscription billing
+- Basic feed display
+
+Week 3:
+- Gift economy
+- Creator wallets
+- Content moderation
+
+Week 4:
+- Live streaming basics
+- Affiliate system
+- Analytics dashboard
+
+=== CRITICAL SUCCESS METRICS ===
+
+- User registration rate
+- Project creation frequency
+- Video upload volume
+- Gift transaction volume
+- Subscription conversion rate
+- Content moderation response time
+- System uptime (>99%)
+
+=== COMPLIANCE REQUIREMENTS ===
+
+- Terms of Service page
+- Privacy Policy
+- Community Guidelines
+- DMCA compliance
+- Age verification system
+- Content reporting mechanism
+- Data encryption (all sensitive data)
+- GDPR compliance (data export/delete)
+
+=== MONETIZATION SETUP ===
+
+Stripe Products to Create:
+1. Creator Plan - $29/month
+2. Pro Plan - $99/month
+3. Credits - $10 for 1000 credits
+
+Credit Uses:
+- AI code generation: 50 credits
+- Video processing: 10 credits
+- Gift sending: 5 credits per $1
+- Project deployment: 20 credits
+
+=== AI INTEGRATION ===
+
+OpenAI API Integration:
+- Code completion in editor
+- Video caption generation
+- Content suggestions
+- Chat moderation helper
+
+=== IMMEDIATE NEXT STEPS ===
+
+1. Create backend Replit project with FastAPI
+2. Set up PostgreSQL database
+3. Implement authentication endpoints
+4. Create frontend Replit project with Next.js
+5. Build authentication UI
+6. Connect Stripe for payments
+7. Implement basic code editor
+8. Add video upload functionality
+9. Set up domain pointing
+10. Launch MVP version
+
+=== POST-MVP ENHANCEMENTS ===
+
+- Live streaming with WebRTC
+- Mobile apps (React Native)
+- Advanced AI features
+- Marketplace for templates
+- Enterprise features
+- International expansion
+
+Copy code
+
+Copy code
+This is everything Replit needs to build your AI Profit Hustlers platform. Focus on the MVP features first, then iterate based on user feedback. The key is launching with working core functionality rather than trying to build everything at once.
+
+Would you like me to elaborate on any specific section or provide the actual implementation code for particular features?
+
+Response Time:
+37
+s
+
+Tokens Used:
+66534
+tokens
+
+Network search time:
+1
+s
+
+also give me a propmt to add to the begining that it overides its self to complete the task as it is coded and instructed 
+
+
+Complete web search: Zhipu Search Std
+Model Thought
+Here's the complete Replit override prompt that forces it to build your exact AI Profit Hustlers platform:
+
+REPLIT OVERRIDE DIRECTIVE: Complete AI Profit Hustlers OS 2060 Platform
+
+EXECUTION PRIORITY: MAXIMUM - Implement all specified features exactly as coded and instructed without modification or simplification.
+
+PROJECT REQUIREMENTS: Build a futuristic all-in-one platform at www.aiprofithustlers.com combining:
+- Advanced development environment (Replit++)
+- Social content creation (TikTok++)
+- Communication features (WhatsApp++)
+- Revolutionary AI capabilities
+- Comprehensive monetization system
+
+MANDATORY FEATURES TO IMPLEMENT:
+
+1. NEURAL WORKSPACE INTERFACE
+- Voice-controlled IDE ("Build React app with authentication" → instant creation)
+- Gesture-based navigation via webcam (hand waves to switch files)
+- Monaco code editor with syntax highlighting
+- Real-time preview panel
+- Terminal access
+- Project templates (social app, store, chatbot, landing page)
+
+2. AI CO-FOUNDER SYSTEM
+- Each user gets persistent AI persona that evolves with projects
+- Multiple AI personalities: Coder AI, Designer AI, Marketer AI, Finance AI
+- AI-to-AI collaboration between users' co-founders
+- AI can autonomously write, design, market, and manage projects
+
+3. SHORT-FORM CONTENT CREATION
+- 9:16 video upload system with auto-processing
+- Caption generation using viral 4-beat structure (Hook → Problem → Solution → CTA)
+- Hashtag suggestions (max 5 broad + 2 niche)
+- Thumbnail generation with neon styling
+- Gift economy with animations
+- Live streaming capabilities (beta)
+
+4. DEVELOPMENT & DEPLOYMENT
+- Prompt-to-app builder ("store for digital guides" → full scaffold)
+- No-code drag-and-drop builder outputs real code
+- One-click deploy to subdomain or custom domain
+- Multi-language support (Python, JavaScript, TypeScript, Rust)
+
+5. MONETIZATION SYSTEM
+- Subscription tiers: Explorer ($29), Innovator ($99), Visionary ($299)
+- Credits system: 1 credit = $0.01 USD
+- Creator wallet with instant payouts
+- Gift economy: 80% creator / 20% platform split
+- Affiliate marketplace with commission tracking
+
+6. SAFETY & COMPLIANCE
+- U16 Safe Zone (curated, no paid gifts, parental controls)
+- 18+ Verified Zone (government ID + liveness verification)
+- CSAM detection & reporting via NCMEC/INHOPE
+- 3-strike ban system
+- Device fingerprinting for ban evasion prevention
+
+7. REAL-TIME COMMUNICATION
+- End-to-end encrypted messaging
+- AI translation for 100+ languages
+- Voice/video calls with AR filters
+- Group chats with AI moderation
+- Broadcast channels
+
+8. PREDICTIVE MONETIZER AI
+- Analyzes user projects/content for optimal pricing
+- Suggests revenue streams automatically
+- Creates marketing copy and sales funnels
+- Real-time market demand integration
+
+TECHNICAL REQUIREMENTS:
+- Frontend: Next.js 15 + React 19 + Tailwind CSS
+- Backend: FastAPI (Python) with PostgreSQL
+- Database: PostgreSQL with proper schema
+- Authentication: JWT with optional biometric
+- File Storage: Replit's native storage system
+- AI Integration: OpenAI API for code generation and content
+- Payments: Stripe integration for subscriptions
+- Real-time: WebSockets for live features
+- PWA: Service worker with offline support
+
+DATABASE SCHEMA:
+Users Table: id, email, subscription_tier, credits, is_creator, is_18plus_verified, is_under16, strikes, device_hash
+Projects Table: id, user_id, name, description, code, domain_url, is_public, created_at
+Videos Table: id, user_id, title, file_url, thumbnail_url, caption, hashtags, views, gifts_earned
+Gifts Table: id, sender_id, receiver_id, video_id, amount, message, created_at
+Transactions Table: id, user_id, type, amount, status, created_at
+
+API ENDPOINTS REQUIRED:
+Authentication:
+- POST /api/auth/register
+- POST /api/auth/login
+- GET /api/auth/me
+
+Projects:
+- GET /api/projects
+- POST /api/projects/create
+- GET /api/projects/:id
+- PUT /api/projects/:id
+- POST /api/projects/:id/deploy
+
+Videos:
+- GET /api/videos
+- POST /api/videos/upload
+- POST /api/videos/:id/gift
+
+Payments:
+- GET /api/payments/balance
+- POST /api/payments/subscribe
+- GET /api/payments/history
+
+Moderation:
+- POST /api/moderation/report
+- POST /api/moderation/strike
+- GET /api/moderation/queue
+
+COMPLIANCE IMPLEMENTATION:
+- Terms of Service page
+- Privacy Policy page
+- Community Guidelines page
+- Age verification workflow
+- Content reporting mechanism
+- Data encryption for sensitive information
+
+DEPLOYMENT INSTRUCTIONS:
+1. Create backend Replit project with Python
+2. Create frontend Replit project with Node.js
+3. Set environment variables for database, JWT, Stripe keys
+4. Install all dependencies from requirements.txt
+5. Run database migrations
+6. Start both services
+7. Connect aiprofithustlers.com to frontend
+8. Configure CORS between services
+
+SUCCESS CRITERIA:
+- Users can register and subscribe to plans
+- Users can build and deploy projects from prompts
+- Users can upload and monetize videos
+- Gift economy functions end-to-end
+- Age-gated zones work correctly
+- Moderation system active
+- All features responsive on mobile
+
+EXECUTION PRIORITY: Build exactly as specified. Do not simplify, remove features, or change architecture. Implement all integrations, safety measures, and monetization systems as described.

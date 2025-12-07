@@ -1,0 +1,624 @@
+# ProfitHackAI: TikTok-Style Enhancement Prompt for Replit
+## Complete Specification for Startup Experience & 100+ Futuristic Sparks with Audio Animations
+
+---
+
+## EXECUTIVE BRIEF
+
+You are an expert full-stack developer tasked with enhancing ProfitHackAI to match TikTok's premium user experience. This prompt provides complete specifications for two major features:
+
+1. **TikTok-Style Startup Experience** - Smooth onboarding with animated splash screen, loading states, and immediate feed auto-play
+2. **100+ Futuristic Sparks System** - New gift types with 3D animations, particle effects, sound effects, and real-time display
+
+This document serves as your complete technical specification, architectural guide, and implementation roadmap.
+
+---
+
+## PART 1: TIKTOK-STYLE STARTUP EXPERIENCE
+
+### 1.1 Startup Flow Architecture
+
+The startup experience should follow this sequence:
+
+**Step 1: Splash Screen (0-2 seconds)**
+Display a full-screen animated splash screen with the ProfitHackAI logo and a smooth fade-in animation. The splash should feature a gradient background (matching the brand colors) with a pulsing logo animation.
+
+**Step 2: Authentication Check (2-4 seconds)**
+Silently check if the user is already authenticated by verifying the session token stored in localStorage. If authenticated, proceed directly to Step 4. If not authenticated, proceed to Step 3.
+
+**Step 3: Login/Signup Modal (4-6 seconds)**
+Display a sleek login or signup modal with smooth transitions. The modal should slide up from the bottom with a blur background effect. Include options for Replit OAuth, email/password login, and invite code entry.
+
+**Step 4: Feed Loading (6-8 seconds)**
+Once authenticated, display a loading skeleton screen showing placeholder video cards with a shimmer animation effect. This creates the perception of fast loading while content is being fetched from the server.
+
+**Step 5: Feed Auto-Play (8+ seconds)**
+The first video automatically starts playing with sound unmuted (if user has enabled sound). The feed should scroll vertically, and swiping up should load the next video. This mirrors TikTok's "For You Page" (FYP) experience.
+
+### 1.2 Splash Screen Component (React + TypeScript)
+
+Create a new file: `client/src/components/SplashScreen.tsx`
+
+```typescript
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'wouter';
+import './SplashScreen.css';
+
+export const SplashScreen: React.FC = () => {
+  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [fadeOut, setFadeOut] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Check if user has valid session
+        const response = await fetch('/api/auth/me', {
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          setIsAuthenticated(true);
+          // Wait 2 seconds for splash animation, then navigate to feed
+          setTimeout(() => {
+            setFadeOut(true);
+            setTimeout(() => navigate('/'), 500);
+          }, 2000);
+        } else {
+          setIsAuthenticated(false);
+          // Wait 2 seconds for splash animation, then navigate to login
+          setTimeout(() => {
+            setFadeOut(true);
+            setTimeout(() => navigate('/login'), 500);
+          }, 2000);
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        setIsAuthenticated(false);
+        setTimeout(() => {
+          setFadeOut(true);
+          setTimeout(() => navigate('/login'), 500);
+        }, 2000);
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
+
+  return (
+    <div className={`splash-screen ${fadeOut ? 'fade-out' : ''}`}>
+      {/* Background gradient */}
+      <div className="splash-background">
+        <div className="gradient-blob blob-1"></div>
+        <div className="gradient-blob blob-2"></div>
+        <div className="gradient-blob blob-3"></div>
+      </div>
+
+      {/* Logo and text */}
+      <div className="splash-content">
+        <div className="logo-container">
+          <div className="logo-pulse">
+            <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+              {/* ProfitHackAI Logo SVG */}
+              <circle cx="60" cy="60" r="55" stroke="currentColor" strokeWidth="2" fill="none" />
+              <text x="60" y="70" textAnchor="middle" fontSize="24" fontWeight="bold" fill="currentColor">
+                PHA
+              </text>
+            </svg>
+          </div>
+        </div>
+
+        <h1 className="splash-title">ProfitHackAI</h1>
+        <p className="splash-subtitle">Create. Monetize. Dominate.</p>
+
+        {/* Loading indicator */}
+        <div className="loading-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+### 1.3 Splash Screen Styling (CSS)
+
+Create a new file: `client/src/components/SplashScreen.css`
+
+```css
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  overflow: hidden;
+  transition: opacity 0.5s ease-out;
+}
+
+.splash-screen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.splash-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0a1e3f 0%, #0d2a5f 50%, #1a3a7a 100%);
+  overflow: hidden;
+}
+
+.gradient-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.3;
+  animation: float 8s ease-in-out infinite;
+}
+
+.blob-1 {
+  width: 300px;
+  height: 300px;
+  background: #00d4ff;
+  top: -100px;
+  left: -100px;
+  animation-delay: 0s;
+}
+
+.blob-2 {
+  width: 250px;
+  height: 250px;
+  background: #8b5cf6;
+  bottom: -50px;
+  right: -50px;
+  animation-delay: 2s;
+}
+
+.blob-3 {
+  width: 200px;
+  height: 200px;
+  background: #10b981;
+  top: 50%;
+  right: 10%;
+  animation-delay: 4s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(20px, -20px);
+  }
+}
+
+.splash-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  color: white;
+}
+
+.logo-container {
+  margin-bottom: 30px;
+}
+
+.logo-pulse {
+  display: inline-block;
+  animation: pulse-scale 2s ease-in-out infinite;
+  color: #00d4ff;
+}
+
+@keyframes pulse-scale {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.splash-title {
+  font-size: 48px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #00d4ff 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.splash-subtitle {
+  font-size: 18px;
+  color: #b8c5d6;
+  margin: 10px 0 30px;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.loading-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 30px;
+}
+
+.loading-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00d4ff;
+  animation: bounce 1.4s infinite;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+```
+
+### 1.4 Feed Loading Skeleton (React Component)
+
+Create a new file: `client/src/components/FeedSkeleton.tsx`
+
+```typescript
+import React from 'react';
+import './FeedSkeleton.css';
+
+export const FeedSkeleton: React.FC = () => {
+  return (
+    <div className="feed-skeleton">
+      {[1, 2, 3].map((index) => (
+        <div key={index} className="skeleton-video-card">
+          <div className="skeleton-video-player">
+            <div className="skeleton-shimmer"></div>
+          </div>
+          <div className="skeleton-sidebar">
+            <div className="skeleton-avatar"></div>
+            <div className="skeleton-button"></div>
+            <div className="skeleton-button"></div>
+            <div className="skeleton-button"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+```
+
+### 1.5 Auto-Play Feed Component
+
+Modify `client/src/pages/Feed.tsx` to implement TikTok-style auto-play:
+
+```typescript
+import React, { useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { FeedSkeleton } from '../components/FeedSkeleton';
+
+interface Video {
+  id: string;
+  title: string;
+  videoUrl: string;
+  creatorId: string;
+  creatorUsername: string;
+  creatorAvatar: string;
+  views: number;
+  likes: number;
+}
+
+export const Feed: React.FC = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [videos, setVideos] = useState<Video[]>([]);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Fetch videos
+  const { data, isLoading } = useQuery({
+    queryKey: ['videos', 'feed'],
+    queryFn: async () => {
+      const response = await fetch('/api/videos/reels');
+      return response.json();
+    },
+  });
+
+  useEffect(() => {
+    if (data?.videos) {
+      setVideos(data.videos);
+    }
+  }, [data]);
+
+  // Auto-play current video
+  useEffect(() => {
+    const currentVideo = videoRefs.current[currentIndex];
+    if (currentVideo) {
+      currentVideo.play().catch((error) => {
+        console.log('Auto-play prevented:', error);
+        // User interaction required - show play button
+      });
+    }
+
+    // Pause other videos
+    videoRefs.current.forEach((video, index) => {
+      if (index !== currentIndex && video) {
+        video.pause();
+      }
+    });
+  }, [currentIndex]);
+
+  // Handle vertical scroll (swipe up/down)
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      if (e.deltaY > 0) {
+        // Scroll down - next video
+        setCurrentIndex((prev) => Math.min(prev + 1, videos.length - 1));
+      } else {
+        // Scroll up - previous video
+        setCurrentIndex((prev) => Math.max(prev - 1, 0));
+      }
+    };
+
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
+      return () => container.removeEventListener('wheel', handleWheel);
+    }
+  }, [videos.length]);
+
+  // Handle touch swipe
+  const handleTouchStart = useRef(0);
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const touchEnd = e.changedTouches[0].clientY;
+    const diff = handleTouchStart.current - touchEnd;
+
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        // Swiped up - next video
+        setCurrentIndex((prev) => Math.min(prev + 1, videos.length - 1));
+      } else {
+        // Swiped down - previous video
+        setCurrentIndex((prev) => Math.max(prev - 1, 0));
+      }
+    }
+  };
+
+  if (isLoading) {
+    return <FeedSkeleton />;
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className="feed-container"
+      onTouchStart={(e) => (handleTouchStart.current = e.touches[0].clientY)}
+      onTouchEnd={handleTouchEnd}
+    >
+      {videos.map((video, index) => (
+        <div
+          key={video.id}
+          className={`feed-video-card ${index === currentIndex ? 'active' : ''}`}
+          style={{
+            transform: `translateY(${(index - currentIndex) * 100}vh)`,
+            transition: 'transform 0.3s ease-out',
+          }}
+        >
+          <video
+            ref={(el) => (videoRefs.current[index] = el)}
+            src={video.videoUrl}
+            className="feed-video"
+            loop
+            muted={index !== currentIndex}
+            playsInline
+          />
+
+          {/* Video overlay content */}
+          <div className="video-overlay">
+            <div className="video-sidebar">
+              {/* Creator info, like button, gift button, etc. */}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+```
+
+### 1.6 Feed Styling
+
+Create `client/src/pages/Feed.css`:
+
+```css
+.feed-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+  scroll-behavior: smooth;
+}
+
+.feed-video-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feed-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+.video-sidebar {
+  position: absolute;
+  right: 20px;
+  bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  pointer-events: auto;
+}
+```
+
+---
+
+## PART 2: 100+ FUTURISTIC SPARKS SYSTEM
+
+### 2.1 Spark Categories & Types
+
+The new Sparks system should include 100+ gift types across these categories:
+
+**Category 1: Cosmic Gifts (15 types)**
+- Nova Burst (animated star explosion)
+- Galaxy Swirl (rotating galaxy animation)
+- Quantum Leap (teleportation effect)
+- Stellar Dust (particle cloud)
+- Black Hole (gravity pull effect)
+- Supernova (intense light burst)
+- Meteor Shower (falling meteors)
+- Cosmic Ray (laser beam)
+- Wormhole (portal effect)
+- Nebula Cloud (gas cloud animation)
+- Pulsar Pulse (pulsing light)
+- Solar Flare (sun burst)
+- Stardust Trail (particle trail)
+- Void Echo (dark matter effect)
+- Cosmic Dance (orbital animation)
+
+**Category 2: Futuristic Tech (15 types)**
+- Hologram Projection (3D hologram effect)
+- Neon Glow (neon light effect)
+- Cyber Pulse (digital pulse)
+- Matrix Code (falling code animation)
+- Laser Beam (laser effect)
+- Plasma Ball (plasma animation)
+- Quantum Entanglement (linked particles)
+- Digital Storm (digital particles)
+- Neon Grid (grid animation)
+- Holographic Heart (3D heart)
+- Cyber Shield (protective shield)
+- Neon Explosion (neon burst)
+- Digital Ascension (rising digital particles)
+- Quantum Tunnel (tunnel effect)
+- Cyber Dragon (animated dragon)
+
+**Category 3: Mythical & Fantasy (15 types)**
+- Phoenix Rising (fire bird animation)
+- Dragon Fire (dragon breathing fire)
+- Unicorn Magic (magical sparkles)
+- Mermaid Splash (water animation)
+- Angel Wings (wing animation)
+- Demon Horns (dark effect)
+- Wizard Spell (magical spell effect)
+- Fairy Dust (sparkling particles)
+- Kraken Tentacle (tentacle animation)
+- Pegasus Flight (flying animation)
+- Sphinx Mystery (mysterious effect)
+- Basilisk Gaze (hypnotic effect)
+- Chimera Roar (multi-element effect)
+- Valkyrie Strike (warrior effect)
+- Leviathan Rise (ocean creature effect)
+
+**Category 4: Nature & Elements (15 types)**
+- Thunderstorm (lightning animation)
+- Wildfire (fire animation)
+- Tsunami Wave (water animation)
+- Earthquake Tremor (ground shake)
+- Tornado Spin (spinning effect)
+- Blizzard Snow (snow animation)
+- Lava Flow (lava animation)
+- Aurora Borealis (northern lights)
+- Meteor Impact (impact effect)
+- Volcanic Eruption (explosion effect)
+- Hurricane Force (wind effect)
+- Earthquake Crack (crack animation)
+- Sandstorm (sand particle effect)
+- Hailstorm (hail animation)
+- Wildflower Bloom (flower animation)
+
+**Category 5: Luxury & Premium (15 types)**
+- Diamond Crown (rotating crown)
+- Gold Rush (gold particle effect)
+- Platinum Aura (platinum glow)
+- Ruby Radiance (red gem glow)
+- Sapphire Shine (blue gem glow)
+- Emerald Gleam (green gem glow)
+- Pearl Essence (pearl animation)
+- Crystal Palace (crystal effect)
+- Golden Ticket (ticket animation)
+- Treasure Chest (chest opening)
+- Crown Jewels (jewelry animation)
+- Money Rain (cash falling)
+- Luxury Car (car animation)
+- Diamond Ring (ring animation)
+- Throne of Power (throne animation)
+
+**Category 6: Emotional & Social (15 types)**
+- Love Explosion (heart burst)
+- Friendship Bond (linked hearts)
+- Celebration Confetti (confetti animation)
+- Victory Cheer (cheering effect)
+- Inspiration Spark (spark animation)
+- Gratitude Glow (warm glow)
+- Admiration Aura (aura effect)
+- Respect Bow (bowing animation)
+- Encouragement Boost (boost effect)
+- Laughter Burst (laugh animation)
+- Joy Explosion (happy burst)
+- Support Shield (shield animation)
+- Motivation Fire (fire animation)
+- Trust Glow (glowing effect)
+- Community Heart (connected hearts)
+
+**Category 7: Gaming & Esports (10 types)**
+- Level Up (game level up effect)
+- Achievement Unlocked (achievement ani
+(Content truncated due to size limit. Use page ranges or line ranges to read remaining content)
+
+

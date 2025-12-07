@@ -1,0 +1,110 @@
+// terminate_user_stream_grpc.ts - Full TypeScript Implementation for TerminateUserStream gRPC Method
+
+// NOTE: This code assumes you have generated gRPC types from your .proto file.
+
+import * as grpc from '@grpc/grpc-js';
+// Conceptual imports based on standard gRPC structure
+// import { SignalingServiceService, ISignalingServiceServer } from './proto/signaling_grpc_pb';
+// import { TerminateUserStreamRequest, TerminateUserStreamResponse } from './proto/signaling_pb';
+
+// --- Conceptual Interfaces (Replace with your actual gRPC types) ---
+interface TerminateUserStreamRequest {
+    getRoomid(): string;
+    getUserid(): string;
+    getReason(): string;
+}
+
+interface TerminateUserStreamResponse {
+    setSuccess(success: boolean): void;
+    setMessage(message: string): void;
+}
+
+// --- Conceptual SFU/Signaling Connection Management ---
+// In a real system, this would be a map or service holding active WebSocket/gRPC stream connections.
+interface UserConnection {
+    send(data: string): void; // Method to send data to the client
+    close(): void; // Method to close the connection
+}
+
+// Placeholder function to find the active connection
+function findUserConnection(roomId: string, userId: string): UserConnection | undefined {
+    // Replace with actual lookup logic (e.g., from a Map<string, UserConnection>)
+    console.log(`Looking up active connection for user ${userId} in room ${roomId}...`);
+    // Simulating a successful lookup
+    return { 
+        send: (data: string) => console.log(`[TO CLIENT ${userId}]: ${data}`),
+        close: () => console.log(`[SFU]: Kicking user ${userId} from room ${roomId}.`)
+    };
+}
+
+// --- Conceptual SFU Manager ---
+// This would interact with the underlying SFU framework (e.g., Mediasoup, Janus)
+const sfuManager = {
+    kickUser: (roomId: string, userId: string) => {
+        // Logic to close the user's WebRTC connection on the SFU server side
+        console.log(`[SFU Manager]: Closing WebRTC connection for ${userId}.`);
+    }
+};
+
+// --- Full gRPC Method Implementation ---
+
+/**
+ * gRPC method to terminate a user's stream in a room, typically called by the Monetization Service.
+ * @param call The gRPC server call object.
+ * @param callback The gRPC callback function.
+ */
+export const TerminateUserStream = (
+    call: grpc.ServerUnaryCall<TerminateUserStreamRequest, TerminateUserStreamResponse>, 
+    callback: grpc.sendUnaryData<TerminateUserStreamResponse>
+) => {
+    const roomId = call.request.getRoomid();
+    const userId = call.request.getUserid();
+    const reason = call.request.getReason();
+
+    const userConnection = findUserConnection(roomId, userId);
+    const response = {} as TerminateUserStreamResponse; // Conceptual response object
+
+    if (userConnection) {
+        // 1. Send the specific, non-WebRTC termination signal to the client
+        const terminationSignal = {
+            type: 'TERMINATE_CALL',
+            reason: reason,
+            redirectUrl: '/models' // The "all models landing page"
+        };
+        
+        try {
+            userConnection.send(JSON.stringify(terminationSignal));
+            
+            // 2. Perform server-side cleanup
+            sfuManager.kickUser(roomId, userId);
+            userConnection.close(); // Close the signaling connection as well
+            
+            response.setSuccess(true);
+            response.setMessage(`Termination signal sent and user ${userId} kicked from room ${roomId}.`);
+            callback(null, response);
+            
+        } catch (error) {
+            console.error(`Error sending termination signal to ${userId}:`, error);
+            response.setSuccess(false);
+            response.setMessage(`Failed to send signal: ${error.message}`);
+            callback(null, response);
+        }
+        
+    } else {
+        console.warn(`RTC: Could not find active connection for user ${userId} in room ${roomId}.`);
+        response.setSuccess(false);
+        response.setMessage(`Connection not found for user ${userId}.`);
+        callback(null, response);
+    }
+};
+
+// --- Conceptual Integration into gRPC Server ---
+/*
+// Assuming your gRPC server setup:
+const rtcServerImplementation = {
+    // ... other methods like joinRoom, signal, etc.
+    TerminateUserStream: TerminateUserStream,
+};
+
+// server.addService(SignalingServiceService, rtcServerImplementation);
+*/

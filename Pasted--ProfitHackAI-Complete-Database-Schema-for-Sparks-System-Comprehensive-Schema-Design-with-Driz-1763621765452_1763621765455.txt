@@ -1,0 +1,398 @@
+# ProfitHackAI: Complete Database Schema for Sparks System
+## Comprehensive Schema Design with Drizzle ORM, SQL Migrations, and Seed Data
+
+---
+
+## Executive Overview
+
+The Sparks system requires five interconnected database tables to manage gift types, animations, user interactions, and revenue tracking. This document provides complete specifications for production-ready implementation using Drizzle ORM with PostgreSQL.
+
+**Tables Overview:**
+
+| Table Name | Purpose | Row Count | Indexes |
+| :--- | :--- | :--- | :--- |
+| `sparks` | Core gift/spark definitions | 100+ | 5 (id, category, isNew, creditCost, isActive) |
+| `spark_animation_configs` | Animation keyframes and physics | 100+ | 3 (sparkId, animationType, easing) |
+| `virtual_gifts` | User gift transactions | 100K+ | 4 (senderId, recipientId, sparkId, createdAt) |
+| `spark_categories` | Gift category metadata | 7 | 2 (id, slug) |
+| `spark_sound_effects` | Audio file management | 50+ | 2 (id, sparkId) |
+
+---
+
+## Part 1: Sparks Table (Core Gift Definitions)
+
+### 1.1 Complete Field Specification
+
+The `sparks` table stores all gift type definitions with 18 fields covering visual, audio, and behavioral properties.
+
+```typescript
+// shared/schema.ts - Sparks Table Definition
+
+import {
+  pgTable,
+  serial,
+  text,
+  integer,
+  boolean,
+  timestamp,
+  jsonb,
+  decimal,
+  varchar,
+  index,
+  uniqueIndex,
+} from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+
+export const sparks = pgTable(
+  'sparks',
+  {
+    // Primary Key
+    id: serial('id').primaryKey(),
+
+    // Basic Information (Fields 1-4)
+    name: varchar('name', { length: 100 }).notNull().unique(),
+    // Description: Human-readable name of the spark (e.g., "Nova Burst", "Galaxy Swirl")
+    // Constraints: Unique, max 100 characters, required
+    // Example: "Nova Burst"
+
+    emoji: varchar('emoji', { length: 10 }).notNull(),
+    // Description: Unicode emoji representation of the spark
+    // Constraints: Required, max 10 characters (supports multi-character emojis)
+    // Example: "💫"
+
+    description: text('description'),
+    // Description: Detailed description of the spark for UI display
+    // Constraints: Optional, max 500 characters
+    // Example: "Explosive star burst animation with particle effects"
+
+    slug: varchar('slug', { length: 100 }).notNull().unique(),
+    // Description: URL-friendly identifier for the spark
+    // Constraints: Unique, lowercase, hyphenated, max 100 characters
+    // Example: "nova-burst"
+
+    // Category & Classification (Fields 5-6)
+    category: varchar('category', { length: 50 }).notNull(),
+    // Description: Gift category for filtering and organization
+    // Constraints: Required, must match spark_categories.slug
+    // Allowed values: 'cosmic', 'tech', 'mythical', 'nature', 'luxury', 'emotional', 'gaming'
+    // Example: "cosmic"
+
+    subcategory: varchar('subcategory', { length: 50 }),
+    // Description: Optional sub-category for finer organization
+    // Constraints: Optional, must match spark_categories.slug if provided
+    // Example: "space-phenomena"
+
+    // Pricing & Economy (Fields 7-9)
+    creditCost: integer('credit_cost').notNull(),
+    // Description: Number of credits required to send this spark
+    // Constraints: Required, positive integer, range 5-20000
+    // Pricing tiers: 5-50 (common), 50-200 (rare), 200-2000 (legendary), 2000+ (exclusive)
+    // Example: 100
+
+    usdValue: decimal('usd_value', { precision: 8, scale: 2 }),
+    // Description: USD equivalent value for analytics and reporting
+    // Constraints: Optional, calculated as creditCost * $0.024
+    // Example: 2.40
+
+    rarity: varchar('rarity', { length: 20 }).default('common'),
+    // Description: Rarity tier affecting visibility and pricing
+    // Constraints: Optional, default 'common'
+    // Allowed values: 'common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic'
+    // Example: "rare"
+
+    // Animation Configuration (Fields 10-14)
+    animationType: varchar('animation_type', { length: 50 }).notNull(),
+    // Description: Type of animation to play when spark is sent
+    // Constraints: Required, must be valid animation type
+    // Allowed values: 'particle', 'scale', 'rotate', 'path', 'morph', 'burst', 'cascade', 'spiral'
+    // Example: "particle"
+
+    animationDuration: integer('animation_duration').notNull(),
+    // Description: Total animation duration in milliseconds
+    // Constraints: Required, positive integer, range 300-3000
+    // Example: 800
+
+    particleCount: integer('particle_count').default(50),
+    // Description: Number of particles to render for particle-based animations
+    // Constraints: Optional, default 50, range 0-500
+    // Example: 80
+
+    scale: integer('scale').default(100),
+    // Description: Size multiplier for the spark as percentage (100 = 1x, 200 = 2x)
+    // Constraints: Optional, default 100, range 50-300
+    // Example: 150
+
+    // Color & Visual Properties (Fields 15-17)
+    primaryColor: varchar('primary_color', { length: 7 }).notNull(),
+    // Description: Primary color in hex format for the spark
+    // Constraints: Required, valid hex color code (#RRGGBB)
+    // Example: "#FFD700"
+
+    secondaryColor: varchar('secondary_color', { length: 7 }),
+    // Description: Secondary color for gradients and effects
+    // Constraints: Optional, valid hex color code
+    // Example: "#FF6B6B"
+
+    tertiaryColor: varchar('tertiary_color', { length: 7 }),
+    // Description: Tertiary color for complex multi-color effects
+    // Constraints: Optional, valid hex color code
+    // Example: "#00D4FF"
+
+    // Audio Configuration (Fields 18-20)
+    soundEffectId: integer('sound_effect_id'),
+    // Description: Foreign key reference to spark_sound_effects table
+    // Constraints: Optional, must exist in spark_sound_effects.id
+    // Example: 42
+
+    soundVolume: integer('sound_volume').default(70),
+    // Description: Audio volume as percentage (0-100)
+    // Constraints: Optional, default 70, range 0-100
+    // Example: 80
+
+    hasAudio: boolean('has_audio').default(false),
+    // Description: Whether this spark has an associated sound effect
+    // Constraints: Optional, default false
+    // Example: true
+
+    // Status & Metadata (Fields 21-24)
+    isActive: boolean('is_active').default(true),
+    // Description: Whether the spark is available for purchase
+    // Constraints: Optional, default true
+    // Example: true
+
+    isNew: boolean('is_new').default(false),
+    // Description: Whether to display "NEW" badge in UI
+    // Constraints: Optional, default false
+    // Example: true
+
+    isFeatured: boolean('is_featured').default(false),
+    // Description: Whether to feature in special promotions
+    // Constraints: Optional, default false
+    // Example: false
+
+    isLimited: boolean('is_limited').default(false),
+    // Description: Whether this is a limited-time spark
+    // Constraints: Optional, default false
+    // Example: false
+
+    // Availability Windows (Fields 25-26)
+    availableFrom: timestamp('available_from'),
+    // Description: Timestamp when spark becomes available
+    // Constraints: Optional, defaults to creation time
+    // Example: 2024-11-20 00:00:00
+
+    availableUntil: timestamp('available_until'),
+    // Description: Timestamp when spark becomes unavailable (for limited-time sparks)
+    // Constraints: Optional, null for permanent sparks
+    // Example: 2024-12-31 23:59:59
+
+    // Analytics & Tracking (Fields 27-29)
+    totalSent: integer('total_sent').default(0),
+    // Description: Total number of times this spark has been sent
+    // Constraints: Optional, default 0, auto-incremented on send
+    // Example: 1250
+
+    totalRevenue: decimal('total_revenue', { precision: 12, scale: 2 }).default('0'),
+    // Description: Total USD revenue generated from this spark
+    // Constraints: Optional, default 0, calculated as totalSent * usdValue
+    // Example: 3000.00
+
+    popularity: integer('popularity').default(0),
+    // Description: Popularity score (0-100) for ranking and recommendations
+    // Constraints: Optional, default 0, calculated from send frequency
+    // Example: 75
+
+    // Timestamps (Fields 30-31)
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    // Description: When the spark was created
+    // Constraints: Required, auto-set to current timestamp
+    // Example: 2024-11-20 10:30:00
+
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    // Description: When the spark was last updated
+    // Constraints: Required, auto-updated on any modification
+    // Example: 2024-11-20 15:45:00
+
+    // Metadata (Field 32)
+    metadata: jsonb('metadata'),
+    // Description: Flexible JSON field for additional spark properties
+    // Constraints: Optional, stores custom properties
+    // Example: { "theme": "space", "difficulty": "easy", "requiredLevel": 5 }
+  },
+  // Index Definitions
+  (table) => ({
+    // Performance indexes for common queries
+    categoryIdx: index('sparks_category_idx').on(table.category),
+    // Used for: Filtering sparks by category in gift picker
+    // Query: SELECT * FROM sparks WHERE category = 'cosmic'
+
+    isNewIdx: index('sparks_is_new_idx').on(table.isNew),
+    // Used for: Displaying "NEW" sparks prominently
+    // Query: SELECT * FROM sparks WHERE isNew = true ORDER BY createdAt DESC
+
+    creditCostIdx: index('sparks_credit_cost_idx').on(table.creditCost),
+    // Used for: Filtering by price range
+    // Query: SELECT * FROM sparks WHERE creditCost BETWEEN 50 AND 200
+
+    isActiveIdx: index('sparks_is_active_idx').on(table.isActive),
+    // Used for: Excluding inactive sparks from UI
+    // Query: SELECT * FROM sparks WHERE isActive = true
+
+    rarityIdx: index('sparks_rarity_idx').on(table.rarity),
+    // Used for: Filtering by rarity tier
+    // Query: SELECT * FROM sparks WHERE rarity = 'legendary'
+
+    // Unique indexes
+    nameUnique: uniqueIndex('sparks_name_unique').on(table.name),
+    slugUnique: uniqueIndex('sparks_slug_unique').on(table.slug),
+
+    // Composite indexes for complex queries
+    categoryActiveIdx: index('sparks_category_active_idx').on(table.category, table.isActive),
+    // Used for: Get active sparks in a category
+    // Query: SELECT * FROM sparks WHERE category = 'cosmic' AND isActive = true
+
+    availabilityIdx: index('sparks_availability_idx').on(table.availableFrom, table.availableUntil),
+    // Used for: Check if spark is currently available
+    // Query: SELECT * FROM sparks WHERE availableFrom <= NOW() AND (availableUntil IS NULL OR availableUntil > NOW())
+  })
+);
+
+// TypeScript Type Definitions
+export type Spark = typeof sparks.$inferSelect;
+export type NewSpark = typeof sparks.$inferInsert;
+
+export interface SparkWithStats extends Spark {
+  sendCount: number;
+  revenue: number;
+  averageRating: number;
+}
+```
+
+### 1.2 Field Summary Table
+
+| Field # | Field Name | Data Type | Required | Default | Constraints | Purpose |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| 1 | id | SERIAL | Yes | Auto | PRIMARY KEY | Unique identifier |
+| 2 | name | VARCHAR(100) | Yes | - | UNIQUE | Display name |
+| 3 | emoji | VARCHAR(10) | Yes | - | - | Visual representation |
+| 4 | description | TEXT | No | NULL | Max 500 chars | UI description |
+| 5 | slug | VARCHAR(100) | Yes | - | UNIQUE | URL-friendly ID |
+| 6 | category | VARCHAR(50) | Yes | - | FK to categories | Gift category |
+| 7 | subcategory | VARCHAR(50) | No | NULL | FK to categories | Sub-category |
+| 8 | creditCost | INTEGER | Yes | - | 5-20000 | Purchase price |
+| 9 | usdValue | DECIMAL(8,2) | No | NULL | Calculated | USD equivalent |
+| 10 | rarity | VARCHAR(20) | No | 'common' | Enum | Rarity tier |
+| 11 | animationType | VARCHAR(50) | Yes | - | Enum | Animation style |
+| 12 | animationDuration | INTEGER | Yes | - | 300-3000 | Duration (ms) |
+| 13 | particleCount | INTEGER | No | 50 | 0-500 | Particle count |
+| 14 | scale | INTEGER | No | 100 | 50-300 | Size multiplier |
+| 15 | primaryColor | VARCHAR(7) | Yes | - | Hex color | Main color |
+| 16 | secondaryColor | VARCHAR(7) | No | NULL | Hex color | Gradient color |
+| 17 | tertiaryColor | VARCHAR(7) | No | NULL | Hex color | Additional color |
+| 18 | soundEffectId | INTEGER | No | NULL | FK to sounds | Audio reference |
+| 19 | soundVolume | INTEGER | No | 70 | 0-100 | Audio volume |
+| 20 | hasAudio | BOOLEAN | No | false | - | Audio flag |
+| 21 | isActive | BOOLEAN | No | true | - | Availability flag |
+| 22 | isNew | BOOLEAN | No | false | - | New badge flag |
+| 23 | isFeatured | BOOLEAN | No | false | - | Featured flag |
+| 24 | isLimited | BOOLEAN | No | false | - | Limited-time flag |
+| 25 | availableFrom | TIMESTAMP | No | NOW() | - | Start availability |
+| 26 | availableUntil | TIMESTAMP | No | NULL | - | End availability |
+| 27 | totalSent | INTEGER | No | 0 | ≥ 0 | Send count |
+| 28 | totalRevenue | DECIMAL(12,2) | No | 0 | ≥ 0 | Revenue total |
+| 29 | popularity | INTEGER | No | 0 | 0-100 | Popularity score |
+| 30 | createdAt | TIMESTAMP | Yes | NOW() | - | Creation time |
+| 31 | updatedAt | TIMESTAMP | Yes | NOW() | - | Update time |
+| 32 | metadata | JSONB | No | NULL | - | Custom properties |
+
+---
+
+## Part 2: Spark Animation Configs Table
+
+### 2.1 Animation Configuration Schema
+
+The `spark_animation_configs` table stores detailed animation keyframes, physics properties, and easing functions for each spark.
+
+```typescript
+export const sparkAnimationConfigs = pgTable(
+  'spark_animation_configs',
+  {
+    // Primary Key
+    id: serial('id').primaryKey(),
+
+    // Foreign Key (Field 1)
+    sparkId: integer('spark_id').notNull(),
+    // Description: Reference to sparks.id
+    // Constraints: Required, must exist in sparks table
+    // Relationship: Many-to-One with sparks table
+    // Example: 42
+
+    // Animation Timing (Fields 2-3)
+    easing: varchar('easing', { length: 50 }).notNull().default('ease-out'),
+    // Description: CSS easing function for animation timing
+    // Constraints: Required, default 'ease-out'
+    // Allowed values: 'linear', 'ease-in', 'ease-out', 'ease-in-out', 'cubic-bezier(x1,y1,x2,y2)'
+    // Example: "cubic-bezier(0.34, 1.56, 0.64, 1)"
+
+    duration: integer('duration').notNull(),
+    // Description: Total animation duration in milliseconds
+    // Constraints: Required, positive integer, 300-3000
+    // Example: 800
+
+    // Position Animation (Fields 4-7)
+    startX: integer('start_x').default(0),
+    // Description: Starting X position relative to center (pixels)
+    // Constraints: Optional, default 0, range -500 to 500
+    // Example: -100
+
+    startY: integer('start_y').default(0),
+    // Description: Starting Y position relative to center (pixels)
+    // Constraints: Optional, default 0, range -500 to 500
+    // Example: -100
+
+    endX: integer('end_x').default(0),
+    // Description: Ending X position relative to center (pixels)
+    // Constraints: Optional, default 0, range -500 to 500
+    // Example: 200
+
+    endY: integer('end_y').default(0),
+    // Description: Ending Y position relative to center (pixels)
+    // Constraints: Optional, default 0, range -500 to 500
+    // Example: 300
+
+    // Rotation Animation (Fields 8-9)
+    rotationStart: integer('rotation_start').default(0),
+    // Description: Starting rotation in degrees
+    // Constraints: Optional, default 0, range 0-360
+    // Example: 0
+
+    rotationEnd: integer('rotation_end').default(360),
+    // Description: Ending rotation in degrees
+    // Constraints: Optional, default 360, range 0-360
+    // Example: 720
+
+    rotationDirection: varchar('rotation_direction', { length: 10 }).default('clockwise'),
+    // Description: Direction of rotation
+    // Constraints: Optional, default 'clockwise'
+    // Allowed values: 'clockwise', 'counter-clockwise', 'random'
+    // Example: "clockwise"
+
+    // Scale Animation (Fields 10-11)
+    scaleStart: integer('scale_start').default(100),
+    // Description: Starting scale as percentage (100 = 1x)
+    // Constraints: Optional, default 100, range 0-500
+    // Example: 50
+
+    scaleEnd: integer('scale_end').default(100),
+    // Description: Ending scale as percentage (100 = 1x)
+    // Constraints: Optional, default 100, range 0-500
+    // Example: 150
+
+    // Opacity Animation (Fields 12-13)
+    opacityStart: integer('opacity_start').default(100),
+    // Description: Starting opacity as percentage (100 = fully opaque)
+    // Constr
+(Content truncated due to size limit. Use page ranges or line ranges to read remaining content)
+
+
+live

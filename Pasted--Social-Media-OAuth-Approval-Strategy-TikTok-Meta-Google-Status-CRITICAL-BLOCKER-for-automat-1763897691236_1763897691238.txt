@@ -1,0 +1,59 @@
+📱 Social Media OAuth Approval Strategy (TikTok, Meta, Google)
+
+Status: CRITICAL BLOCKER for automated marketing and growth.
+
+The goal is to secure OAuth approval from TikTok, Meta (Instagram/Threads), and Google (YouTube) to enable the automated posting features of your 200-agent marketing system.
+
+1. Core Strategy: Position as a "Creator Tool"
+
+Social media platforms are hesitant to approve apps that automate posting, fearing spam. The strategy is to position ProfitHack AI as a Premium, High-Value Creator Management Tool.
+
+Platform
+Required Approval
+Strategic Pitch
+TikTok
+Login Kit, Posting API
+"A next-generation, AI-powered content creation and scheduling tool that helps creators maximize engagement and revenue by cross-posting unique, high-quality content."
+Meta (Instagram/Threads)
+Instagram Graph API (Basic & Creator)
+"A professional content management dashboard for high-volume creators to manage their content lifecycle, analytics, and direct monetization channels."
+Google (YouTube)
+YouTube Data API v3
+"A dedicated tool for managing YouTube Shorts and long-form video uploads, focusing on AI-driven SEO optimization and multi-platform content syndication."
+
+
+2. Application Checklist and Best Practices
+
+Item
+Action
+Rationale
+App Name
+Use a professional name like "ProfitHack AI Creator Suite" or "PHAI Management."
+Avoid names that sound like spam bots (e.g., "AutoPoster," "GrowthHack").
+Video Demo
+CRITICAL: Provide a high-quality video demo showing a human user interacting with the app, not the automated posting running in the background.
+Show the user selecting the AI-generated content, scheduling it, and reviewing analytics. This proves it's a "tool," not a "bot."
+Privacy Policy
+Must explicitly state how you use the posting permissions (e.g., "We use your granted permissions to post content to your account on your behalf and at your direction").
+Transparency is key to approval.
+Scope Limitation
+Request the minimum required permissions (scopes). Do not ask for "everything."
+Reduces the platform's security concern and speeds up review.
+Support URL
+Ensure your support email and URL are active and monitored.
+Platforms will test your support responsiveness.
+
+
+3. Final Action
+
+1.
+Prepare the Video Demo: Focus the demo on the content creation and scheduling UI.
+
+2.
+Submit Applications: Submit all three applications simultaneously, using the consistent "Creator Tool" pitch.
+
+3.
+Monitor and Respond: The review process can take weeks. Respond to any reviewer questions within 24 hours.
+
+Until approval, your Soft Launch strategy of focusing on the internal P2P FYP and direct user engagement is the correct approach.
+

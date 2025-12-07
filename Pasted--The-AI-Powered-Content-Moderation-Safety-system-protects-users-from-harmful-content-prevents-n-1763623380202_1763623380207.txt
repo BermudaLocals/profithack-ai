@@ -1,0 +1,1479 @@
+
+
+
+The AI-Powered Content Moderation & Safety system protects users from harmful content, prevents non-consensual deepfakes, and ensures compliance with global regulations. This system is essential for platform credibility and legal protection.
+
+
+
+
+PART 1: DATABASE SCHEMA
+
+Add to shared/schema.ts:
+
+TypeScript
+
+
+import { pgTable, serial, integer, text, timestamp, varchar, boolean, index, decimal, jsonb } from 'drizzle-orm/pg-core';
+
+// Content moderation flags
+export const contentFlags = pgTable(
+  'content_flags',
+  {
+    id: serial('id').primaryKey(),
+    contentType: varchar('content_type', { length: 50 }).notNull(), // 'video', 'deepfake', 'image', 'comment'
+    contentId: integer('content_id').notNull(),
+    flagReason: varchar('flag_reason', { length: 100 }).notNull(), // 'explicit', 'violence', 'hate_speech', 'deepfake', 'non_consensual'
+    flagSeverity: varchar('flag_severity', { length: 20 }).notNull(), // 'low', 'medium', 'high', 'critical'
+    confidence: decimal('confidence', { precision: 5, scale: 2 }).notNull(), // 0-100
+    flaggedBy: integer('flagged_by').notNull().references(() => users.id), // AI or user ID
+    flaggedAt: timestamp('flagged_at').defaultNow().notNull(),
+    status: varchar('status', { length: 20 }).default('pending'), // 'pending', 'reviewed', 'approved', 'removed'
+    reviewedBy: integer('reviewed_by').references(() => users.id),
+    reviewedAt: timestamp('reviewed_at'),
+    reviewNotes: text('review_notes'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    contentTypeIdx: index('content_flags_content_type_idx').on(table.contentType),
+    statusIdx: index('content_flags_status_idx').on(table.status),
+    severityIdx: index('content_flags_severity_idx').on(table.flagSeverity),
+  })
+);
+
+// Deepfake detection records
+export const deepfakeDetections = pgTable(
+  'deepfake_detections',
+  {
+    id: serial('id').primaryKey(),
+    videoId: integer('video_id').notNull().references(() => videos.id),
+    deepfakeScore: decimal('deepfake_score', { precision: 5, scale: 2 }).notNull(), // 0-100
+    faceManipulationScore: decimal('face_manipulation_score', { precision: 5, scale: 2 }).notNull(),
+    voiceSynthesisScore: decimal('voice_synthesis_score', { precision: 5, scale: 2 }).notNull(),
+    lipSyncScore: decimal('lip_sync_score', { precision: 5, scale: 2 }).notNull(),
+    detectionMethod: varchar('detection_method', { length: 100 }).notNull(),
+    isDeepfake: boolean('is_deepfake').notNull(),
+    confidence: decimal('confidence', { precision: 5, scale: 2 }).notNull(),
+    detectionDetails: jsonb('detection_details'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    videoIdIdx: index('deepfake_detections_video_id_idx').on(table.videoId),
+    isDeepfakeIdx: index('deepfake_detections_is_deepfake_idx').on(table.isDeepfake),
+  })
+);
+
+// Consent verification records
+export const consentRecords = pgTable(
+  'consent_records',
+  {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id').notNull().references(() => users.id),
+    contentType: varchar('content_type', { length: 50 }).notNull(), // 'voice_clone', 'face_clone', 'deepfake'
+    targetUserId: integer('target_user_id').references(() => users.id), // User whose face/voice is used
+    consentStatus: varchar('consent_status', { length: 20 }).notNull(), // 'pending', 'approved', 'denied', 'revoked'
+    consentToken: varchar('consent_token', { length: 255 }).notNull().unique(),
+    expiresAt: timestamp('expires_at'),
+    ipAddress: varchar('ip_address', { length: 50 }),
+    userAgent: text('user_agent'),
+    approvedAt: timestamp('approved_at'),
+    deniedAt: timestamp('denied_at'),
+    revokedAt: timestamp('revoked_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userIdIdx: index('consent_records_user_id_idx').on(table.userId),
+    targetUserIdIdx: index('consent_records_target_user_id_idx').on(table.targetUserId),
+    statusIdx: index('consent_records_status_idx').on(table.consentStatus),
+  })
+);
+
+// Content watermarks
+export const contentWatermarks = pgTable(
+  'content_watermarks',
+  {
+    id: serial('id').primaryKey(),
+    contentId: integer('content_id').notNull(),
+    contentType: varchar('content_type', { length: 50 }).notNull(), // 'video', 'image', 'audio'
+    watermarkType: varchar('watermark_type', { length: 50 }).notNull(), // 'visible', 'invisible', 'metadata'
+    watermarkData: jsonb('watermark_data').notNull(),
+    isAiGenerated: boolean('is_ai_generated').notNull(),
+    aiGenerationMethod: varchar('ai_generation_method', { length: 100 }),
+    watermarkVerified: boolean('watermark_verified').default(false),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    contentIdIdx: index('content_watermarks_content_id_idx').on(table.contentId),
+    isAiGeneratedIdx: index('content_watermarks_is_ai_generated_idx').on(table.isAiGenerated),
+  })
+);
+
+// User safety reports
+export const safetyReports = pgTable(
+  'safety_reports',
+  {
+    id: serial('id').primaryKey(),
+    reportedBy: integer('reported_by').notNull().references(() => users.id),
+    reportedUser: integer('reported_user').references(() => users.id),
+    reportedContent: integer('reported_content'),
+    reportType: varchar('report_type', { length: 50 }).notNull(), // 'harassment', 'non_consensual_content', 'deepfake', 'impersonation'
+    description: text('description').notNull(),
+    evidence: jsonb('evidence'), // URLs, timestamps, etc.
+    severity: varchar('severity', { length: 20 }).notNull(), // 'low', 'medium', 'high', 'critical'
+    status: varchar('status', { length: 20 }).default('open'), // 'open', 'investigating', 'resolved', 'dismissed'
+    resolution: text('resolution'),
+    resolvedBy: integer('resolved_by').references(() => users.id),
+    resolvedAt: timestamp('resolved_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    reportedByIdx: index('safety_reports_reported_by_idx').on(table.reportedBy),
+    reportedUserIdx: index('safety_reports_reported_user_idx').on(table.reportedUser),
+    statusIdx: index('safety_reports_status_idx').on(table.status),
+  })
+);
+
+// Moderation queue
+export const moderationQueue = pgTable(
+  'moderation_queue',
+  {
+    id: serial('id').primaryKey(),
+    flagId: integer('flag_id').notNull().references(() => contentFlags.id),
+    priority: varchar('priority', { length: 20 }).notNull(), // 'low', 'medium', 'high', 'urgent'
+    assignedTo: integer('assigned_to').references(() => users.id),
+    status: varchar('status', { length: 20 }).default('pending'), // 'pending', 'in_progress', 'completed'
+    estimatedReviewTime: integer('estimated_review_time'), // seconds
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    completedAt: timestamp('completed_at'),
+  },
+  (table) => ({
+    priorityIdx: index('moderation_queue_priority_idx').on(table.priority),
+    statusIdx: index('moderation_queue_status_idx').on(table.status),
+    assignedToIdx: index('moderation_queue_assigned_to_idx').on(table.assignedTo),
+  })
+);
+
+// Blocked users/content
+export const blockedContent = pgTable(
+  'blocked_content',
+  {
+    id: serial('id').primaryKey(),
+    contentId: integer('content_id').notNull(),
+    contentType: varchar('content_type', { length: 50 }).notNull(),
+    blockReason: varchar('block_reason', { length: 100 }).notNull(),
+    blockedBy: integer('blocked_by').notNull().references(() => users.id),
+    blockedAt: timestamp('blocked_at').defaultNow().notNull(),
+    appealable: boolean('appealable').default(true),
+    appealDeadline: timestamp('appeal_deadline'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    contentIdIdx: index('blocked_content_content_id_idx').on(table.contentId),
+    blockedByIdx: index('blocked_content_blocked_by_idx').on(table.blockedBy),
+  })
+);
+
+
+1.2 Database Migration
+
+Create migrations/003_moderation_tables.sql:
+
+SQL
+
+
+-- Content flags
+CREATE TABLE IF NOT EXISTS content_flags (
+  id SERIAL PRIMARY KEY,
+  content_type VARCHAR(50) NOT NULL,
+  content_id INTEGER NOT NULL,
+  flag_reason VARCHAR(100) NOT NULL,
+  flag_severity VARCHAR(20) NOT NULL,
+  confidence DECIMAL(5, 2) NOT NULL,
+  flagged_by INTEGER NOT NULL REFERENCES users(id),
+  flagged_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  status VARCHAR(20) DEFAULT 'pending',
+  reviewed_by INTEGER REFERENCES users(id),
+  reviewed_at TIMESTAMP,
+  review_notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX content_flags_content_type_idx ON content_flags(content_type);
+CREATE INDEX content_flags_status_idx ON content_flags(status);
+CREATE INDEX content_flags_severity_idx ON content_flags(flag_severity);
+
+-- Deepfake detections
+CREATE TABLE IF NOT EXISTS deepfake_detections (
+  id SERIAL PRIMARY KEY,
+  video_id INTEGER NOT NULL REFERENCES videos(id),
+  deepfake_score DECIMAL(5, 2) NOT NULL,
+  face_manipulation_score DECIMAL(5, 2) NOT NULL,
+  voice_synthesis_score DECIMAL(5, 2) NOT NULL,
+  lip_sync_score DECIMAL(5, 2) NOT NULL,
+  detection_method VARCHAR(100) NOT NULL,
+  is_deepfake BOOLEAN NOT NULL,
+  confidence DECIMAL(5, 2) NOT NULL,
+  detection_details JSONB,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX deepfake_detections_video_id_idx ON deepfake_detections(video_id);
+CREATE INDEX deepfake_detections_is_deepfake_idx ON deepfake_detections(is_deepfake);
+
+-- Consent records
+CREATE TABLE IF NOT EXISTS consent_records (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id),
+  content_type VARCHAR(50) NOT NULL,
+  target_user_id INTEGER REFERENCES users(id),
+  consent_status VARCHAR(20) NOT NULL,
+  consent_token VARCHAR(255) NOT NULL UNIQUE,
+  expires_at TIMESTAMP,
+  ip_address VARCHAR(50),
+  user_agent TEXT,
+  approved_at TIMESTAMP,
+  denied_at TIMESTAMP,
+  revoked_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX consent_records_user_id_idx ON consent_records(user_id);
+CREATE INDEX consent_records_target_user_id_idx ON consent_records(target_user_id);
+CREATE INDEX consent_records_status_idx ON consent_records(consent_status);
+
+-- Content watermarks
+CREATE TABLE IF NOT EXISTS content_watermarks (
+  id SERIAL PRIMARY KEY,
+  content_id INTEGER NOT NULL,
+  content_type VARCHAR(50) NOT NULL,
+  watermark_type VARCHAR(50) NOT NULL,
+  watermark_data JSONB NOT NULL,
+  is_ai_generated BOOLEAN NOT NULL,
+  ai_generation_method VARCHAR(100),
+  watermark_verified BOOLEAN DEFAULT false,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX content_watermarks_content_id_idx ON content_watermarks(content_id);
+CREATE INDEX content_watermarks_is_ai_generated_idx ON content_watermarks(is_ai_generated);
+
+-- Safety reports
+CREATE TABLE IF NOT EXISTS safety_reports (
+  id SERIAL PRIMARY KEY,
+  reported_by INTEGER NOT NULL REFERENCES users(id),
+  reported_user INTEGER REFERENCES users(id),
+  reported_content INTEGER,
+  report_type VARCHAR(50) NOT NULL,
+  description TEXT NOT NULL,
+  evidence JSONB,
+  severity VARCHAR(20) NOT NULL,
+  status VARCHAR(20) DEFAULT 'open',
+  resolution TEXT,
+  resolved_by INTEGER REFERENCES users(id),
+  resolved_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX safety_reports_reported_by_idx ON safety_reports(reported_by);
+CREATE INDEX safety_reports_reported_user_idx ON safety_reports(reported_user);
+CREATE INDEX safety_reports_status_idx ON safety_reports(status);
+
+-- Moderation queue
+CREATE TABLE IF NOT EXISTS moderation_queue (
+  id SERIAL PRIMARY KEY,
+  flag_id INTEGER NOT NULL REFERENCES content_flags(id),
+  priority VARCHAR(20) NOT NULL,
+  assigned_to INTEGER REFERENCES users(id),
+  status VARCHAR(20) DEFAULT 'pending',
+  estimated_review_time INTEGER,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  completed_at TIMESTAMP
+);
+
+CREATE INDEX moderation_queue_priority_idx ON moderation_queue(priority);
+CREATE INDEX moderation_queue_status_idx ON moderation_queue(status);
+CREATE INDEX moderation_queue_assigned_to_idx ON moderation_queue(assigned_to);
+
+-- Blocked content
+CREATE TABLE IF NOT EXISTS blocked_content (
+  id SERIAL PRIMARY KEY,
+  content_id INTEGER NOT NULL,
+  content_type VARCHAR(50) NOT NULL,
+  block_reason VARCHAR(100) NOT NULL,
+  blocked_by INTEGER NOT NULL REFERENCES users(id),
+  blocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  appealable BOOLEAN DEFAULT true,
+  appeal_deadline TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX blocked_content_content_id_idx ON blocked_content(content_id);
+CREATE INDEX blocked_content_blocked_by_idx ON blocked_content(blocked_by);
+
+
+
+
+
+PART 2: CONTENT MODERATION SERVICE
+
+Create server/services/moderation-service.ts:
+
+TypeScript
+
+
+import Anthropic from "@anthropic-ai/sdk";
+import { db } from "../storage";
+import {
+  contentFlags,
+  deepfakeDetections,
+  consentRecords,
+  contentWatermarks,
+  safetyReports,
+  moderationQueue,
+  blockedContent,
+  videos,
+  users,
+} from "../../shared/schema";
+import { eq, and, gte, lte } from "drizzle-orm";
+
+interface ContentAnalysisResult {
+  hasExplicitContent: boolean;
+  hasViolence: boolean;
+  hasHateSpeech: boolean;
+  hasDeepfake: boolean;
+  hasNonConsentualContent: boolean;
+  overallRisk: "low" | "medium" | "high" | "critical";
+  confidence: number;
+  details: string;
+}
+
+interface DeepfakeAnalysisResult {
+  isDeepfake: boolean;
+  deepfakeScore: number;
+  faceManipulationScore: number;
+  voiceSynthesisScore: number;
+  lipSyncScore: number;
+  confidence: number;
+  detectionMethod: string;
+}
+
+export class ModerationService {
+  private client: Anthropic;
+
+  constructor() {
+    this.client = new Anthropic();
+  }
+
+  /**
+   * Analyze content for harmful material
+   */
+  async analyzeContent(
+    contentId: number,
+    contentType: string,
+    contentUrl: string
+  ): Promise<ContentAnalysisResult> {
+    try {
+      const analysisPrompt = `Analyze this ${contentType} for harmful content:
+URL: ${contentUrl}
+
+Check for:
+1. Explicit sexual content (0-100)
+2. Violence or gore (0-100)
+3. Hate speech or discrimination (0-100)
+4. Deepfake or synthetic media (0-100)
+5. Non-consensual intimate content (0-100)
+
+Respond in JSON:
+{
+  "explicitContent": <0-100>,
+  "violence": <0-100>,
+  "hateSpeech": <0-100>,
+  "deepfake": <0-100>,
+  "nonConsentual": <0-100>,
+  "overallRisk": "<low|medium|high|critical>",
+  "confidence": <0-100>,
+  "details": "<explanation>"
+}`;
+
+      const response = await this.client.messages.create({
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 500,
+        messages: [
+          {
+            role: "user",
+            content: analysisPrompt,
+          },
+        ],
+      });
+
+      const analysisText =
+        response.content[0].type === "text" ? response.content[0].text : "{}";
+      const analysis = JSON.parse(analysisText);
+
+      return {
+        hasExplicitContent: analysis.explicitContent > 50,
+        hasViolence: analysis.violence > 50,
+        hasHateSpeech: analysis.hateSpeech > 50,
+        hasDeepfake: analysis.deepfake > 50,
+        hasNonConsentualContent: analysis.nonConsentual > 50,
+        overallRisk: analysis.overallRisk,
+        confidence: analysis.confidence,
+        details: analysis.details,
+      };
+    } catch (error) {
+      console.error("Error analyzing content:", error);
+      throw new Error("Failed to analyze content");
+    }
+  }
+
+  /**
+   * Detect deepfakes in video
+   */
+  async detectDeepfake(
+    videoId: number,
+    videoUrl: string
+  ): Promise<DeepfakeAnalysisResult> {
+    try {
+      const detectionPrompt = `Analyze this video for deepfake indicators:
+Video URL: ${videoUrl}
+
+Analyze:
+1. Face manipulation (0-100): Signs of face swapping, morphing, or synthesis
+2. Voice synthesis (0-100): Signs of voice cloning or text-to-speech
+3. Lip sync (0-100): Misalignment between audio and visual
+4. Overall deepfake probability (0-100)
+
+Respond in JSON:
+{
+  "faceManipulation": <0-100>,
+  "voiceSynthesis": <0-100>,
+  "lipSync": <0-100>,
+  "deepfakeScore": <0-100>,
+  "isDeepfake": <true|false>,
+  "confidence": <0-100>,
+  "method": "<detection method>"
+}`;
+
+      const response = await this.client.messages.create({
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 500,
+        messages: [
+          {
+            role: "user",
+            content: detectionPrompt,
+          },
+        ],
+      });
+
+      const detectionText =
+        response.content[0].type === "text" ? response.content[0].text : "{}";
+      const detection = JSON.parse(detectionText);
+
+      // Store detection result
+      await db.insert(deepfakeDetections).values({
+        videoId,
+        deepfakeScore: detection.deepfakeScore,
+        faceManipulationScore: detection.faceManipulation,
+        voiceSynthesisScore: detection.voiceSynthesis,
+        lipSyncScore: detection.lipSync,
+        isDeepfake: detection.isDeepfake,
+        confidence: detection.confidence,
+        detectionMethod: detection.method,
+        detectionDetails: detection,
+      });
+
+      return {
+        isDeepfake: detection.isDeepfake,
+        deepfakeScore: detection.deepfakeScore,
+        faceManipulationScore: detection.faceManipulation,
+        voiceSynthesisScore: detection.voiceSynthesis,
+        lipSyncScore: detection.lipSync,
+        confidence: detection.confidence,
+        detectionMethod: detection.method,
+      };
+    } catch (error) {
+      console.error("Error detecting deepfake:", error);
+      throw new Error("Failed to detect deepfake");
+    }
+  }
+
+  /**
+   * Flag content for review
+   */
+  async flagContent(
+    contentType: string,
+    contentId: number,
+    reason: string,
+    severity: "low" | "medium" | "high" | "critical",
+    confidence: number,
+    flaggedBy: number
+  ): Promise<void> {
+    try {
+      // Create flag
+      const flagResult = await db
+        .insert(contentFlags)
+        .values({
+          contentType,
+          contentId,
+          flagReason: reason,
+          flagSeverity: severity,
+          confidence,
+          flaggedBy,
+        })
+        .returning({ id: contentFlags.id });
+
+      const flagId = flagResult[0].id;
+
+      // Add to moderation queue
+      const priority =
+        severity === "critical"
+          ? "urgent"
+          : severity === "high"
+            ? "high"
+            : severity === "medium"
+              ? "medium"
+              : "low";
+
+      await db.insert(moderationQueue).values({
+        flagId,
+        priority,
+        estimatedReviewTime: priority === "urgent" ? 300 : 3600,
+      });
+
+      console.log(`✅ Content flagged: ${contentType} #${contentId}`);
+    } catch (error) {
+      console.error("Error flagging content:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Request consent for AI-generated content
+   */
+  async requestConsent(
+    userId: number,
+    contentType: string,
+    targetUserId?: number
+  ): Promise<string> {
+    try {
+      const consentToken = `consent_${userId}_${contentType}_${Date.now()}`;
+
+      await db.insert(consentRecords).values({
+        userId,
+        contentType,
+        targetUserId,
+        consentStatus: "pending",
+        consentToken,
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+      });
+
+      return consentToken;
+    } catch (error) {
+      console.error("Error requesting consent:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Verify consent
+   */
+  async verifyConsent(consentToken: string): Promise<boolean> {
+    try {
+      const record = await db
+        .select()
+        .from(consentRecords)
+        .where(eq(consentRecords.consentToken, consentToken));
+
+      if (record.length === 0) {
+        return false;
+      }
+
+      const consent = record[0];
+
+      // Check if expired
+      if (consent.expiresAt && new Date() > consent.expiresAt) {
+        return false;
+      }
+
+      // Check if approved
+      if (consent.consentStatus !== "approved") {
+        return false;
+      }
+
+      // Check if revoked
+      if (consent.revokedAt) {
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error("Error verifying consent:", error);
+      return false;
+    }
+  }
+
+  /**
+   * Add watermark to content
+   */
+  async addWatermark(
+    contentId: number,
+    contentType: string,
+    isAiGenerated: boolean,
+    aiMethod?: string
+  ): Promise<void> {
+    try {
+      const watermarkData = {
+        timestamp: new Date().toISOString(),
+        contentId,
+        contentType,
+        isAiGenerated,
+        aiMethod,
+        watermarkId: `wm_${contentId}_${Date.now()}`,
+      };
+
+      await db.insert(contentWatermarks).values({
+        contentId,
+        contentType,
+        watermarkType: isAiGenerated ? "visible" : "metadata",
+        watermarkData,
+        isAiGenerated,
+        aiGenerationMethod: aiMethod,
+        watermarkVerified: true,
+      });
+
+      console.log(`✅ Watermark added to ${contentType} #${contentId}`);
+    } catch (error) {
+      console.error("Error adding watermark:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Report unsafe content
+   */
+  async reportContent(
+    reportedBy: number,
+    reportType: string,
+    description: string,
+    severity: string,
+    reportedUserId?: number,
+    reportedContentId?: number,
+    evidence?: any
+  ): Promise<void> {
+    try {
+      await db.insert(safetyReports).values({
+        reportedBy,
+        reportedUser: reportedUserId,
+        reportedContent: reportedContentId,
+        reportType,
+        description,
+        severity,
+        evidence,
+        status: "open",
+      });
+
+      console.log(`✅ Safety report created: ${reportType}`);
+    } catch (error) {
+      console.error("Error creating safety report:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Block content
+   */
+  async blockContent(
+    contentId: number,
+    contentType: string,
+    reason: string,
+    blockedBy: number
+  ): Promise<void> {
+    try {
+      await db.insert(blockedContent).values({
+        contentId,
+        contentType,
+        blockReason: reason,
+        blockedBy,
+        appealDeadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+      });
+
+      console.log(`✅ Content blocked: ${contentType} #${contentId}`);
+    } catch (error) {
+      console.error("Error blocking content:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get moderation queue
+   */
+  async getModerationQueue(limit: number = 50) {
+    try {
+      const queue = await db
+        .select()
+        .from(moderationQueue)
+        .where(eq(moderationQueue.status, "pending"))
+        .orderBy(moderationQueue.priority)
+        .limit(limit);
+
+      return queue;
+    } catch (error) {
+      console.error("Error getting moderation queue:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Review flagged content
+   */
+  async reviewContent(
+    flagId: number,
+    decision: "approved" | "removed",
+    reviewedBy: number,
+    notes?: string
+  ): Promise<void> {
+    try {
+      // Update flag
+      await db
+        .update(contentFlags)
+        .set({
+          status: decision === "approved" ? "approved" : "removed",
+          reviewedBy,
+          reviewedAt: new Date(),
+          reviewNotes: notes,
+        })
+        .where(eq(contentFlags.id, flagId));
+
+      // Update queue
+      await db
+        .update(moderationQueue)
+        .set({
+          status: "completed",
+          completedAt: new Date(),
+        })
+        .where(eq(moderationQueue.flagId, flagId));
+
+      console.log(`✅ Content review completed: ${decision}`);
+    } catch (error) {
+      console.error("Error reviewing content:", error);
+      throw error;
+    }
+  }
+}
+
+export const moderationService = new ModerationService();
+
+
+
+
+
+PART 3: BACKEND API ENDPOINTS
+
+Add to server/routes.ts:
+
+TypeScript
+
+
+// POST /api/moderation/analyze
+app.post('/api/moderation/analyze', async (req, res) => {
+  try {
+    const { contentId, contentType, contentUrl } = req.body;
+
+    if (!contentId || !contentType || !contentUrl) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const analysis = await moderationService.analyzeContent(
+      contentId,
+      contentType,
+      contentUrl
+    );
+
+    // Flag if risky
+    if (analysis.overallRisk !== 'low') {
+      await moderationService.flagContent(
+        contentType,
+        contentId,
+        analysis.details,
+        analysis.overallRisk,
+        analysis.confidence,
+        1 // AI user ID
+      );
+    }
+
+    res.json({ success: true, analysis });
+  } catch (error) {
+    console.error('Error analyzing content:', error);
+    res.status(500).json({ error: 'Failed to analyze content' });
+  }
+});
+
+// POST /api/moderation/detect-deepfake
+app.post('/api/moderation/detect-deepfake', async (req, res) => {
+  try {
+    const { videoId, videoUrl } = req.body;
+
+    if (!videoId || !videoUrl) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    const detection = await moderationService.detectDeepfake(videoId, videoUrl);
+
+    // Flag if deepfake detected
+    if (detection.isDeepfake) {
+      await moderationService.flagContent(
+        'video',
+        videoId,
+        'Deepfake detected',
+        'high',
+        detection.confidence,
+        1 // AI user ID
+      );
+    }
+
+    res.json({ success: true, detection });
+  } catch (error) {
+    console.error('Error detecting deepfake:', error);
+    res.status(500).json({ error: 'Failed to detect deepfake' });
+  }
+});
+
+// POST /api/moderation/request-consent
+app.post('/api/moderation/request-consent', async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const { contentType, targetUserId } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    const consentToken = await moderationService.requestConsent(
+      userId,
+      contentType,
+      targetUserId
+    );
+
+    res.json({ success: true, consentToken });
+  } catch (error) {
+    console.error('Error requesting consent:', error);
+    res.status(500).json({ error: 'Failed to request consent' });
+  }
+});
+
+// GET /api/moderation/verify-consent/:token
+app.get('/api/moderation/verify-consent/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    const isValid = await moderationService.verifyConsent(token);
+
+    res.json({ success: true, isValid });
+  } catch (error) {
+    console.error('Error verifying consent:', error);
+    res.status(500).json({ error: 'Failed to verify consent' });
+  }
+});
+
+// POST /api/moderation/report
+app.post('/api/moderation/report', async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const {
+      reportType,
+      description,
+      severity,
+      reportedUserId,
+      reportedContentId,
+      evidence,
+    } = req.body;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+
+    await moderationService.reportContent(
+      userId,
+      reportType,
+      description,
+      severity,
+      reportedUserId,
+      reportedContentId,
+      evidence
+    );
+
+    res.json({ success: true, message: 'Report submitted' });
+  } catch (error) {
+    console.error('Error submitting report:', error);
+    res.status(500).json({ error: 'Failed to submit report' });
+  }
+});
+
+// GET /api/moderation/queue (Admin only)
+app.get('/api/moderation/queue', async (req, res) => {
+  try {
+    if (!req.session.isAdmin) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const queue = await moderationService.getModerationQueue();
+    res.json({ success: true, queue });
+  } catch (error) {
+    console.error('Error getting moderation queue:', error);
+    res.status(500).json({ error: 'Failed to get queue' });
+  }
+});
+
+// POST /api/moderation/review (Admin only)
+app.post('/api/moderation/review', async (req, res) => {
+  try {
+    if (!req.session.isAdmin) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const { flagId, decision, notes } = req.body;
+
+    await moderationService.reviewContent(
+      flagId,
+      decision,
+      req.session.userId,
+      notes
+    );
+
+    res.json({ success: true, message: 'Review completed' });
+  } catch (error) {
+    console.error('Error reviewing content:', error);
+    res.status(500).json({ error: 'Failed to review content' });
+  }
+});
+
+
+
+
+
+PART 4: FRONTEND MODERATION DASHBOARD
+
+Create client/src/pages/ModerationDashboard.tsx:
+
+TypeScript
+
+
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import './ModerationDashboard.css';
+
+interface QueueItem {
+  id: number;
+  flagId: number;
+  priority: string;
+  status: string;
+  estimatedReviewTime: number;
+}
+
+export const ModerationDashboard: React.FC = () => {
+  const [selectedItem, setSelectedItem] = useState<QueueItem | null>(null);
+  const [decision, setDecision] = useState<'approved' | 'removed'>('approved');
+  const [notes, setNotes] = useState('');
+
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['moderation-queue'],
+    queryFn: async () => {
+      const response = await fetch('/api/moderation/queue');
+      return response.json();
+    },
+  });
+
+  const handleReview = async () => {
+    if (!selectedItem) return;
+
+    try {
+      const response = await fetch('/api/moderation/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          flagId: selectedItem.flagId,
+          decision,
+          notes,
+        }),
+      });
+
+      if (response.ok) {
+        setSelectedItem(null);
+        setNotes('');
+        refetch();
+      }
+    } catch (error) {
+      console.error('Error submitting review:', error);
+    }
+  };
+
+  if (isLoading) {
+    return <div className="moderation-loading">Loading queue...</div>;
+  }
+
+  const queue = data?.queue || [];
+
+  return (
+    <div className="moderation-dashboard">
+      <h1>Content Moderation Queue</h1>
+
+      <div className="moderation-layout">
+        <div className="queue-list">
+          <h2>Pending Items ({queue.length})</h2>
+          <div className="queue-items">
+            {queue.map((item: QueueItem) => (
+              <div
+                key={item.id}
+                className={`queue-item ${item.priority} ${
+                  selectedItem?.id === item.id ? 'selected' : ''
+                }`}
+                onClick={() => setSelectedItem(item)}
+              >
+                <div className="item-priority">{item.priority.toUpperCase()}</div>
+                <div className="item-time">
+                  {(item.estimatedReviewTime / 60).toFixed(0)} min
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {selectedItem && (
+          <div className="review-panel">
+            <h2>Review Content</h2>
+            <div className="review-form">
+              <div className="form-group">
+                <label>Decision</label>
+                <select
+                  value={decision}
+                  onChange={(e) => setDecision(e.target.value as any)}
+                >
+                  <option value="approved">Approve</option>
+                  <option value="removed">Remove</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Review Notes</label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Add notes for this review..."
+                />
+              </div>
+
+              <button onClick={handleReview} className="btn-submit">
+                Submit Review
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
+Create client/src/pages/ModerationDashboard.css:
+
+CSS
+
+
+.moderation-dashboard {
+  padding: 30px;
+  background: linear-gradient(135deg, #0a1e3f 0%, #0d2a5f 100%);
+  min-height: 100vh;
+  color: white;
+}
+
+.moderation-dashboard h1 {
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.moderation-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.queue-list {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.queue-list h2 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+}
+
+.queue-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.queue-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: rgba(0, 212, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.queue-item:hover {
+  border-color: #00d4ff;
+  background: rgba(0, 212, 255, 0.1);
+}
+
+.queue-item.selected {
+  border-color: #00d4ff;
+  background: rgba(0, 212, 255, 0.15);
+}
+
+.queue-item.urgent {
+  border-left: 4px solid #ff6b6b;
+}
+
+.queue-item.high {
+  border-left: 4px solid #ff9500;
+}
+
+.queue-item.medium {
+  border-left: 4px solid #ffc107;
+}
+
+.queue-item.low {
+  border-left: 4px solid #10b981;
+}
+
+.item-priority {
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.item-time {
+  font-size: 12px;
+  color: #b8c5d6;
+}
+
+.review-panel {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.review-panel h2 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+}
+
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.form-group select,
+.form-group textarea {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  background: rgba(0, 212, 255, 0.05);
+  color: white;
+  font-family: inherit;
+}
+
+.form-group textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.btn-submit {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #00d4ff 0%, #8b5cf6 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+}
+
+.moderation-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 18px;
+  color: #b8c5d6;
+}
+
+@media (max-width: 1024px) {
+  .moderation-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+
+
+PART 5: SAFETY REPORTING COMPONENT
+
+Create client/src/components/SafetyReportModal.tsx:
+
+TypeScript
+
+
+import React, { useState } from 'react';
+import './SafetyReportModal.css';
+
+interface SafetyReportModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  reportedUserId?: number;
+  reportedContentId?: number;
+}
+
+export const SafetyReportModal: React.FC<SafetyReportModalProps> = ({
+  isOpen,
+  onClose,
+  reportedUserId,
+  reportedContentId,
+}) => {
+  const [reportType, setReportType] = useState('harassment');
+  const [severity, setSeverity] = useState('medium');
+  const [description, setDescription] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/moderation/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reportType,
+          severity,
+          description,
+          reportedUserId,
+          reportedContentId,
+        }),
+      });
+
+      if (response.ok) {
+        onClose();
+        setDescription('');
+      }
+    } catch (error) {
+      console.error('Error submitting report:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="safety-report-overlay" onClick={onClose}>
+      <div className="safety-report-modal" onClick={(e) => e.stopPropagation()}>
+        <h2>Report Content</h2>
+
+        <div className="form-group">
+          <label>Report Type</label>
+          <select value={reportType} onChange={(e) => setReportType(e.target.value)}>
+            <option value="harassment">Harassment</option>
+            <option value="non_consensual_content">Non-Consensual Content</option>
+            <option value="deepfake">Deepfake</option>
+            <option value="impersonation">Impersonation</option>
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label>Severity</label>
+          <select value={severity} onChange={(e) => setSeverity(e.target.value)}>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label>Description</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Describe the issue..."
+            rows={5}
+          />
+        </div>
+
+        <div className="modal-actions">
+          <button onClick={onClose} className="btn-cancel">
+            Cancel
+          </button>
+          <button onClick={handleSubmit} disabled={isSubmitting} className="btn-submit">
+            {isSubmitting ? 'Submitting...' : 'Submit Report'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+
+
+
+PART 6: SCHEDULED MODERATION JOBS
+
+Create server/jobs/moderation-jobs.ts:
+
+TypeScript
+
+
+import { moderationService } from '../services/moderation-service';
+import schedule from 'node-schedule';
+
+/**
+ * Process moderation queue
+ * Schedule: Every hour
+ */
+export async function processModerationQueue() {
+  try {
+    const queue = await moderationService.getModerationQueue(100);
+    console.log(`Processing ${queue.length} items in moderation queue`);
+  } catch (error) {
+    console.error('Error processing moderation queue:', error);
+  }
+}
+
+/**
+ * Initialize moderation jobs
+ */
+export function initializeModerationJobs() {
+  // Process queue every hour
+  schedule.scheduleJob('0 * * * *', processModerationQueue);
+
+  console.log('✅ Moderation jobs initialized');
+}
+
+
+
+
+
+IMPLEMENTATION CHECKLIST
+
+
+
+
+Create all moderation tables in database
+
+
+
+
+Run migration script
+
+
+
+
+Implement ModerationService
+
+
+
+
+Add API endpoints to routes.ts
+
+
+
+
+Create ModerationDashboard.tsx
+
+
+
+
+Create SafetyReportModal.tsx
+
+
+
+
+Add CSS styling
+
+
+
+
+Implement scheduled jobs
+
+
+
+
+Test content analysis
+
+
+
+
+Test deepfake detection
+
+
+
+
+Test consent verification
+
+
+
+
+Deploy to production
+
+
+
+
+SUCCESS METRICS
+
+•
+Moderation Queue Processing: <1 hour average
+
+•
+False Positive Rate: <5%
+
+•
+Deepfake Detection Accuracy: >95%
+
+•
+User Reports Response Time: <24 hours
+
+•
+Platform Safety Score: >90/100
+
+
+
+

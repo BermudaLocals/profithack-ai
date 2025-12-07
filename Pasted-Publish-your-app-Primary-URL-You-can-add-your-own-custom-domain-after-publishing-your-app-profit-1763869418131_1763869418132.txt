@@ -1,0 +1,76 @@
+Publish your app
+Primary URL
+You can add your own custom domain after publishing your app.
+profithackai
+.replit.app
+Available
+Published App Access
+Limit published app access to team members who have viewer access. Learn more
+
+
+Public
+
+Private
+Teams
+
+Publish
+Production database settings
+Beta
+Configure how your production database is created and populated when you publish. Production databases help protect your live data while you continue building. Learn more
+Existing production database found from previous published app, this may conflict if significant changes have been made. Delete via database settings to create a new one.
+
+Create production database upon publishing
+Advanced settings
+Manually configure machine settings, secrets, build commands, ports, and more.
+
+Deployment type
+Technology used to publish your app. Learn more
+
+Autoscale
+
+Autoscale
+Automatically scales from zero to any level of demand.
+Machine configuration
+The power of the servers running your app
+8 vCPUs / 32 GiB RAM / 10 max
+
+Edit
+Per machine:
+$2.396/hour
+At max traffic:
+$23.962/hour
+Build command
+Optional
+Compiles your app before it deploys
+npm run build
+Run command
+Starts your app after it deploys
+npm run start
+Deployment secrets
+Private keys your apps use to access APIs and services. Manage your development secrets
+Secrets now sync automatically with your team's deployments. Deployment secrets added before 4/17/2025 12:00 AM remain unchanged to avoid disrupting existing workflows. Manage syncing below.
+Port configuration
+Configure which port your app uses for incoming requests
+Deployment forwarding to External Port :80. Open the 
+Deployment expects:
+Host
+External Port
+0.0.0.0
+:80
+ 
+ 
+ 
+Your External Port configuration(s):
+Host
+External Port
+0.0.0.0
+:80
+0.0.0.0
+:3000
+0.0.0.0
+:3001
+0.0.0.0
+:3002
+Pre-publishing security scan
+Beta
+Before publishing your app, run a security scan powered by our partner Semgrep to identify potential vulnerabilities. Learn more

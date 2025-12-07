@@ -1,0 +1,39 @@
+The build logs confirm that Nixpacks is automatically selecting Node.js 18, which is incompatible with your project's core dependencies like mediasoup. The good news is that you can override this behavior with a simple configuration file. Here is the solution:
+
+⚙️ Create a Nixpacks Configuration File
+Add a file named nixpacks.toml to the root of your project (same directory as your package.json). This file tells Nixpacks exactly which version of Node.js to use and which system packages to install.
+
+toml
+# nixpacks.toml
+[phases.setup]
+nixPkgs = ["nodejs-20", "bzip2"]
+
+[phases.install]
+# Optionally, use the modern flag to suppress the warning
+cmds = ["npm ci --omit=dev"]
+📝 Explanation of the Configuration
+The configuration in the table below addresses the two critical failures from your logs:
+
+Build Phase	Directly Solves This Error	How it Works
+setup	EBADENGINE ... required: { node: '>=20' }	Forces Nixpacks to install Node.js 20 instead of its default (18).
+setup	tar (child): bzip2: Cannot exec: No such file or directory	Installs the bzip2 system package, which is required to extract the PhantomJS binary.
+install	npm warn config production Use '--omit=dev' instead	Uses the modern --omit=dev flag in the npm ci command.
+📤 Commit and Re-Deploy
+Create the nixpacks.toml file in your project's root.
+
+Commit the file to your Git repository.
+
+Re-deploy your application on Railway. Nixpacks will now use this configuration.
+
+💡 Important Next Steps
+Fix Deprecated Dependencies: Once the build succeeds, you should address the long list of deprecated warnings in your package.json (like phantomjs-prebuilt, rimraf@2.x, uuid@3.x). They pose security and stability risks. Start by checking if phantomjs-prebuilt is a direct dependency you can replace with a modern alternative like puppeteer.
+
+Verify Node.js Version in package.json: Ensure your package.json includes an "engines" field. This acts as a secondary check and helps other platforms.
+
+json
+{
+  "engines": {
+    "node": ">=20"
+  }
+}
+If you apply this configuration and the build still fails, the next step would be to check if the phantomjs-prebuilt package itself is incompatible with Node 20 and needs to be removed or replaced.

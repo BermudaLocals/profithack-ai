@@ -1,0 +1,482 @@
+// ============================================================================
+// ProfitHackAI: Video Ads System - Drizzle ORM Schema Definitions
+// Version: 1.0
+// Description: Complete TypeScript schema for all 8 video ad tables
+// Usage: Add this to your shared/schema.ts file
+// ============================================================================
+
+import {
+  pgTable,
+  serial,
+  integer,
+  decimal,
+  text,
+  varchar,
+  timestamp,
+  boolean,
+  jsonb,
+  date,
+  index,
+  uniqueIndex,
+  foreignKey,
+  check,
+} from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+
+// ============================================================================
+// TABLE 1: video_ad_campaigns
+// ============================================================================
+export const videoAdCampaigns = pgTable(
+  'video_ad_campaigns',
+  {
+    id: serial('id').primaryKey(),
+    advertiserId: integer('advertiser_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    campaignName: varchar('campaign_name', { length: 255 }).notNull(),
+    campaignDescription: text('campaign_description'),
+    productName: varchar('product_name', { length: 255 }).notNull(),
+    productUrl: varchar('product_url', { length: 500 }).notNull(),
+    productCategory: varchar('product_category', { length: 100 }),
+    targetAudience: jsonb('target_audience').default('{}'),
+    budget: decimal('budget', { precision: 12, scale: 2 }).notNull(),
+    dailyBudget: decimal('daily_budget', { precision: 10, scale: 2 }).notNull(),
+    spent: decimal('spent', { precision: 12, scale: 2 }).default('0.00'),
+    creatorShare: decimal('creator_share', { precision: 5, scale: 2 }).default('25.00'),
+    status: varchar('status', { length: 20 }).default('draft'),
+    startDate: timestamp('start_date').notNull(),
+    endDate: timestamp('end_date').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    advertiserIdIdx: index('idx_video_ad_campaigns_advertiser_id').on(table.advertiserId),
+    statusIdx: index('idx_video_ad_campaigns_status').on(table.status),
+    startDateIdx: index('idx_video_ad_campaigns_start_date').on(table.startDate),
+    endDateIdx: index('idx_video_ad_campaigns_end_date').on(table.endDate),
+    createdAtIdx: index('idx_video_ad_campaigns_created_at').on(table.createdAt),
+  })
+);
+
+export type VideoAdCampaign = typeof videoAdCampaigns.$inferSelect;
+export type InsertVideoAdCampaign = typeof videoAdCampaigns.$inferInsert;
+
+// ============================================================================
+// TABLE 2: video_ad_creatives
+// ============================================================================
+export const videoAdCreatives = pgTable(
+  'video_ad_creatives',
+  {
+    id: serial('id').primaryKey(),
+    campaignId: integer('campaign_id')
+      .notNull()
+      .references(() => videoAdCampaigns.id, { onDelete: 'cascade' }),
+    videoUrl: varchar('video_url', { length: 500 }).notNull(),
+    thumbnailUrl: varchar('thumbnail_url', { length: 500 }),
+    title: varchar('title', { length: 255 }).notNull(),
+    description: text('description'),
+    duration: integer('duration').notNull(),
+    generatedBy: varchar('generated_by', { length: 50 }).notNull(),
+    aiCloneId: integer('ai_clone_id').references(() => aiClones.id, { onDelete: 'set null' }),
+    scriptUsed: text('script_used'),
+    viralScore: decimal('viral_score', { precision: 5, scale: 2 }).default('0.00'),
+    views: integer('views').default(0),
+    clicks: integer('clicks').default(0),
+    conversions: integer('conversions').default(0),
+    engagementRate: decimal('engagement_rate', { precision: 5, scale: 2 }).default('0.00'),
+    qualityScore: decimal('quality_score', { precision: 5, scale: 2 }).default('0.00'),
+    isActive: boolean('is_active').default(true),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    campaignIdIdx: index('idx_video_ad_creatives_campaign_id').on(table.campaignId),
+    aiCloneIdIdx: index('idx_video_ad_creatives_ai_clone_id').on(table.aiCloneId),
+    viralScoreIdx: index('idx_video_ad_creatives_viral_score').on(table.viralScore),
+    engagementRateIdx: index('idx_video_ad_creatives_engagement_rate').on(table.engagementRate),
+    isActiveIdx: index('idx_video_ad_creatives_is_active').on(table.isActive),
+  })
+);
+
+export type VideoAdCreative = typeof videoAdCreatives.$inferSelect;
+export type InsertVideoAdCreative = typeof videoAdCreatives.$inferInsert;
+
+// ============================================================================
+// TABLE 3: ai_clones
+// ============================================================================
+export const aiClones = pgTable(
+  'ai_clones',
+  {
+    id: serial('id').primaryKey(),
+    creatorId: integer('creator_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    cloneName: varchar('clone_name', { length: 255 }).notNull(),
+    cloneDescription: text('clone_description'),
+    voiceUrl: varchar('voice_url', { length: 500 }),
+    voiceSampleDuration: integer('voice_sample_duration'),
+    faceModelUrl: varchar('face_model_url', { length: 500 }),
+    bodyModelUrl: varchar('body_model_url', { length: 500 }),
+    personalityTraits: jsonb('personality_traits').default('{}'),
+    videoSamples: jsonb('video_samples').default('[]'),
+    trainingDataUrl: varchar('training_data_url', { length: 500 }),
+    trainingDataSize: integer('training_data_size'),
+    cloneQuality: varchar('clone_quality', { length: 20 }).default('standard'),
+    isPublic: boolean('is_public').default(false),
+    usageCount: integer('usage_count').default(0),
+    earnings: decimal('earnings', { precision: 12, scale: 2 }).default('0.00'),
+    status: varchar('status', { length: 20 }).default('training'),
+    accuracyScore: decimal('accuracy_score', { precision: 5, scale: 2 }).default('0.00'),
+    lastUsedAt: timestamp('last_used_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    creatorIdIdx: index('idx_ai_clones_creator_id').on(table.creatorId),
+    statusIdx: index('idx_ai_clones_status').on(table.status),
+    isPublicIdx: index('idx_ai_clones_is_public').on(table.isPublic),
+    cloneQualityIdx: index('idx_ai_clones_clone_quality').on(table.cloneQuality),
+    accuracyScoreIdx: index('idx_ai_clones_accuracy_score').on(table.accuracyScore),
+  })
+);
+
+export type AIClone = typeof aiClones.$inferSelect;
+export type InsertAIClone = typeof aiClones.$inferInsert;
+
+// ============================================================================
+// TABLE 4: video_ad_placements
+// ============================================================================
+export const videoAdPlacements = pgTable(
+  'video_ad_placements',
+  {
+    id: serial('id').primaryKey(),
+    videoId: integer('video_id')
+      .notNull()
+      .references(() => videos.id, { onDelete: 'cascade' }),
+    creatorId: integer('creator_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    campaignId: integer('campaign_id')
+      .notNull()
+      .references(() => videoAdCampaigns.id, { onDelete: 'cascade' }),
+    creativeId: integer('creative_id')
+      .notNull()
+      .references(() => videoAdCreatives.id, { onDelete: 'cascade' }),
+    placementType: varchar('placement_type', { length: 50 }).notNull(),
+    placementPosition: integer('placement_position').notNull(),
+    placementDuration: integer('placement_duration').notNull(),
+    placementSize: varchar('placement_size', { length: 50 }),
+    creatorEarnings: decimal('creator_earnings', { precision: 10, scale: 2 }).default('0.00'),
+    platformEarnings: decimal('platform_earnings', { precision: 10, scale: 2 }).default('0.00'),
+    totalEarnings: decimal('total_earnings', { precision: 10, scale: 2 }).default('0.00'),
+    views: integer('views').default(0),
+    clicks: integer('clicks').default(0),
+    conversions: integer('conversions').default(0),
+    ctr: decimal('ctr', { precision: 5, scale: 2 }).default('0.00'),
+    status: varchar('status', { length: 20 }).default('active'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    videoIdIdx: index('idx_video_ad_placements_video_id').on(table.videoId),
+    creatorIdIdx: index('idx_video_ad_placements_creator_id').on(table.creatorId),
+    campaignIdIdx: index('idx_video_ad_placements_campaign_id').on(table.campaignId),
+    creativeIdIdx: index('idx_video_ad_placements_creative_id').on(table.creativeId),
+    placementTypeIdx: index('idx_video_ad_placements_placement_type').on(table.placementType),
+    statusIdx: index('idx_video_ad_placements_status').on(table.status),
+    creatorEarningsIdx: index('idx_video_ad_placements_creator_earnings').on(table.creatorEarnings),
+  })
+);
+
+export type VideoAdPlacement = typeof videoAdPlacements.$inferSelect;
+export type InsertVideoAdPlacement = typeof videoAdPlacements.$inferInsert;
+
+// ============================================================================
+// TABLE 5: video_ad_metrics
+// ============================================================================
+export const videoAdMetrics = pgTable(
+  'video_ad_metrics',
+  {
+    id: serial('id').primaryKey(),
+    campaignId: integer('campaign_id')
+      .notNull()
+      .references(() => videoAdCampaigns.id, { onDelete: 'cascade' }),
+    creativeId: integer('creative_id')
+      .notNull()
+      .references(() => videoAdCreatives.id, { onDelete: 'cascade' }),
+    date: date('date').notNull(),
+    impressions: integer('impressions').notNull().default(0),
+    views: integer('views').notNull().default(0),
+    clicks: integer('clicks').notNull().default(0),
+    conversions: integer('conversions').notNull().default(0),
+    spend: decimal('spend', { precision: 10, scale: 2 }).notNull().default('0.00'),
+    creatorEarnings: decimal('creator_earnings', { precision: 10, scale: 2 }).notNull().default('0.00'),
+    platformEarnings: decimal('platform_earnings', { precision: 10, scale: 2 }).notNull().default('0.00'),
+    revenue: decimal('revenue', { precision: 10, scale: 2 }).notNull().default('0.00'),
+    ctr: decimal('ctr', { precision: 5, scale: 2 }).notNull().default('0.00'),
+    cpc: decimal('cpc', { precision: 8, scale: 2 }).notNull().default('0.00'),
+    cpa: decimal('cpa', { precision: 8, scale: 2 }).notNull().default('0.00'),
+    roi: decimal('roi', { precision: 5, scale: 2 }).notNull().default('0.00'),
+    conversionRate: decimal('conversion_rate', { precision: 5, scale: 2 }).notNull().default('0.00'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    campaignIdIdx: index('idx_video_ad_metrics_campaign_id').on(table.campaignId),
+    creativeIdIdx: index('idx_video_ad_metrics_creative_id').on(table.creativeId),
+    dateIdx: index('idx_video_ad_metrics_date').on(table.date),
+    campaignDateIdx: index('idx_video_ad_metrics_campaign_date').on(table.campaignId, table.date),
+    roiIdx: index('idx_video_ad_metrics_roi').on(table.roi),
+    uniqueConstraint: uniqueIndex('uq_video_ad_metrics_campaign_creative_date').on(
+      table.campaignId,
+      table.creativeId,
+      table.date
+    ),
+  })
+);
+
+export type VideoAdMetric = typeof videoAdMetrics.$inferSelect;
+export type InsertVideoAdMetric = typeof videoAdMetrics.$inferInsert;
+
+// ============================================================================
+// TABLE 6: advertiser_discovery_records
+// ============================================================================
+export const advertiserDiscoveryRecords = pgTable(
+  'advertiser_discovery_records',
+  {
+    id: serial('id').primaryKey(),
+    companyName: varchar('company_name', { length: 255 }).notNull(),
+    companyWebsite: varchar('company_website', { length: 500 }).notNull(),
+    companyEmail: varchar('company_email', { length: 255 }),
+    companyPhone: varchar('company_phone', { length: 20 }),
+    companyLogoUrl: varchar('company_logo_url', { length: 500 }),
+    industry: varchar('industry', { length: 100 }).notNull(),
+    companySize: varchar('company_size', { length: 50 }),
+    estimatedBudget: decimal('estimated_budget', { precision: 12, scale: 2 }),
+    estimatedAnnualRevenue: decimal('estimated_annual_revenue', { precision: 12, scale: 2 }),
+    marketingChannels: jsonb('marketing_channels').default('[]'),
+    socialMediaPresence: jsonb('social_media_presence').default('{}'),
+    discoverySources: jsonb('discovery_sources').default('[]'),
+    contactPersonName: varchar('contact_person_name', { length: 255 }),
+    contactPersonTitle: varchar('contact_person_title', { length: 255 }),
+    contactPersonEmail: varchar('contact_person_email', { length: 255 }),
+    contactPersonPhone: varchar('contact_person_phone', { length: 20 }),
+    contactStatus: varchar('contact_status', { length: 20 }).default('discovered'),
+    outreachAttempts: integer('outreach_attempts').default(0),
+    lastContactDate: timestamp('last_contact_date'),
+    lastContactMethod: varchar('last_contact_method', { length: 50 }),
+    outreachEmailTemplate: text('outreach_email_template'),
+    responseReceived: boolean('response_received').default(false),
+    responseContent: text('response_content'),
+    notes: text('notes'),
+    aiFitScore: decimal('ai_fit_score', { precision: 5, scale: 2 }).default('0.00'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    companyNameIdx: index('idx_advertiser_discovery_records_company_name').on(table.companyName),
+    companyWebsiteIdx: uniqueIndex('idx_advertiser_discovery_records_company_website').on(
+      table.companyWebsite
+    ),
+    industryIdx: index('idx_advertiser_discovery_records_industry').on(table.industry),
+    contactStatusIdx: index('idx_advertiser_discovery_records_contact_status').on(table.contactStatus),
+    aiFitScoreIdx: index('idx_advertiser_discovery_records_ai_fit_score').on(table.aiFitScore),
+    createdAtIdx: index('idx_advertiser_discovery_records_created_at').on(table.createdAt),
+  })
+);
+
+export type AdvertiserDiscoveryRecord = typeof advertiserDiscoveryRecords.$inferSelect;
+export type InsertAdvertiserDiscoveryRecord = typeof advertiserDiscoveryRecords.$inferInsert;
+
+// ============================================================================
+// TABLE 7: creator_video_ad_earnings
+// ============================================================================
+export const creatorVideoAdEarnings = pgTable(
+  'creator_video_ad_earnings',
+  {
+    id: serial('id').primaryKey(),
+    creatorId: integer('creator_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    campaignId: integer('campaign_id')
+      .notNull()
+      .references(() => videoAdCampaigns.id, { onDelete: 'cascade' }),
+    videoId: integer('video_id')
+      .notNull()
+      .references(() => videos.id, { onDelete: 'cascade' }),
+    placementId: integer('placement_id')
+      .notNull()
+      .references(() => videoAdPlacements.id, { onDelete: 'cascade' }),
+    creativeId: integer('creative_id')
+      .notNull()
+      .references(() => videoAdCreatives.id, { onDelete: 'cascade' }),
+    totalEarnings: decimal('total_earnings', { precision: 10, scale: 2 }).notNull().default('0.00'),
+    views: integer('views').notNull().default(0),
+    clicks: integer('clicks').notNull().default(0),
+    conversions: integer('conversions').notNull().default(0),
+    conversionValue: decimal('conversion_value', { precision: 10, scale: 2 }).default('0.00'),
+    ctr: decimal('ctr', { precision: 5, scale: 2 }).default('0.00'),
+    engagementRate: decimal('engagement_rate', { precision: 5, scale: 2 }).default('0.00'),
+    payoutStatus: varchar('payout_status', { length: 20 }).default('pending'),
+    payoutDate: timestamp('payout_date'),
+    payoutMethod: varchar('payout_method', { length: 50 }),
+    payoutAmount: decimal('payout_amount', { precision: 10, scale: 2 }),
+    transactionId: varchar('transaction_id', { length: 255 }),
+    notes: text('notes'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    creatorIdIdx: index('idx_creator_video_ad_earnings_creator_id').on(table.creatorId),
+    campaignIdIdx: index('idx_creator_video_ad_earnings_campaign_id').on(table.campaignId),
+    videoIdIdx: index('idx_creator_video_ad_earnings_video_id').on(table.videoId),
+    placementIdIdx: index('idx_creator_video_ad_earnings_placement_id').on(table.placementId),
+    payoutStatusIdx: index('idx_creator_video_ad_earnings_payout_status').on(table.payoutStatus),
+    totalEarningsIdx: index('idx_creator_video_ad_earnings_total_earnings').on(table.totalEarnings),
+    createdAtIdx: index('idx_creator_video_ad_earnings_created_at').on(table.createdAt),
+  })
+);
+
+export type CreatorVideoAdEarning = typeof creatorVideoAdEarnings.$inferSelect;
+export type InsertCreatorVideoAdEarning = typeof creatorVideoAdEarnings.$inferInsert;
+
+// ============================================================================
+// TABLE 8: ad_generation_jobs
+// ============================================================================
+export const adGenerationJobs = pgTable(
+  'ad_generation_jobs',
+  {
+    id: serial('id').primaryKey(),
+    campaignId: integer('campaign_id')
+      .notNull()
+      .references(() => videoAdCampaigns.id, { onDelete: 'cascade' }),
+    jobType: varchar('job_type', { length: 50 }).notNull(),
+    status: varchar('status', { length: 20 }).default('queued'),
+    priority: integer('priority').default(5),
+    inputData: jsonb('input_data').notNull().default('{}'),
+    outputData: jsonb('output_data').default('{}'),
+    generatedVideoUrl: varchar('generated_video_url', { length: 500 }),
+    generatedScriptUrl: varchar('generated_script_url', { length: 500 }),
+    generatedThumbnailUrl: varchar('generated_thumbnail_url', { length: 500 }),
+    processingTime: integer('processing_time'),
+    quality: varchar('quality', { length: 20 }).default('standard'),
+    aiModel: varchar('ai_model', { length: 100 }).default('claude-3.5-sonnet'),
+    errorMessage: text('error_message'),
+    retryCount: integer('retry_count').default(0),
+    maxRetries: integer('max_retries').default(3),
+    startedAt: timestamp('started_at'),
+    completedAt: timestamp('completed_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    campaignIdIdx: index('idx_ad_generation_jobs_campaign_id').on(table.campaignId),
+    statusIdx: index('idx_ad_generation_jobs_status').on(table.status),
+    jobTypeIdx: index('idx_ad_generation_jobs_job_type').on(table.jobType),
+    priorityIdx: index('idx_ad_generation_jobs_priority').on(table.priority),
+    createdAtIdx: index('idx_ad_generation_jobs_created_at').on(table.createdAt),
+    statusPriorityIdx: index('idx_ad_generation_jobs_status_priority').on(table.status, table.priority),
+  })
+);
+
+export type AdGenerationJob = typeof adGenerationJobs.$inferSelect;
+export type InsertAdGenerationJob = typeof adGenerationJobs.$inferInsert;
+
+// ============================================================================
+// RELATIONS (for Drizzle ORM)
+// ============================================================================
+
+export const videoAdCampaignsRelations = relations(videoAdCampaigns, ({ one, many }) => ({
+  advertiser: one(users, {
+    fields: [videoAdCampaigns.advertiserId],
+    references: [users.id],
+  }),
+  creatives: many(videoAdCreatives),
+  placements: many(videoAdPlacements),
+  metrics: many(videoAdMetrics),
+  generationJobs: many(adGenerationJobs),
+}));
+
+export const videoAdCreativesRelations = relations(videoAdCreatives, ({ one, many }) => ({
+  campaign: one(videoAdCampaigns, {
+    fields: [videoAdCreatives.campaignId],
+    references: [videoAdCampaigns.id],
+  }),
+  aiClone: one(aiClones, {
+    fields: [videoAdCreatives.aiCloneId],
+    references: [aiClones.id],
+  }),
+  placements: many(videoAdPlacements),
+  metrics: many(videoAdMetrics),
+  earnings: many(creatorVideoAdEarnings),
+}));
+
+export const aiClonesRelations = relations(aiClones, ({ one, many }) => ({
+  creator: one(users, {
+    fields: [aiClones.creatorId],
+    references: [users.id],
+  }),
+  creatives: many(videoAdCreatives),
+}));
+
+export const videoAdPlacementsRelations = relations(videoAdPlacements, ({ one }) => ({
+  video: one(videos, {
+    fields: [videoAdPlacements.videoId],
+    references: [videos.id],
+  }),
+  creator: one(users, {
+    fields: [videoAdPlacements.creatorId],
+    references: [users.id],
+  }),
+  campaign: one(videoAdCampaigns, {
+    fields: [videoAdPlacements.campaignId],
+    references: [videoAdCampaigns.id],
+  }),
+  creative: one(videoAdCreatives, {
+    fields: [videoAdPlacements.creativeId],
+    references: [videoAdCreatives.id],
+  }),
+}));
+
+export const videoAdMetricsRelations = relations(videoAdMetrics, ({ one }) => ({
+  campaign: one(videoAdCampaigns, {
+    fields: [videoAdMetrics.campaignId],
+    references: [videoAdCampaigns.id],
+  }),
+  creative: one(videoAdCreatives, {
+    fields: [videoAdMetrics.creativeId],
+    references: [videoAdCreatives.id],
+  }),
+}));
+
+export const creatorVideoAdEarningsRelations = relations(
+  creatorVideoAdEarnings,
+  ({ one }) => ({
+    creator: one(users, {
+      fields: [creatorVideoAdEarnings.creatorId],
+      references: [users.id],
+    }),
+    campaign: one(videoAdCampaigns, {
+      fields: [creatorVideoAdEarnings.campaignId],
+      references: [videoAdCampaigns.id],
+    }),
+    video: one(videos, {
+      fields: [creatorVideoAdEarnings.videoId],
+      references: [videos.id],
+    }),
+    placement: one(videoAdPlacements, {
+      fields: [creatorVideoAdEarnings.placementId],
+      references: [videoAdPlacements.id],
+    }),
+    creative: one(videoAdCreatives, {
+      fields: [creatorVideoAdEarnings.creativeId],
+      references: [videoAdCreatives.id],
+    }),
+  })
+);
+
+export const adGenerationJobsRelations = relations(adGenerationJobs, ({ one }) => ({
+  campaign: one(videoAdCampaigns, {
+    fields: [adGenerationJobs.campaignId],
+    references: [videoAdCampaigns.id],
+  }),
+}));

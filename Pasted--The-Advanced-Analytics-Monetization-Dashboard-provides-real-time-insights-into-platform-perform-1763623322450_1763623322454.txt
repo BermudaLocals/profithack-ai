@@ -1,0 +1,1837 @@
+
+
+
+The Advanced Analytics & Monetization Dashboard provides real-time insights into platform performance, creator earnings, gift metrics, and user engagement. This comprehensive analytics system drives engagement through transparency and helps creators understand their monetization potential.
+
+
+
+
+PART 1: DATABASE SCHEMA
+
+1.1 Analytics Tables
+
+Add to shared/schema.ts:
+
+TypeScript
+
+
+import {A pgTable, serial, integer, decimal, text, timestamp, varchar, index, boolean, jsonb } from 'drizzle-orm/pg-core';
+
+// Daily analytics snapshot
+export const dailyAnalytics = pgTable(
+  'daily_analytics',
+  {
+    id: serial('id').primaryKey(),
+    date: timestamp('date').notNull().unique(),
+    totalUsers: integer('total_users').notNull(),
+    activeUsers: integer('active_users').notNull(),
+    newUsers: integer('new_users').notNull(),
+    totalGiftsSent: integer('total_gifts_sent').notNull(),
+    totalRevenue: decimal('total_revenue', { precision: 12, scale: 2 }).notNull(),
+    creatorEarnings: decimal('creator_earnings', { precision: 12, scale: 2 }).notNull(),
+    platformEarnings: decimal('platform_earnings', { precision: 12, scale: 2 }).notNull(),
+    averageGiftValue: decimal('average_gift_value', { precision: 8, scale: 2 }).notNull(),
+    topSparkId: integer('top_spark_id'),
+    engagementRate: decimal('engagement_rate', { precision: 5, scale: 2 }).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    dateIdx: index('daily_analytics_date_idx').on(table.date),
+  })
+);
+
+// Creator performance metrics
+export const creatorMetrics = pgTable(
+  'creator_metrics',
+  {
+    id: serial('id').primaryKey(),
+    creatorId: integer('creator_id').notNull().references(() => users.id),
+    date: timestamp('date').notNull(),
+    videoViews: integer('video_views').notNull().default(0),
+    videoLikes: integer('video_likes').notNull().default(0),
+    videoComments: integer('video_comments').notNull().default(0),
+    videoShares: integer('video_shares').notNull().default(0),
+    giftsReceived: integer('gifts_received').notNull().default(0),
+    giftRevenue: decimal('gift_revenue', { precision: 10, scale: 2 }).notNull().default('0'),
+    followers: integer('followers').notNull().default(0),
+    followersGained: integer('followers_gained').notNull().default(0),
+    engagementRate: decimal('engagement_rate', { precision: 5, scale: 2 }).notNull().default('0'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    creatorIdIdx: index('creator_metrics_creator_id_idx').on(table.creatorId),
+    dateIdx: index('creator_metrics_date_idx').on(table.date),
+    creatorDateIdx: index('creator_metrics_creator_date_idx').on(table.creatorId, table.date),
+  })
+);
+
+// Hourly gift analytics
+export const giftAnalytics = pgTable(
+  'gift_analytics',
+  {
+    id: serial('id').primaryKey(),
+    sparkId: integer('spark_id').notNull().references(() => sparks.id),
+    hour: timestamp('hour').notNull(),
+    sendCount: integer('send_count').notNull().default(0),
+    revenue: decimal('revenue', { precision: 10, scale: 2 }).notNull().default('0'),
+    uniqueSenders: integer('unique_senders').notNull().default(0),
+    uniqueRecipients: integer('unique_recipients').notNull().default(0),
+    averageValue: decimal('average_value', { precision: 8, scale: 2 }).notNull().default('0'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    sparkIdIdx: index('gift_analytics_spark_id_idx').on(table.sparkId),
+    hourIdx: index('gift_analytics_hour_idx').on(table.hour),
+  })
+);
+
+// User engagement tracking
+export const userEngagement = pgTable(
+  'user_engagement',
+  {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id').notNull().references(() => users.id),
+    date: timestamp('date').notNull(),
+    sessionCount: integer('session_count').notNull().default(0),
+    sessionDuration: integer('session_duration').notNull().default(0), // seconds
+    videosWatched: integer('videos_watched').notNull().default(0),
+    giftsReceived: integer('gifts_received').notNull().default(0),
+    giftsSent: integer('gifts_sent').notNull().default(0),
+    creditsSpent: integer('credits_spent').notNull().default(0),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    userIdIdx: index('user_engagement_user_id_idx').on(table.userId),
+    dateIdx: index('user_engagement_date_idx').on(table.date),
+  })
+);
+
+// Revenue breakdown by source
+export const revenueBreakdown = pgTable(
+  'revenue_breakdown',
+  {
+    id: serial('id').primaryKey(),
+    date: timestamp('date').notNull(),
+    source: varchar('source', { length: 50 }).notNull(), // 'gifts', 'subscriptions', 'ads', 'premium_features'
+    amount: decimal('amount', { precision: 12, scale: 2 }).notNull(),
+    transactionCount: integer('transaction_count').notNull(),
+    averageTransaction: decimal('average_transaction', { precision: 8, scale: 2 }).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    dateIdx: index('revenue_breakdown_date_idx').on(table.date),
+    sourceIdx: index('revenue_breakdown_source_idx').on(table.source),
+  })
+);
+
+// Retention cohorts
+export const retentionCohorts = pgTable(
+  'retention_cohorts',
+  {
+    id: serial('id').primaryKey(),
+    cohortDate: timestamp('cohort_date').notNull(), // signup date
+    cohortSize: integer('cohort_size').notNull(),
+    day0: integer('day_0').notNull(), // users active on day 0
+    day1: integer('day_1').notNull(),
+    day7: integer('day_7').notNull(),
+    day30: integer('day_30').notNull(),
+    day60: integer('day_60').notNull(),
+    day90: integer('day_90').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    cohortDateIdx: index('retention_cohorts_cohort_date_idx').on(table.cohortDate),
+  })
+);
+
+// Forecast data
+export const revenueForecast = pgTable(
+  'revenue_forecast',
+  {
+    id: serial('id').primaryKey(),
+    forecastDate: timestamp('forecast_date').notNull(),
+    projectedRevenue: decimal('projected_revenue', { precision: 12, scale: 2 }).notNull(),
+    confidence: decimal('confidence', { precision: 5, scale: 2 }).notNull(), // 0-100
+    methodology: varchar('methodology', { length: 100 }).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    forecastDateIdx: index('revenue_forecast_forecast_date_idx').on(table.forecastDate),
+  })
+);
+
+
+1.2 Database Migration
+
+Create migrations/002_analytics_tables.sql:
+
+SQL
+
+
+-- Daily analytics
+CREATE TABLE IF NOT EXISTS daily_analytics (
+  id SERIAL PRIMARY KEY,
+  date TIMESTAMP NOT NULL UNIQUE,
+  total_users INTEGER NOT NULL,
+  active_users INTEGER NOT NULL,
+  new_users INTEGER NOT NULL,
+  total_gifts_sent INTEGER NOT NULL,
+  total_revenue DECIMAL(12, 2) NOT NULL,
+  creator_earnings DECIMAL(12, 2) NOT NULL,
+  platform_earnings DECIMAL(12, 2) NOT NULL,
+  average_gift_value DECIMAL(8, 2) NOT NULL,
+  top_spark_id INTEGER,
+  engagement_rate DECIMAL(5, 2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX daily_analytics_date_idx ON daily_analytics(date);
+
+-- Creator metrics
+CREATE TABLE IF NOT EXISTS creator_metrics (
+  id SERIAL PRIMARY KEY,
+  creator_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  date TIMESTAMP NOT NULL,
+  video_views INTEGER NOT NULL DEFAULT 0,
+  video_likes INTEGER NOT NULL DEFAULT 0,
+  video_comments INTEGER NOT NULL DEFAULT 0,
+  video_shares INTEGER NOT NULL DEFAULT 0,
+  gifts_received INTEGER NOT NULL DEFAULT 0,
+  gift_revenue DECIMAL(10, 2) NOT NULL DEFAULT 0,
+  followers INTEGER NOT NULL DEFAULT 0,
+  followers_gained INTEGER NOT NULL DEFAULT 0,
+  engagement_rate DECIMAL(5, 2) NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX creator_metrics_creator_id_idx ON creator_metrics(creator_id);
+CREATE INDEX creator_metrics_date_idx ON creator_metrics(date);
+CREATE INDEX creator_metrics_creator_date_idx ON creator_metrics(creator_id, date);
+
+-- Gift analytics
+CREATE TABLE IF NOT EXISTS gift_analytics (
+  id SERIAL PRIMARY KEY,
+  spark_id INTEGER NOT NULL REFERENCES sparks(id),
+  hour TIMESTAMP NOT NULL,
+  send_count INTEGER NOT NULL DEFAULT 0,
+  revenue DECIMAL(10, 2) NOT NULL DEFAULT 0,
+  unique_senders INTEGER NOT NULL DEFAULT 0,
+  unique_recipients INTEGER NOT NULL DEFAULT 0,
+  average_value DECIMAL(8, 2) NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX gift_analytics_spark_id_idx ON gift_analytics(spark_id);
+CREATE INDEX gift_analytics_hour_idx ON gift_analytics(hour);
+
+-- User engagement
+CREATE TABLE IF NOT EXISTS user_engagement (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  date TIMESTAMP NOT NULL,
+  session_count INTEGER NOT NULL DEFAULT 0,
+  session_duration INTEGER NOT NULL DEFAULT 0,
+  videos_watched INTEGER NOT NULL DEFAULT 0,
+  gifts_received INTEGER NOT NULL DEFAULT 0,
+  gifts_sent INTEGER NOT NULL DEFAULT 0,
+  credits_spent INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX user_engagement_user_id_idx ON user_engagement(user_id);
+CREATE INDEX user_engagement_date_idx ON user_engagement(date);
+
+-- Revenue breakdown
+CREATE TABLE IF NOT EXISTS revenue_breakdown (
+  id SERIAL PRIMARY KEY,
+  date TIMESTAMP NOT NULL,
+  source VARCHAR(50) NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  transaction_count INTEGER NOT NULL,
+  average_transaction DECIMAL(8, 2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX revenue_breakdown_date_idx ON revenue_breakdown(date);
+CREATE INDEX revenue_breakdown_source_idx ON revenue_breakdown(source);
+
+-- Retention cohorts
+CREATE TABLE IF NOT EXISTS retention_cohorts (
+  id SERIAL PRIMARY KEY,
+  cohort_date TIMESTAMP NOT NULL,
+  cohort_size INTEGER NOT NULL,
+  day_0 INTEGER NOT NULL,
+  day_1 INTEGER NOT NULL,
+  day_7 INTEGER NOT NULL,
+  day_30 INTEGER NOT NULL,
+  day_60 INTEGER NOT NULL,
+  day_90 INTEGER NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX retention_cohorts_cohort_date_idx ON retention_cohorts(cohort_date);
+
+-- Revenue forecast
+CREATE TABLE IF NOT EXISTS revenue_forecast (
+  id SERIAL PRIMARY KEY,
+  forecast_date TIMESTAMP NOT NULL,
+  projected_revenue DECIMAL(12, 2) NOT NULL,
+  confidence DECIMAL(5, 2) NOT NULL,
+  methodology VARCHAR(100) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE INDEX revenue_forecast_forecast_date_idx ON revenue_forecast(forecast_date);
+
+
+
+
+
+PART 2: BACKEND ANALYTICS SERVICE
+
+Create server/services/analytics-service.ts:
+
+TypeScript
+
+
+import { db } from '../storage';
+import {
+  dailyAnalytics,
+  creatorMetrics,
+  giftAnalytics,
+  userEngagement,
+  revenueBreakdown,
+  retentionCohorts,
+  revenueForecast,
+  virtualGifts,
+  users,
+  videos,
+} from '../../shared/schema';
+import { eq, gte, lte, and, sql } from 'drizzle-orm';
+
+export class AnalyticsService {
+  /**
+   * Calculate and store daily analytics snapshot
+   */
+  async calculateDailyAnalytics(date: Date): Promise<void> {
+    try {
+      // Get all metrics for the day
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      // Total users
+      const totalUsersResult = await db
+        .select({ count: sql`COUNT(*)` })
+        .from(users);
+      const totalUsers = Number(totalUsersResult[0]?.count || 0);
+
+      // Active users (users with engagement on this day)
+      const activeUsersResult = await db
+        .select({ count: sql`COUNT(DISTINCT user_id)` })
+        .from(userEngagement)
+        .where(
+          and(
+            gte(userEngagement.date, startOfDay),
+            lte(userEngagement.date, endOfDay)
+          )
+        );
+      const activeUsers = Number(activeUsersResult[0]?.count || 0);
+
+      // New users (created on this day)
+      const newUsersResult = await db
+        .select({ count: sql`COUNT(*)` })
+        .from(users)
+        .where(
+          and(
+            gte(users.createdAt, startOfDay),
+            lte(users.createdAt, endOfDay)
+          )
+        );
+      const newUsers = Number(newUsersResult[0]?.count || 0);
+
+      // Gifts sent
+      const giftsResult = await db
+        .select({
+          count: sql`COUNT(*)`,
+          totalRevenue: sql`SUM(creator_share + platform_share)`,
+          creatorEarnings: sql`SUM(creator_share)`,
+          platformEarnings: sql`SUM(platform_share)`,
+          avgValue: sql`AVG(creator_share + platform_share)`,
+        })
+        .from(virtualGifts)
+        .where(
+          and(
+            gte(virtualGifts.createdAt, startOfDay),
+            lte(virtualGifts.createdAt, endOfDay),
+            eq(virtualGifts.status, 'completed')
+          )
+        );
+
+      const giftData = giftsResult[0];
+      const totalGiftsSent = Number(giftData?.count || 0);
+      const totalRevenue = Number(giftData?.totalRevenue || 0);
+      const creatorEarnings = Number(giftData?.creatorEarnings || 0);
+      const platformEarnings = Number(giftData?.platformEarnings || 0);
+      const avgGiftValue = Number(giftData?.avgValue || 0);
+
+      // Engagement rate
+      const engagementRate = totalUsers > 0 ? (activeUsers / totalUsers) * 100 : 0;
+
+      // Top spark
+      const topSparkResult = await db
+        .select({
+          sparkId: virtualGifts.sparkId,
+          count: sql`COUNT(*)`,
+        })
+        .from(virtualGifts)
+        .where(
+          and(
+            gte(virtualGifts.createdAt, startOfDay),
+            lte(virtualGifts.createdAt, endOfDay),
+            eq(virtualGifts.status, 'completed')
+          )
+        )
+        .groupBy(virtualGifts.sparkId)
+        .orderBy(sql`COUNT(*) DESC`)
+        .limit(1);
+
+      const topSparkId = topSparkResult[0]?.sparkId || null;
+
+      // Store daily analytics
+      await db.insert(dailyAnalytics).values({
+        date: startOfDay,
+        totalUsers,
+        activeUsers,
+        newUsers,
+        totalGiftsSent,
+        totalRevenue: totalRevenue.toString(),
+        creatorEarnings: creatorEarnings.toString(),
+        platformEarnings: platformEarnings.toString(),
+        averageGiftValue: avgGiftValue.toString(),
+        topSparkId,
+        engagementRate: engagementRate.toString(),
+      });
+
+      console.log(`✅ Daily analytics calculated for ${date.toDateString()}`);
+    } catch (error) {
+      console.error('Error calculating daily analytics:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Calculate creator metrics for a specific date
+   */
+  async calculateCreatorMetrics(creatorId: number, date: Date): Promise<void> {
+    try {
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      // Video stats
+      const videoStats = await db
+        .select({
+          views: sql`SUM(views)`,
+          likes: sql`SUM(likes)`,
+          comments: sql`SUM(comments)`,
+          shares: sql`SUM(shares)`,
+        })
+        .from(videos)
+        .where(
+          and(
+            eq(videos.creatorId, creatorId),
+            gte(videos.createdAt, startOfDay),
+            lte(videos.createdAt, endOfDay)
+          )
+        );
+
+      const videoData = videoStats[0];
+      const videoViews = Number(videoData?.views || 0);
+      const videoLikes = Number(videoData?.likes || 0);
+      const videoComments = Number(videoData?.comments || 0);
+      const videoShares = Number(videoData?.shares || 0);
+
+      // Gift stats
+      const giftStats = await db
+        .select({
+          count: sql`COUNT(*)`,
+          revenue: sql`SUM(creator_share)`,
+        })
+        .from(virtualGifts)
+        .where(
+          and(
+            eq(virtualGifts.recipientId, creatorId),
+            gte(virtualGifts.createdAt, startOfDay),
+            lte(virtualGifts.createdAt, endOfDay),
+            eq(virtualGifts.status, 'completed')
+          )
+        );
+
+      const giftData = giftStats[0];
+      const giftsReceived = Number(giftData?.count || 0);
+      const giftRevenue = Number(giftData?.revenue || 0);
+
+      // Follower count
+      const creatorData = await db
+        .select({ followers: users.followers })
+        .from(users)
+        .where(eq(users.id, creatorId));
+
+      const followers = creatorData[0]?.followers || 0;
+
+      // Calculate engagement rate
+      const totalEngagement = videoViews + videoLikes + videoComments + videoShares;
+      const engagementRate = videoViews > 0 ? (totalEngagement / videoViews) * 100 : 0;
+
+      // Store metrics
+      await db.insert(creatorMetrics).values({
+        creatorId,
+        date: startOfDay,
+        videoViews,
+        videoLikes,
+        videoComments,
+        videoShares,
+        giftsReceived,
+        giftRevenue: giftRevenue.toString(),
+        followers,
+        followersGained: 0, // Calculate separately
+        engagementRate: engagementRate.toString(),
+      });
+
+      console.log(`✅ Creator metrics calculated for user ${creatorId}`);
+    } catch (error) {
+      console.error('Error calculating creator metrics:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Calculate hourly gift analytics
+   */
+  async calculateGiftAnalytics(sparkId: number, hour: Date): Promise<void> {
+    try {
+      const startOfHour = new Date(hour);
+      startOfHour.setMinutes(0, 0, 0);
+      const endOfHour = new Date(startOfHour);
+      endOfHour.setHours(endOfHour.getHours() + 1);
+
+      const stats = await db
+        .select({
+          count: sql`COUNT(*)`,
+          revenue: sql`SUM(creator_share + platform_share)`,
+          uniqueSenders: sql`COUNT(DISTINCT sender_id)`,
+          uniqueRecipients: sql`COUNT(DISTINCT recipient_id)`,
+          avgValue: sql`AVG(creator_share + platform_share)`,
+        })
+        .from(virtualGifts)
+        .where(
+          and(
+            eq(virtualGifts.sparkId, sparkId),
+            gte(virtualGifts.createdAt, startOfHour),
+            lte(virtualGifts.createdAt, endOfHour),
+            eq(virtualGifts.status, 'completed')
+          )
+        );
+
+      const data = stats[0];
+
+      await db.insert(giftAnalytics).values({
+        sparkId,
+        hour: startOfHour,
+        sendCount: Number(data?.count || 0),
+        revenue: (Number(data?.revenue || 0)).toString(),
+        uniqueSenders: Number(data?.uniqueSenders || 0),
+        uniqueRecipients: Number(data?.uniqueRecipients || 0),
+        averageValue: (Number(data?.avgValue || 0)).toString(),
+      });
+    } catch (error) {
+      console.error('Error calculating gift analytics:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Calculate revenue forecast using linear regression
+   */
+  async calculateRevenueForecast(days: number = 30): Promise<void> {
+    try {
+      // Get last 30 days of revenue data
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const historicalData = await db
+        .select({
+          date: dailyAnalytics.date,
+          revenue: dailyAnalytics.totalRevenue,
+        })
+        .from(dailyAnalytics)
+        .where(gte(dailyAnalytics.date, thirtyDaysAgo))
+        .orderBy(dailyAnalytics.date);
+
+      if (historicalData.length < 7) {
+        console.log('Insufficient data for forecast');
+        return;
+      }
+
+      // Simple linear regression
+      const n = historicalData.length;
+      let sumX = 0,
+        sumY = 0,
+        sumXY = 0,
+        sumX2 = 0;
+
+      historicalData.forEach((item, index) => {
+        const x = index;
+        const y = Number(item.revenue);
+        sumX += x;
+        sumY += y;
+        sumXY += x * y;
+        sumX2 += x * x;
+      });
+
+      const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+      const intercept = (sumY - slope * sumX) / n;
+
+      // Project forward
+      const forecastDate = new Date();
+      forecastDate.setDate(forecastDate.getDate() + days);
+
+      const projectedRevenue = intercept + slope * (n + days);
+      const confidence = Math.min(95, 50 + historicalData.length * 1.5); // Confidence increases with data
+
+      await db.insert(revenueForecast).values({
+        forecastDate,
+        projectedRevenue: Math.max(0, projectedRevenue).toString(),
+        confidence: confidence.toString(),
+        methodology: 'linear_regression',
+      });
+
+      console.log(`✅ Revenue forecast calculated: $${projectedRevenue.toFixed(2)}`);
+    } catch (error) {
+      console.error('Error calculating revenue forecast:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get dashboard summary data
+   */
+  async getDashboardSummary(days: number = 30) {
+    try {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+
+      // Get analytics for period
+      const analytics = await db
+        .select()
+        .from(dailyAnalytics)
+        .where(gte(dailyAnalytics.date, startDate))
+        .orderBy(dailyAnalytics.date);
+
+      if (analytics.length === 0) {
+        return null;
+      }
+
+      const latest = analytics[analytics.length - 1];
+      const previous = analytics[0];
+
+      return {
+        current: {
+          totalUsers: latest.totalUsers,
+          activeUsers: latest.activeUsers,
+          totalRevenue: Number(latest.totalRevenue),
+          creatorEarnings: Number(latest.creatorEarnings),
+          platformEarnings: Number(latest.platformEarnings),
+          giftsReceived: latest.totalGiftsSent,
+          engagementRate: Number(latest.engagementRate),
+        },
+        previous: {
+          totalUsers: previous.totalUsers,
+          activeUsers: previous.activeUsers,
+          totalRevenue: Number(previous.totalRevenue),
+          creatorEarnings: Number(previous.creatorEarnings),
+          platformEarnings: Number(previous.platformEarnings),
+          giftsReceived: previous.totalGiftsSent,
+          engagementRate: Number(previous.engagementRate),
+        },
+        trend: {
+          userGrowth: ((latest.totalUsers - previous.totalUsers) / previous.totalUsers) * 100,
+          revenueGrowth: ((Number(latest.totalRevenue) - Number(previous.totalRevenue)) / Number(previous.totalRevenue)) * 100,
+          engagementTrend: Number(latest.engagementRate) - Number(previous.engagementRate),
+        },
+        analytics,
+      };
+    } catch (error) {
+      console.error('Error getting dashboard summary:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get creator dashboard data
+   */
+  async getCreatorDashboard(creatorId: number, days: number = 30) {
+    try {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+
+      const metrics = await db
+        .select()
+        .from(creatorMetrics)
+        .where(
+          and(
+            eq(creatorMetrics.creatorId, creatorId),
+            gte(creatorMetrics.date, startDate)
+          )
+        )
+        .orderBy(creatorMetrics.date);
+
+      if (metrics.length === 0) {
+        return null;
+      }
+
+      const latest = metrics[metrics.length - 1];
+      const totalMetrics = metrics.reduce(
+        (acc, m) => ({
+          videoViews: acc.videoViews + m.videoViews,
+          videoLikes: acc.videoLikes + m.videoLikes,
+          videoComments: acc.videoComments + m.videoComments,
+          videoShares: acc.videoShares + m.videoShares,
+          giftsReceived: acc.giftsReceived + m.giftsReceived,
+          giftRevenue: acc.giftRevenue + Number(m.giftRevenue),
+          avgEngagement: acc.avgEngagement + Number(m.engagementRate),
+        }),
+        {
+          videoViews: 0,
+          videoLikes: 0,
+          videoComments: 0,
+          videoShares: 0,
+          giftsReceived: 0,
+          giftRevenue: 0,
+          avgEngagement: 0,
+        }
+      );
+
+      return {
+        current: {
+          followers: latest.followers,
+          giftsReceived: latest.giftsReceived,
+          giftRevenue: Number(latest.giftRevenue),
+          engagementRate: Number(latest.engagementRate),
+        },
+        period: {
+          videoViews: totalMetrics.videoViews,
+          videoLikes: totalMetrics.videoLikes,
+          videoComments: totalMetrics.videoComments,
+          videoShares: totalMetrics.videoShares,
+          giftsReceived: totalMetrics.giftsReceived,
+          giftRevenue: totalMetrics.giftRevenue,
+          avgEngagementRate: totalMetrics.avgEngagement / metrics.length,
+        },
+        metrics,
+      };
+    } catch (error) {
+      console.error('Error getting creator dashboard:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get revenue breakdown
+   */
+  async getRevenueBreakdown(days: number = 30) {
+    try {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+
+      const breakdown = await db
+        .select()
+        .from(revenueBreakdown)
+        .where(gte(revenueBreakdown.date, startDate))
+        .orderBy(revenueBreakdown.date);
+
+      return breakdown;
+    } catch (error) {
+      console.error('Error getting revenue breakdown:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get retention cohort data
+   */
+  async getRetentionCohorts(days: number = 90) {
+    try {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - days);
+
+      const cohorts = await db
+        .select()
+        .from(retentionCohorts)
+        .where(gte(retentionCohorts.cohortDate, startDate))
+        .orderBy(retentionCohorts.cohortDate);
+
+      return cohorts;
+    } catch (error) {
+      console.error('Error getting retention cohorts:', error);
+      throw error;
+    }
+  }
+}
+
+export const analyticsService = new AnalyticsService();
+
+
+
+
+
+PART 3: BACKEND API ENDPOINTS
+
+Add to server/routes.ts:
+
+TypeScript
+
+
+// GET /api/analytics/dashboard
+app.get('/api/analytics/dashboard', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days as string) || 30;
+    const summary = await analyticsService.getDashboardSummary(days);
+
+    if (!summary) {
+      return res.status(404).json({ error: 'No analytics data available' });
+    }
+
+    res.json({ success: true, data: summary });
+  } catch (error) {
+    console.error('Error fetching dashboard:', error);
+    res.status(500).json({ error: 'Failed to fetch dashboard' });
+  }
+});
+
+// GET /api/analytics/creator/:creatorId
+app.get('/api/analytics/creator/:creatorId', async (req, res) => {
+  try {
+    const creatorId = parseInt(req.params.creatorId);
+    const days = parseInt(req.query.days as string) || 30;
+
+    // Verify user is the creator or admin
+    if (req.session.userId !== creatorId && !req.session.isAdmin) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    const dashboard = await analyticsService.getCreatorDashboard(creatorId, days);
+
+    if (!dashboard) {
+      return res.status(404).json({ error: 'No analytics data available' });
+    }
+
+    res.json({ success: true, data: dashboard });
+  } catch (error) {
+    console.error('Error fetching creator analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch creator analytics' });
+  }
+});
+
+// GET /api/analytics/revenue-breakdown
+app.get('/api/analytics/revenue-breakdown', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days as string) || 30;
+    const breakdown = await analyticsService.getRevenueBreakdown(days);
+
+    res.json({ success: true, data: breakdown });
+  } catch (error) {
+    console.error('Error fetching revenue breakdown:', error);
+    res.status(500).json({ error: 'Failed to fetch revenue breakdown' });
+  }
+});
+
+// GET /api/analytics/retention
+app.get('/api/analytics/retention', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days as string) || 90;
+    const cohorts = await analyticsService.getRetentionCohorts(days);
+
+    res.json({ success: true, data: cohorts });
+  } catch (error) {
+    console.error('Error fetching retention data:', error);
+    res.status(500).json({ error: 'Failed to fetch retention data' });
+  }
+});
+
+// POST /api/analytics/calculate-daily (Admin only)
+app.post('/api/analytics/calculate-daily', async (req, res) => {
+  try {
+    if (!req.session.isAdmin) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const date = new Date(req.body.date || new Date());
+    await analyticsService.calculateDailyAnalytics(date);
+
+    res.json({ success: true, message: 'Daily analytics calculated' });
+  } catch (error) {
+    console.error('Error calculating daily analytics:', error);
+    res.status(500).json({ error: 'Failed to calculate analytics' });
+  }
+});
+
+// POST /api/analytics/forecast (Admin only)
+app.post('/api/analytics/forecast', async (req, res) => {
+  try {
+    if (!req.session.isAdmin) {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    const days = req.body.days || 30;
+    await analyticsService.calculateRevenueForecast(days);
+
+    res.json({ success: true, message: 'Revenue forecast calculated' });
+  } catch (error) {
+    console.error('Error calculating forecast:', error);
+    res.status(500).json({ error: 'Failed to calculate forecast' });
+  }
+});
+
+
+
+
+
+PART 4: FRONTEND DASHBOARD COMPONENTS
+
+Create client/src/pages/Analytics.tsx:
+
+TypeScript
+
+
+import React, { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
+import './Analytics.css';
+
+interface DashboardData {
+  current: {
+    totalUsers: number;
+    activeUsers: number;
+    totalRevenue: number;
+    creatorEarnings: number;
+    platformEarnings: number;
+    giftsReceived: number;
+    engagementRate: number;
+  };
+  trend: {
+    userGrowth: number;
+    revenueGrowth: number;
+    engagementTrend: number;
+  };
+  analytics: Array<any>;
+}
+
+export const Analytics: React.FC = () => {
+  const [days, setDays] = useState(30);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['analytics', days],
+    queryFn: async () => {
+      const response = await fetch(`/api/analytics/dashboard?days=${days}`);
+      return response.json();
+    },
+  });
+
+  const { data: revenueBreakdown } = useQuery({
+    queryKey: ['revenue-breakdown', days],
+    queryFn: async () => {
+      const response = await fetch(`/api/analytics/revenue-breakdown?days=${days}`);
+      return response.json();
+    },
+  });
+
+  if (isLoading) {
+    return <div className="analytics-loading">Loading analytics...</div>;
+  }
+
+  const dashboardData: DashboardData = data?.data;
+
+  return (
+    <div className="analytics-container">
+      <div className="analytics-header">
+        <h1>Platform Analytics</h1>
+        <div className="date-filter">
+          <select value={days} onChange={(e) => setDays(Number(e.target.value))}>
+            <option value={7}>Last 7 days</option>
+            <option value={30}>Last 30 days</option>
+            <option value={90}>Last 90 days</option>
+            <option value={365}>Last year</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Key Metrics */}
+      <div className="metrics-grid">
+        <MetricCard
+          title="Total Users"
+          value={dashboardData.current.totalUsers}
+          change={dashboardData.trend.userGrowth}
+          icon="👥"
+        />
+        <MetricCard
+          title="Active Users"
+          value={dashboardData.current.activeUsers}
+          change={dashboardData.trend.userGrowth}
+          icon="⚡"
+        />
+        <MetricCard
+          title="Total Revenue"
+          value={`$${dashboardData.current.totalRevenue.toFixed(2)}`}
+          change={dashboardData.trend.revenueGrowth}
+          icon="💰"
+        />
+        <MetricCard
+          title="Creator Earnings"
+          value={`$${dashboardData.current.creatorEarnings.toFixed(2)}`}
+          change={dashboardData.trend.revenueGrowth}
+          icon="🎬"
+        />
+        <MetricCard
+          title="Gifts Sent"
+          value={dashboardData.current.giftsReceived}
+          change={0}
+          icon="🎁"
+        />
+        <MetricCard
+          title="Engagement Rate"
+          value={`${dashboardData.current.engagementRate.toFixed(1)}%`}
+          change={dashboardData.trend.engagementTrend}
+          icon="📊"
+        />
+      </div>
+
+      {/* Charts */}
+      <div className="charts-grid">
+        {/* Revenue Trend */}
+        <div className="chart-card">
+          <h2>Revenue Trend</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={dashboardData.analytics}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="date"
+                tickFormatter={(date) => new Date(date).toLocaleDateString()}
+              />
+              <YAxis />
+              <Tooltip
+                formatter={(value) => `$${Number(value).toFixed(2)}`}
+                labelFormatter={(label) => new Date(label).toLocaleDateString()}
+              />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="totalRevenue"
+                stroke="#00d4ff"
+                name="Total Revenue"
+              />
+              <Line
+                type="monotone"
+                dataKey="creatorEarnings"
+                stroke="#10b981"
+                name="Creator Earnings"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* User Growth */}
+        <div className="chart-card">
+          <h2>User Growth</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={dashboardData.analytics}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="date"
+                tickFormatter={(date) => new Date(date).toLocaleDateString()}
+              />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="totalUsers" fill="#00d4ff" name="Total Users" />
+              <Bar dataKey="activeUsers" fill="#8b5cf6" name="Active Users" />
+              <Bar dataKey="newUsers" fill="#10b981" name="New Users" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Revenue Breakdown */}
+        {revenueBreakdown?.data && (
+          <div className="chart-card">
+            <h2>Revenue Sources</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={aggregateRevenueBySource(revenueBreakdown.data)}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={renderCustomLabel}
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {['#00d4ff', '#10b981', '#8b5cf6', '#ff6b6b'].map((color, index) => (
+                    <Cell key={`cell-${index}`} fill={color} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value) => `$${Number(value).toFixed(2)}`} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Engagement */}
+        <div className="chart-card">
+          <h2>Engagement Rate</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={dashboardData.analytics}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="date"
+                tickFormatter={(date) => new Date(date).toLocaleDateString()}
+              />
+              <YAxis />
+              <Tooltip formatter={(value) => `${Number(value).toFixed(1)}%`} />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="engagementRate"
+                stroke="#ff6b6b"
+                name="Engagement Rate %"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface MetricCardProps {
+  title: string;
+  value: string | number;
+  change: number;
+  icon: string;
+}
+
+const MetricCard: React.FC<MetricCardProps> = ({ title, value, change, icon }) => {
+  const isPositive = change >= 0;
+
+  return (
+    <div className="metric-card">
+      <div className="metric-header">
+        <span className="metric-icon">{icon}</span>
+        <h3>{title}</h3>
+      </div>
+      <div className="metric-value">{value}</div>
+      <div className={`metric-change ${isPositive ? 'positive' : 'negative'}`}>
+        {isPositive ? '↑' : '↓'} {Math.abs(change).toFixed(1)}%
+      </div>
+    </div>
+  );
+};
+
+const aggregateRevenueBySource = (data: any[]) => {
+  const sources: { [key: string]: number } = {};
+
+  data.forEach((item) => {
+    sources[item.source] = (sources[item.source] || 0) + Number(item.amount);
+  });
+
+  return Object.entries(sources).map(([name, value]) => ({
+    name,
+    value,
+  }));
+};
+
+const renderCustomLabel = ({ name, value }: any) => {
+  return `${name}: $${Number(value).toFixed(0)}`;
+};
+
+
+Create client/src/pages/Analytics.css:
+
+CSS
+
+
+.analytics-container {
+  padding: 30px;
+  background: linear-gradient(135deg, #0a1e3f 0%, #0d2a5f 100%);
+  min-height: 100vh;
+  color: white;
+}
+
+.analytics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.analytics-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.date-filter select {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 2px solid #00d4ff;
+  background: rgba(0, 212, 255, 0.1);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.metric-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+  border-color: #00d4ff;
+  background: rgba(0, 212, 255, 0.1);
+  transform: translateY(-5px);
+}
+
+.metric-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.metric-icon {
+  font-size: 24px;
+}
+
+.metric-header h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #b8c5d6;
+}
+
+.metric-value {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.metric-change {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.metric-change.positive {
+  color: #10b981;
+}
+
+.metric-change.negative {
+  color: #ff6b6b;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 20px;
+}
+
+.chart-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.chart-card h2 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.analytics-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 18px;
+  color: #b8c5d6;
+}
+
+@media (max-width: 768px) {
+  .analytics-header {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
+
+
+
+PART 5: CREATOR DASHBOARD
+
+Create client/src/pages/CreatorDashboard.tsx:
+
+TypeScript
+
+
+import React, { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useSession } from '../hooks/useSession';
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
+import './CreatorDashboard.css';
+
+export const CreatorDashboard: React.FC = () => {
+  const { user } = useSession();
+  const [days, setDays] = useState(30);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['creator-analytics', user?.id, days],
+    queryFn: async () => {
+      const response = await fetch(`/api/analytics/creator/${user?.id}?days=${days}`);
+      return response.json();
+    },
+    enabled: !!user?.id,
+  });
+
+  if (isLoading) {
+    return <div className="dashboard-loading">Loading your analytics...</div>;
+  }
+
+  const dashboard = data?.data;
+
+  return (
+    <div className="creator-dashboard">
+      <div className="dashboard-header">
+        <h1>Creator Dashboard</h1>
+        <div className="date-filter">
+          <select value={days} onChange={(e) => setDays(Number(e.target.value))}>
+            <option value={7}>Last 7 days</option>
+            <option value={30}>Last 30 days</option>
+            <option value={90}>Last 90 days</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Current Stats */}
+      <div className="stats-grid">
+        <StatBox
+          label="Followers"
+          value={dashboard.current.followers}
+          icon="👥"
+          trend={0}
+        />
+        <StatBox
+          label="Gifts Received"
+          value={dashboard.current.giftsReceived}
+          icon="🎁"
+          trend={0}
+        />
+        <StatBox
+          label="Gift Revenue"
+          value={`$${dashboard.current.giftRevenue.toFixed(2)}`}
+          icon="💰"
+          trend={0}
+        />
+        <StatBox
+          label="Engagement Rate"
+          value={`${dashboard.current.engagementRate.toFixed(1)}%`}
+          icon="📊"
+          trend={0}
+        />
+      </div>
+
+      {/* Period Stats */}
+      <div className="period-stats">
+        <h2>Performance ({days} days)</h2>
+        <div className="stats-table">
+          <div className="stat-row">
+            <span>Video Views</span>
+            <span className="stat-value">{dashboard.period.videoViews.toLocaleString()}</span>
+          </div>
+          <div className="stat-row">
+            <span>Video Likes</span>
+            <span className="stat-value">{dashboard.period.videoLikes.toLocaleString()}</span>
+          </div>
+          <div className="stat-row">
+            <span>Comments</span>
+            <span className="stat-value">{dashboard.period.videoComments.toLocaleString()}</span>
+          </div>
+          <div className="stat-row">
+            <span>Shares</span>
+            <span className="stat-value">{dashboard.period.videoShares.toLocaleString()}</span>
+          </div>
+          <div className="stat-row">
+            <span>Total Gift Revenue</span>
+            <span className="stat-value">${dashboard.period.giftRevenue.toFixed(2)}</span>
+          </div>
+          <div className="stat-row">
+            <span>Avg Engagement Rate</span>
+            <span className="stat-value">{dashboard.period.avgEngagementRate.toFixed(1)}%</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts */}
+      <div className="dashboard-charts">
+        <div className="chart-container">
+          <h2>Gift Revenue Trend</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={dashboard.metrics}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="date"
+                tickFormatter={(date) => new Date(date).toLocaleDateString()}
+              />
+              <YAxis />
+              <Tooltip
+                formatter={(value) => `$${Number(value).toFixed(2)}`}
+                labelFormatter={(label) => new Date(label).toLocaleDateString()}
+              />
+              <Line
+                type="monotone"
+                dataKey="giftRevenue"
+                stroke="#10b981"
+                name="Gift Revenue"
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="chart-container">
+          <h2>Engagement Metrics</h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={dashboard.metrics}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="date"
+                tickFormatter={(date) => new Date(date).toLocaleDateString()}
+              />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="videoLikes" fill="#00d4ff" name="Likes" />
+              <Bar dataKey="videoComments" fill="#8b5cf6" name="Comments" />
+              <Bar dataKey="videoShares" fill="#10b981" name="Shares" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+interface StatBoxProps {
+  label: string;
+  value: string | number;
+  icon: string;
+  trend: number;
+}
+
+const StatBox: React.FC<StatBoxProps> = ({ label, value, icon, trend }) => {
+  return (
+    <div className="stat-box">
+      <div className="stat-icon">{icon}</div>
+      <div className="stat-label">{label}</div>
+      <div className="stat-value">{value}</div>
+      {trend !== 0 && (
+        <div className={`stat-trend ${trend >= 0 ? 'positive' : 'negative'}`}>
+          {trend >= 0 ? '↑' : '↓'} {Math.abs(trend).toFixed(1)}%
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+Create client/src/pages/CreatorDashboard.css:
+
+CSS
+
+
+.creator-dashboard {
+  padding: 30px;
+  background: linear-gradient(135deg, #0a1e3f 0%, #0d2a5f 100%);
+  min-height: 100vh;
+  color: white;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.dashboard-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+  border-color: #00d4ff;
+  background: rgba(0, 212, 255, 0.1);
+  transform: translateY(-5px);
+}
+
+.stat-icon {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #b8c5d6;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.stat-trend {
+  font-size: 12px;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.stat-trend.positive {
+  color: #10b981;
+}
+
+.stat-trend.negative {
+  color: #ff6b6b;
+}
+
+.period-stats {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 40px;
+  backdrop-filter: blur(10px);
+}
+
+.period-stats h2 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.stats-table {
+  display: grid;
+  gap: 15px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: rgba(0, 212, 255, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid #00d4ff;
+}
+
+.stat-value {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.dashboard-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 20px;
+}
+
+.chart-container {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.chart-container h2 {
+  margin: 0 0 20px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.dashboard-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 18px;
+  color: #b8c5d6;
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .dashboard-charts {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
+
+
+
+PART 6: SCHEDULED ANALYTICS JOBS
+
+Create server/jobs/analytics-jobs.ts:
+
+TypeScript
+
+
+import { analyticsService } from '../services/analytics-service';
+
+/**
+ * Run daily analytics calculation
+ * Schedule: Every day at 00:05 UTC
+ */
+export async function runDailyAnalytics() {
+  try {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    await analyticsService.calculateDailyAnalytics(yesterday);
+    console.log('✅ Daily analytics job completed');
+  } catch (error) {
+    console.error('❌ Daily analytics job failed:', error);
+  }
+}
+
+/**
+ * Run revenue forecast
+ * Schedule: Every week on Monday at 01:00 UTC
+ */
+export async function runRevenueForecasting() {
+  try {
+    await analyticsService.calculateRevenueForecast(30);
+    console.log('✅ Revenue forecast job completed');
+  } catch (error) {
+    console.error('❌ Revenue forecast job failed:', error);
+  }
+}
+
+/**
+ * Calculate creator metrics for all creators
+ * Schedule: Every day at 00:30 UTC
+ */
+export async function runCreatorMetricsCalculation() {
+  try {
+    const db = require('../storage').db;
+    const { users } = require('../../shared/schema');
+
+    // Get all creators (users with videos)
+    const creators = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(users.isCreator === true);
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    for (const creator of creators) {
+      await analyticsService.calculateCreatorMetrics(creator.id, yesterday);
+    }
+
+    console.log(`✅ Creator metrics calculated for ${creators.length} creators`);
+  } catch (error) {
+    console.error('❌ Creator metrics job failed:', error);
+  }
+}
+
+/**
+ * Initialize scheduled jobs
+ */
+export function initializeAnalyticsJobs() {
+  // Daily analytics at 00:05 UTC
+  schedule.scheduleJob('5 0 * * *', runDailyAnalytics);
+
+  // Creator metrics at 00:30 UTC
+  schedule.scheduleJob('30 0 * * *', runCreatorMetricsCalculation);
+
+  // Revenue forecast every Monday at 01:00 UTC
+  schedule.scheduleJob('0 1 * * 1', runRevenueForecasting);
+
+  console.log('✅ Analytics jobs initialized');
+}
+
+
+
+
+
+IMPLEMENTATION CHECKLIST
+
+
+
+
+Create all analytics tables in database
+
+
+
+
+Run migration script
+
+
+
+
+Implement AnalyticsService
+
+
+
+
+Add API endpoints to routes.ts
+
+
+
+
+Create Analytics.tsx dashboard component
+
+
+
+
+Create CreatorDashboard.tsx component
+
+
+
+
+Add CSS styling for both dashboards
+
+
+
+
+Implement scheduled jobs
+
+
+
+
+Test all queries and endpoints
+
+
+
+
+Verify data accuracy
+
+
+
+
+Deploy to production
+
+
+
+
+Monitor analytics data collection
+
+
+
+
+SUCCESS METRICS
+
+•
+Dashboard Load Time: <2 seconds
+
+•
+Data Accuracy: 99.9%
+
+•
+Creator Adoption: >50% of creators viewing dashboard
+
+•
+Engagement Increase: 30-40%
+
+•
+Revenue Growth: 15-25% from increased engagement
+
+
+
+
