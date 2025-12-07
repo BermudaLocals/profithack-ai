@@ -1,128 +1,72 @@
-# NotOnlyFans
+# WhatsApp Clone with Video Calls
 
-NotOnlyFans is an open source, self-hosted digital content subscription platform like `onlyfans.com`. The difference, however, is that it uses cryptocurrency (ETH) for payment, so the content will no longer be judged by the payment platform and credit card companies.
+![Project Logo](https://play-lh.googleusercontent.com/bYtqbOcTYOlgc6gqZ2rwb8lptHuwlNE75zYJu6Bn076-hTmvd96HH-6v7S0YUAAJXoJN)
 
-[简体中文](README.cn.md)
+## About
 
-## Screenshots
+This project is a WhatsApp clone with video call functionality, built using React.js, Node.js, MongoDB, Socket.io, and WebRTC. It allows users to send text messages, images, and make video calls in real-time, similar to the popular messaging application WhatsApp.
 
-### Register and login page
+## Features
 
-![](images/2021-08-25-21-20-33.png)
+- User registration and authentication.
+- Real-time text messaging with individual and group chat support.
+- Image sharing within chats.
+- Dcouments sharing within chats.
+- Video calling with peer-to-peer WebRTC technology.
+- Filterization between chats
+- End-to-end encryption for secure messaging.
 
-### Create column
+## Demo
 
-![](images/2021-08-25-21-21-47.png)
+![image](https://github.com/piyushyadav0191/Full-Stack-Whatsapp-Clone/assets/84402719/0dedda2e-6111-4c40-95a6-55ac67388629)
 
-### Column view
+You can experience the project by visiting our [live demo](https://whatsapp-clone-frontend-liart.vercel.app/).
 
-![](images/2021-08-25-21-23-12.png)
+## Getting Started
 
-### Home feeds
+### Prerequisites
 
-![](images/2021-08-25-21-33-05.png)
+Before you begin, ensure you have met the following requirements:
 
-### Purchase column VIP via ETH
+- Node.js and npm installed on your development machine.
+- MongoDB installed and running.
+- WebRTC-compatible browsers (e.g., Chrome, Firefox).
 
-![](images/2021-08-25-21-28-14.png)
+### Installation
 
-### Subscribe and review
+1. Clone the repository:
 
-![](images/2021-08-25-21-31-27.png)
+   ```
+   git clone https://github.com/piyushyadav0191/Full-Stack-Whatsapp-Clone.git
+   ```
+2. Change to the project directory:
+   ```
+   cd whatsapp-clone
+    ```
+3. Install server dependencies and start server:
+   ```
+   cd backend && yarn && yarn dev
+   ```
+4.  Install client dependencies and start server:
+    ```
+    cd frontend && yarn && yarn start
+    ```
+5. Copy your environment variables in both frontend and backend in new .env file same as .env.example
+   
+### Usage
 
-### Message box
+    1. Visit http://localhost:3000 in your web browser to access the WhatsApp clone application.
 
-![](images/2021-08-25-21-32-18.png)
+    2. Register a new account or log in with existing credentials.
 
-### Modify profile
-
-![](images/2021-08-25-21-22-24.png)
-
-### Modify personal background image
-
-![](images/2021-08-25-21-34-44.png)
-
-### Blacklist
-
-![](images/2021-08-25-21-36-09.png)
-
-### Multi-language
-
-![](images/2021-08-25-21-36-51.png)
-
-
-<!-- ## Online demo site
-
-- <http://notonlyfans.vip/> -->
-
-## Self-hosted
-
-### Installation requirements
-
-First we need to prepare a server with `docker` and `docker-compose` already installed, this server IP is noted as `SIP`.
-
-### Clone the code and start Docker
-
-```bash
-git clone https://github.com/easychen/not-only-fans.git
-cd not-only-fans
-docker-compose up -d --build
-```
-
-### Initialize project data 
-
-Start by looking at the running Docker container.
-
-```bash
-docker ps
-```
-
-Record the container ID of the image as `not-only-fans_app` (CID for short), and then go inside the container.
-
-```bash
-docker exec -it ${container_id} /bin/bash
-```
-
-### Initialize the web front end
-
-```bash
-cd /app/client/ && yarn install && yarn build
-```
-
-### Initialize the API
-
-```bash
-cd /app/api/ && composer install && mkdir /app/api/storage && chmod -R 0777 /app/api/storage
-```
-
-### Domain pointing
-
-This image uses different domains to point to different directories, you can point the following two domains to the server IP (i.e. SIP before) in localhost.
-
-1. `notonlyfans.vip` → SIP (front-end domain)
-1. `api.notonlyfans.vip` → SIP (API domain name)
-
-Access at this point is ready for testing.
-
-## Customization
-
-### Use your own domain name
-
-1. Modify `docker/app/vhost.conf` and replace the front-end domain and API domain with your own.
-1. modify `www/client/.env.production` and replace the domain name in `REACT_APP_API_BASE` with your API domain name
-1. modify `www/api/config/app.php` and replace the front-end domain name in it with your front-end domain name
-
-### Use your own infura
-
-1. Go to https://infura.io/ to open the service, click on the project name in [Dashboard](https://infura.io/dashboard/ethereum) and copy the Key in `Settings`.
-1. Note that you can select the main or test network as needed.
-1. Update `www/api/config/app.php` where `web3_network` is located.
-
-### Use your own contract
-
-1. modify `www/api/contract/group.js` and `www/api/contract/deploy.js`
-1. deploy via `deploy.js`
-1. Fill in the address of the deployed contract in `www/api/config/app.php` in the corresponding place
+    3. Explore the application's features, including text messaging, image sharing, and video calls.
 
 
-Translated with www.DeepL.com/Translator 
+### Technologies Used
+
+    React.js
+    Node.js
+    MongoDB
+    Socket.io
+    WebRTC
+    Redux toolkit
