@@ -1,8 +1,5 @@
-[build]
-nodeVersion = "20.11.1"
+[phases.setup]
+nixPkgs = ["nodejs-20", "bzip2"]
 
-[deploy]
-startCommand = "npm run build && npm start"
-
-[[phases]]
-name = "setup"
+[phases.install]
+cmds = ["npm ci --omit=dev"]
