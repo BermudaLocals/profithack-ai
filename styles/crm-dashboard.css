@@ -1,0 +1,509 @@
+/* ============================================
+   ENTERPRISE CRM DASHBOARD CSS
+   Professional Design | Responsive | Animations
+   Neon Pink/Cyan Theme
+   ============================================ */
+
+.crm-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0e27 0%, #050812 100%);
+  color: #e0e0e0;
+  padding: 20px;
+}
+
+.crm-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: 18px;
+  color: #00F2EA;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+
+.crm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(0, 242, 234, 0.2);
+}
+
+.header-left h1 {
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 4px;
+  background: linear-gradient(135deg, #FF00FF, #00F2EA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-left p {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.header-right {
+  display: flex;
+  gap: 16px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 24px;
+  background: rgba(255, 0, 255, 0.05);
+  border: 1px solid rgba(255, 0, 255, 0.3);
+  border-radius: 12px;
+  min-width: 150px;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #FF00FF, #00F2EA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   NAVIGATION
+   ============================================ */
+
+.crm-nav {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(0, 242, 234, 0.2);
+  flex-wrap: wrap;
+}
+
+.crm-nav button {
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+/* ============================================
+   CONTENT SECTIONS
+   ============================================ */
+
+.crm-content {
+  padding: 20px 0;
+}
+
+.crm-content h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #FF00FF, #00F2EA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   CALENDAR SECTION
+   ============================================ */
+
+.calendar-section {
+  animation: fadeIn 0.3s ease;
+}
+
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.post-card {
+  padding: 20px;
+  background: rgba(255, 0, 255, 0.05);
+  border: 1px solid rgba(255, 0, 255, 0.3);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.post-card:hover {
+  border-color: #FF00FF;
+  background: rgba(255, 0, 255, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(255, 0, 255, 0.2);
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.post-header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.post-status {
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.post-status.draft {
+  background: rgba(255, 165, 0, 0.2);
+  color: #FFA500;
+}
+
+.post-status.scheduled {
+  background: rgba(0, 208, 132, 0.2);
+  color: #00D084;
+}
+
+.post-status.published {
+  background: rgba(0, 242, 234, 0.2);
+  color: #00F2EA;
+}
+
+.post-status.failed {
+  background: rgba(255, 68, 68, 0.2);
+  color: #FF4444;
+}
+
+.post-description {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 12px;
+}
+
+.post-platforms {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.platform-badge {
+  font-size: 0.75rem;
+  padding: 4px 12px;
+  background: rgba(0, 242, 234, 0.2);
+  color: #00F2EA;
+  border-radius: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.post-content p {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.hashtags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hashtag {
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  background: rgba(255, 69, 0, 0.2);
+  color: #FF4500;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* ============================================
+   GENERATE SECTION
+   ============================================ */
+
+.generate-section {
+  animation: fadeIn 0.3s ease;
+}
+
+.generator-form {
+  padding: 24px;
+  background: rgba(255, 0, 255, 0.05);
+  border: 1px solid rgba(255, 0, 255, 0.3);
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input,
+.platform-select {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 242, 234, 0.3);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.platform-select:focus {
+  border-color: #00F2EA;
+  outline: none;
+  box-shadow: 0 0 15px rgba(0, 242, 234, 0.3);
+}
+
+.generated-content {
+  padding: 24px;
+  background: rgba(0, 242, 234, 0.05);
+  border: 2px solid #00F2EA;
+  border-radius: 12px;
+  animation: slideIn 0.4s ease;
+}
+
+.generated-content h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #00F2EA;
+  margin-bottom: 20px;
+}
+
+.content-block {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(0, 242, 234, 0.2);
+}
+
+.content-block:last-child {
+  border-bottom: none;
+}
+
+.content-block label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #00F2EA;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.content-block p {
+  font-size: 1rem;
+  color: #fff;
+  line-height: 1.6;
+}
+
+.hook {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #FF00FF;
+}
+
+.cta {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #FF4500;
+}
+
+/* ============================================
+   ANALYTICS SECTION
+   ============================================ */
+
+.analytics-section {
+  animation: fadeIn 0.3s ease;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.analytics-card {
+  padding: 24px;
+  background: rgba(0, 242, 234, 0.05);
+  border: 1px solid rgba(0, 242, 234, 0.3);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.analytics-card:hover {
+  border-color: #00F2EA;
+  background: rgba(0, 242, 234, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0, 242, 234, 0.2);
+}
+
+.analytics-card h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #00F2EA;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 242, 234, 0.2);
+}
+
+.metric:last-child {
+  border-bottom: none;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.metric-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ============================================
+   AUTOMATION SECTION
+   ============================================ */
+
+.automation-section {
+  animation: fadeIn 0.3s ease;
+}
+
+/* ============================================
+   EMPTY STATES
+   ============================================ */
+
+.empty-state {
+  padding: 60px 40px;
+  text-align: center;
+  background: rgba(255, 0, 255, 0.05);
+  border: 1px solid rgba(255, 0, 255, 0.3);
+  border-radius: 12px;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 8px;
+}
+
+.empty-state .subtitle {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 1200px) {
+  .header-right {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .crm-header {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .header-right {
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .posts-grid,
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-nav {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .crm-dashboard {
+    padding: 12px;
+  }
+
+  .header-left h1 {
+    font-size: 1.5rem;
+  }
+
+  .stat-card {
+    min-width: 120px;
+    padding: 12px 16px;
+  }
+
+  .stat-value {
+    font-size: 1.4rem;
+  }
+}
