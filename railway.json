@@ -1,7 +1,17 @@
 {
-  "$schema": "https://railway.app/railway.schema.json",
+  "$schema": "https://railway.app/schema.json",
   "build": {
-    "builder": "DOCKERFILE",
-    "dockerfilePath": "Dockerfile"
+    "builder": "dockerfile"
+  },
+  "deploy": {
+    "numReplicas": 1,
+    "startCommand": "npm start",
+    "restartPolicyMaxRetries": 10,
+    "healthcheckPath": "/healthz",
+    "healthcheckTimeout": 10
+  },
+  "variables": {
+    "NODE_ENV": "production",
+    "PORT": "3000"
   }
 }
