@@ -1,9 +1,14 @@
-# Ignore everything except what we need for deployment
+# Ignore everything except what's needed for production
 *
+!backend/
 !apps/web/
+!public/
+!dist/
 !package.json
 !package-lock.json
 !railway.json
 !Dockerfile
 !.railwayignore
-!.env.example
+!.env.production
+!*.config.js
+!*.config.ts
