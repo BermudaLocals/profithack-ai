@@ -1,2 +1,7 @@
-# This file is superseded by Dockerfile
-# Railway will use Dockerfile for Node 20 + bzip2 support
+# ============================================================================
+# PROFITHACK AI - Nixpacks Configuration
+# This file is superseded by Dockerfile for Railway deployment
+# ============================================================================
+
+# Railway will use Dockerfile instead of Nixpacks
+# This file exists only as fallback documentation
