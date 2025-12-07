@@ -1,4 +1,3 @@
-# Ignore everything except production code
 *
 !server/
 !client/
@@ -9,7 +8,3 @@
 !Dockerfile
 !.railwayignore
 !.env.production
-!*.config.js
-!*.config.ts
-!vite.config.ts
-!drizzle.config.ts
