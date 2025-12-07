@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProfitHack AI - The Ultimate AI-Powered Social Platform</title>
+    <!-- 
+        NOTE: For this to work, you must:
+        1. Ensure the Tailwind config (tailwind_config_snippet.js) is merged into your project's tailwind.config.js.
+        2. Ensure the core CSS (profithack_css_snippet.css) is included in your project.
+        3. Run your Tailwind build process to generate the final CSS file.
+    -->
+    <style>
+        /* Include the core CSS variables and utility classes here for demonstration */
+        :root {
+            --color-primary-accent: #FF007F; /* Magenta/Pink */
+            --color-secondary-accent: #00FFFF; /* Teal/Cyan */
+            --color-background: #000000;
+            --color-text-primary: #FFFFFF;
+            --color-text-secondary: #AAAAAA;
+        }
+        .neon-glow-magenta {
+            box-shadow: 0 0 5px var(--color-primary-accent), 0 0 15px var(--color-primary-accent);
+            text-shadow: 0 0 5px var(--color-primary-accent);
+        }
+        .neon-glow-cyan {
+            box-shadow: 0 0 5px var(--color-secondary-accent), 0 0 15px var(--color-secondary-accent);
+            text-shadow: 0 0 5px var(--color-secondary-accent);
+        }
+        /* Assuming Tailwind is configured to use the custom colors: ph-magenta, ph-cyan, ph-bg, etc. */
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Temporary Tailwind config for CDN usage to demonstrate custom colors
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'ph-magenta': '#FF007F',
+                        'ph-cyan': '#00FFFF',
+                        'ph-bg': '#000000',
+                        'ph-text': '#FFFFFF',
+                        'ph-text-secondary': '#AAAAAA',
+                    },
+                    textShadow: {
+                        'neon-magenta': '0 0 5px #FF007F, 0 0 10px #FF007F',
+                        'neon-cyan': '0 0 5px #00FFFF, 0 0 10px #00FFFF',
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-ph-bg text-ph-text font-sans antialiased">
+
+    <!-- Header / Navigation -->
+    <header class="sticky top-0 z-50 bg-ph-bg/90 backdrop-blur-sm border-b border-ph-cyan/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <a href="#" class="text-2xl font-extrabold tracking-wider text-ph-text">
+                    <span class="text-ph-magenta">PROFIT</span><span class="text-ph-cyan">HACK</span> AI
+                </a>
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#features" class="text-ph-text-secondary hover:text-ph-cyan transition duration-300">Features</a>
+                    <a href="#ai-power" class="text-ph-text-secondary hover:text-ph-cyan transition duration-300">AI Power</a>
+                    <a href="#monetization" class="text-ph-text-secondary hover:text-ph-cyan transition duration-300">Monetization</a>
+                    <a href="#launch" class="text-ph-text-secondary hover:text-ph-cyan transition duration-300">Launch</a>
+                </nav>
+                <!-- CTA Button -->
+                <a href="#" class="px-6 py-2 rounded-full bg-ph-magenta text-ph-text font-bold transition duration-300 hover:bg-ph-magenta/80 neon-glow-magenta">
+                    Launch App
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="relative pt-20 pb-32 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-6xl sm:text-7xl lg:text-8xl font-extrabold leading-tight mb-6">
+                    <span class="block text-ph-text">The <span class="text-ph-magenta">TikTok Killer</span></span>
+                    <span class="block text-ph-cyan">Built for Profit.</span>
+                </h1>
+                <p class="text-xl text-ph-text-secondary max-w-3xl mx-auto mb-10">
+                    ProfitHack AI is a production-ready, full-stack social platform with 11 microservices, 8 payment gateways, and a 55/45 revenue split that beats the competition.
+                </p>
+                <div class="flex justify-center space-x-6">
+                    <a href="#" class="px-10 py-4 rounded-lg bg-ph-magenta text-ph-text text-lg font-bold transition duration-300 hover:bg-ph-magenta/80 neon-glow-magenta">
+                        Start Earning Now
+                    </a>
+                    <a href="#ai-power" class="px-10 py-4 rounded-lg border border-ph-cyan text-ph-cyan text-lg font-bold transition duration-300 hover:bg-ph-cyan/10 neon-glow-cyan">
+                        Explore AI Features
+                    </a>
+                </div>
+                
+                <!-- App Mockup Placeholder (Using logo8.png as a visual element) -->
+                <div class="mt-20 relative">
+                    <img src="logo8.png" alt="ProfitHack AI App Mockup" class="w-full max-w-4xl mx-auto rounded-xl shadow-2xl neon-glow-cyan" style="opacity: 0.8;">
+                    <div class="absolute inset-0 bg-gradient-to-t from-ph-bg to-transparent"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Section 1: Core Platform -->
+        <section id="features" class="py-24 bg-ph-bg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-5xl font-bold text-center mb-16">
+                    A <span class="text-ph-magenta">Superior</span> Social Core
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <!-- Feature Card 1: Video Processing -->
+                    <div class="p-8 rounded-xl border border-ph-magenta/30 bg-ph-bg/50 hover:bg-ph-bg/70 transition duration-500">
+                        <div class="text-4xl text-ph-magenta mb-4">🚀</div>
+                        <h3 class="text-2xl font-semibold mb-3 text-ph-text">Enterprise Video Processing</h3>
+                        <p class="text-ph-text-secondary">PostgreSQL-based job queue for reliable, ACID-compliant transcoding. HLS/DASH adaptive streaming and dynamic watermarking (using your logo) built-in.</p>
+                    </div>
+                    <!-- Feature Card 2: Unique Engagement -->
+                    <div class="p-8 rounded-xl border border-ph-cyan/30 bg-ph-bg/50 hover:bg-ph-bg/70 transition duration-500">
+                        <div class="text-4xl text-ph-cyan mb-4">⚔️</div>
+                        <h3 class="text-2xl font-semibold mb-3 text-ph-text">Battle Rooms & Dating</h3>
+                        <p class="text-ph-text-secondary">Go beyond simple video feeds. Engage users with 1v1 to 20-player Battle Rooms and an AI-matched Dating App (Love Connection) with XAI compatibility scores.</p>
+                    </div>
+                    <!-- Feature Card 3: Microservices -->
+                    <div class="p-8 rounded-xl border border-ph-magenta/30 bg-ph-bg/50 hover:bg-ph-bg/70 transition duration-500">
+                        <div class="text-4xl text-ph-magenta mb-4">⚙️</div>
+                        <h3 class="text-2xl font-semibold mb-3 text-ph-text">11 Running Microservices</h3>
+                        <p class="text-ph-text-secondary">Built on a robust gRPC architecture (Feed, XAI, Monetization, Security, etc.) for 100x better performance and scalability than traditional monoliths.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Section 2: AI Power -->
+        <section id="ai-power" class="py-24 bg-ph-bg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-5xl font-bold text-center mb-16">
+                    Unleash <span class="text-ph-cyan">True AI Power</span>
+                </h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <!-- Text Content -->
+                    <div>
+                        <h3 class="text-4xl font-bold mb-6 text-ph-text">
+                            From Sora 2 to 200-Agent Orchestration
+                        </h3>
+                        <p class="text-xl text-ph-text-secondary mb-8">
+                            The platform is ready to activate the most advanced AI features on the market, giving your creators an unfair advantage.
+                        </p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start space-x-3">
+                                <span class="text-ph-magenta text-2xl font-bold">✓</span>
+                                <p class="text-lg text-ph-text">
+                                    **Sora 2 Video Generator:** 60 agents are pre-configured to generate high-quality, viral content on demand (requires API key).
+                                </p>
+                            </li>
+                            <li class="flex items-start space-x-3">
+                                <span class="text-ph-cyan text-2xl font-bold">✓</span>
+                                <p class="text-lg text-ph-text">
+                                    **200-Agent Orchestration:** A dashboard to manage content creators, marketing bots, and SEO writers, posting every 15 seconds.
+                                </p>
+                            </li>
+                            <li class="flex items-start space-x-3">
+                                <span class="text-ph-magenta text-2xl font-bold">✓</span>
+                                <p class="text-lg text-ph-text">
+                                    **Manus-Style Autonomy:** The foundation is built for tool-calling, multi-step task execution, and web browsing AI.
+                                </p>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Visual/Code Mockup -->
+                    <div class="bg-gray-900 p-8 rounded-xl border border-ph-cyan/50 neon-glow-cyan">
+                        <pre class="text-sm text-ph-text-secondary overflow-x-auto">
+<code class="language-typescript">
+// server/services/agent-orchestrator.service.ts
+
+const AGENT_COUNT = 200;
+const SORA_AGENTS = 60;
+
+// Agent types: Content Creator, SEO Writer, Marketing Bot
+const agents = initializeAgents(AGENT_COUNT);
+
+// Health check for Sora 2 connectivity
+setInterval(() => {
+    checkSoraConnectivity(SORA_AGENTS);
+}, 5 * 60 * 1000);
+
+// Start the autonomous execution loop
+agents.forEach(agent => {
+    agent.startTaskLoop();
+});
+</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Section 3: Monetization -->
+        <section id="monetization" class="py-24 bg-ph-bg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-5xl font-bold mb-16">
+                    The <span class="text-ph-magenta">Creator-First</span> Economy
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <!-- Stat Card 1: Revenue Split -->
+                    <div class="p-6 rounded-xl border border-ph-magenta/30">
+                        <p class="text-5xl font-extrabold text-ph-magenta">55/45</p>
+                        <p class="text-lg text-ph-text-secondary mt-2">Creator Revenue Split (Beats TikTok)</p>
+                    </div>
+                    <!-- Stat Card 2: Payment Gateways -->
+                    <div class="p-6 rounded-xl border border-ph-cyan/30">
+                        <p class="text-5xl font-extrabold text-ph-cyan">8+</p>
+                        <p class="text-lg text-ph-text-secondary mt-2">Global Payment Gateways (Crypto, PayPal, Stripe)</p>
+                    </div>
+                    <!-- Stat Card 3: Monetization Types -->
+                    <div class="p-6 rounded-xl border border-ph-magenta/30">
+                        <p class="text-5xl font-extrabold text-ph-magenta">5</p>
+                        <p class="text-lg text-ph-text-secondary mt-2">Monetization Streams (Gifts, Subs, Ads, Marketplace, Coins)</p>
+                    </div>
+                    <!-- Stat Card 4: Video Count -->
+                    <div class="p-6 rounded-xl border border-ph-cyan/30">
+                        <p class="text-5xl font-extrabold text-ph-cyan">9,628+</p>
+                        <p class="text-lg text-ph-text-secondary mt-2">Videos Seeded (Content-rich from Day 1)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-24 bg-ph-bg">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center p-10 rounded-xl border border-ph-magenta/50 neon-glow-magenta">
+                <h2 class="text-4xl font-bold mb-4 text-ph-text">
+                    Ready to Launch the Future of Social?
+                </h2>
+                <p class="text-xl text-ph-text-secondary mb-8">
+                    Your platform is 85% complete. All that's left is to plug in the API keys and secure the final approvals.
+                </p>
+                <a href="#" class="px-12 py-4 rounded-full bg-ph-cyan text-ph-bg text-xl font-bold transition duration-300 hover:bg-ph-cyan/80 neon-glow-cyan">
+                    Get Started Today
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-10 border-t border-ph-cyan/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-ph-text-secondary">
+            <p>&copy; 2025 ProfitHack AI. All rights reserved. | Built with <span class="text-ph-magenta">AI</span> and <span class="text-ph-cyan">gRPC</span>.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

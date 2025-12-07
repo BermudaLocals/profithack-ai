@@ -1,0 +1,70 @@
+/* index.css - ProfitHack AI Global Styles */
+
+/* 1. Core CSS Variables (for use in non-Tailwind contexts or for easy color reference) */
+:root {
+    --color-primary-accent: #FF007F; /* ph-magenta */
+    --color-secondary-accent: #00FFFF; /* ph-cyan */
+    --color-background: #000000; /* ph-bg */
+    --color-text-primary: #FFFFFF; /* ph-text */
+    --color-text-secondary: #AAAAAA; /* ph-text-secondary */
+}
+
+/* 2. Custom Neon Glow Utility Classes (for combining box and text shadow) */
+
+/* Magenta Neon Glow - Use for CTA buttons, active states, and highlights */
+.neon-glow-magenta {
+    box-shadow: 0 0 10px rgba(255, 0, 127, 0.8), 0 0 20px rgba(255, 0, 127, 0.4);
+    text-shadow: 0 0 5px var(--color-primary-accent), 0 0 10px var(--color-primary-accent);
+    border: 1px solid rgba(255, 0, 127, 0.5);
+    transition: all 0.3s ease-in-out;
+}
+
+/* Cyan Neon Glow - Use for profile badges, borders, and secondary highlights */
+.neon-glow-cyan {
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.4);
+    text-shadow: 0 0 5px var(--color-secondary-accent), 0 0 10px var(--color-secondary-accent);
+    border: 1px solid rgba(0, 255, 255, 0.5);
+    transition: all 0.3s ease-in-out;
+}
+
+/* 3. TikTok Navigation Styling */
+
+/* The main navigation bar (bottom of the screen) */
+.tiktok-nav-bar {
+    background-color: var(--color-background); /* Pure black background */
+    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Subtle separator */
+}
+
+/* Active state for bottom navigation item */
+.tiktok-nav-item.active {
+    color: var(--color-primary-accent); /* Magenta color */
+    /* Use the custom neon glow for the active icon/text */
+    text-shadow: 0 0 5px var(--color-primary-accent); 
+    transform: scale(1.1); /* Subtle scale effect */
+}
+
+/* Like button when active (liked) */
+.tiktok-like-button.liked {
+    color: var(--color-primary-accent); /* Magenta for the heart */
+    animation: pulse-neon 0.5s ease-in-out;
+}
+
+/* Follow button with magenta background */
+.tiktok-follow-button {
+    background-color: var(--color-primary-accent);
+    color: var(--color-text-primary);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.tiktok-follow-button:hover {
+    background-color: #FF3399; /* Slightly lighter on hover */
+    box-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+}
+
+/* Keyframe for a subtle neon pulse effect */
+@keyframes pulse-neon {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}

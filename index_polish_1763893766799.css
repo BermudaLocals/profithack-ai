@@ -1,0 +1,82 @@
+/* index_polish.css - Remaining Neon Branding Polish */
+
+/* 1. Core CSS Variables (for reference) */
+:root {
+    --color-primary-accent: #FF007F; /* ph-magenta */
+    --color-secondary-accent: #00FFFF; /* ph-cyan */
+    --color-background: #000000; /* ph-bg */
+    --color-text-primary: #FFFFFF; /* ph-text */
+}
+
+/* 2. TikTok Navigation Styling (Enhanced) */
+
+/* Bottom navigation bar styling */
+.tiktok-nav-bar {
+    /* Pure black background with a subtle top border */
+    background-color: var(--color-background); 
+    border-top: 1px solid rgba(255, 255, 255, 0.1); 
+    /* Ensures it's always on top of content */
+    z-index: 50; 
+}
+
+/* Active state for bottom navigation item */
+.tiktok-nav-item.active {
+    color: var(--color-primary-accent); /* Magenta color */
+    /* Neon glow on the active icon/text */
+    text-shadow: 0 0 5px var(--color-primary-accent); 
+    /* Subtle scale effect on active item */
+    transform: scale(1.1); 
+    transition: all 0.2s ease-in-out;
+}
+
+/* 3. Component Styling */
+
+/* Like button when active (liked) */
+.tiktok-like-button.liked {
+    color: var(--color-primary-accent); /* Magenta for the heart */
+    animation: pulse-neon 0.5s ease-in-out;
+}
+
+/* Follow button with magenta background */
+.tiktok-follow-button {
+    background-color: var(--color-primary-accent);
+    color: var(--color-text-primary);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.tiktok-follow-button:hover {
+    background-color: #FF3399; /* Slightly lighter on hover */
+    box-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+}
+
+/* Neon Pulse Animation */
+@keyframes pulse-neon {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Additional utility for neon badges/accents */
+.neon-badge-cyan {
+    background-color: rgba(0, 255, 255, 0.1);
+    color: var(--color-secondary-accent);
+    border: 1px solid var(--color-secondary-accent);
+    box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+.neon-balance-magenta {
+    color: var(--color-primary-accent);
+    text-shadow: 0 0 5px var(--color-primary-accent);
+}
+
+.neon-balance-cyan {
+    color: var(--color-secondary-accent);
+    text-shadow: 0 0 5px var(--color-secondary-accent);
+}

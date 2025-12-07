@@ -1,0 +1,49 @@
+// video-processor-config.json (Configuration for the Video Processing Microservice)
+
+{
+  "watermark": {
+    "enabled": true,
+    "image_path": "/assets/logos/logo2.png", // Path to the chosen logo (blue, swirling head profile)
+    "position": "bottom_right", // Standard TikTok position
+    "size_ratio": 0.08, // 8% of video width
+    "opacity": 0.75, // Semi-transparent
+    "dynamic_text": "@@{username}", // Placeholder for the creator's username
+    "font_color": "#FFFFFF",
+    "font_size": 18,
+    "font_family": "TikTokSans-Bold" // Assuming a custom font is used
+  },
+  "transcoding": {
+    "formats": ["HLS", "DASH"],
+    "resolutions": ["1080p", "720p", "480p"]
+  }
+}
+
+// video-processor.service.ts (Conceptual FFmpeg Command Snippet)
+
+/* 
+This snippet shows the logic within the video processing worker (which is confirmed as running 
+on the PostgreSQL job queue) to apply the image and text watermark using FFmpeg.
+*/
+
+const watermarkText = `@@${job.data.username}`; // Get username from job data
+const watermarkImage = config.watermark.image_path;
+
+const ffmpegCommand = [
+    '-i', inputPath,
+    '-i', watermarkImage,
+    '-filter_complex',
+    // 1. Scale watermark image (logo2.png) and position it (bottom right, 20px padding)
+    '[1:v] scale=iw*0.08:-1 [wm];' +
+    '[0:v][wm] overlay=W-w-20:H-h-20:enable=\'between(t,0,9999)\' [watermarked_video];' +
+    // 2. Add dynamic text watermark (username) centered near the bottom
+    '[watermarked_video] drawtext=text=\'' + watermarkText + '\':' +
+    'fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:' + // Replace with actual font path
+    'fontsize=18:' +
+    'fontcolor=white@0.75:' +
+    'x=(w-text_w)/2:' + // Center the text horizontally
+    'y=H-50', // Position text 50px from the bottom
+    // ... output and other transcoding options
+    outputPath
+];
+
+// Execute the command: exec(ffmpegCommand)
