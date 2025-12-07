@@ -1,39 +1,68 @@
-# railway-builder: dockerfile
-FROM node:20-alpine
+dockerfile
+# ============================================================================
+# PROFITHACK AI - Production Docker Build
+# Node 20 + Multi-stage build for optimal performance
+# ============================================================================
 
-# Install system dependencies (MEDIASOUP NEEDS THESE)
+# Stage 0: Build Stage
+FROM node:20-alpine AS builder
+
+# Install system dependencies required for native modules
 RUN apk add --no-cache \
     python3 \
     make \
     g++ \
     bzip2 \
-    ffmpeg \
-    openssl
-
-# CRITICAL: Prevent phantomjs from breaking build
-ENV PHANTOMJS_SKIP_INSTALL=true
-ENV NPM_CONFIG_FUND=false
-ENV NPM_CONFIG_AUDIT=false
+    git \
+    curl
 
 WORKDIR /app
 
-# 1. Copy package files
+# Copy package files first for better layer caching
 COPY package*.json ./
 
-# 2. Install dependencies with legacy support
-RUN npm ci --omit=dev --legacy-peer-deps
+# Install ALL dependencies (including dev for build)
+RUN npm ci --legacy-peer-deps
 
-# 3. Copy ALL source code
+# Copy source code
 COPY . .
 
-# 4. Build both frontend and backend
+# Build the application (frontend + backend)
 RUN npm run build
 
-# 5. Health check for Railway
-HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/healthz', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
+# ============================================================================
+# Stage 1: Production Stage
+# ============================================================================
+FROM node:20-alpine AS production
 
+# Install runtime dependencies only
+RUN apk add --no-cache \
+    bzip2 \
+    curl
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install production dependencies only
+RUN npm ci --omit=dev --legacy-peer-deps
+
+# Copy built artifacts from builder stage
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/shared ./shared
+COPY --from=builder /app/server ./server
+
+# Set production environment
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Expose port
 EXPOSE 3000
 
-# 6. Start production server
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000/healthz || exit 1
+
+# Start the application
 CMD ["npm", "start"]
