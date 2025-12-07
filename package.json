@@ -1,15 +1,17 @@
 {
-  "name": "rest-express",
+  "name": "profithack-ai",
   "version": "1.0.0",
   "type": "module",
-  "license": "MIT", 
-  "engines": { "node": ">=20" },
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "dev": "NODE_ENV=development tsx server/index.ts",
-    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "dev": "NODE_ENV=development tsx backend/server/index.ts",
+    "build": "cd apps/web && npm run build && cd ../../backend && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=../dist",
     "start": "NODE_ENV=production node dist/index.js",
-    "check": "tsc",
-    "db:push": "drizzle-kit push"
+    "check": "tsc --noEmit",
+    "db:push": "cd backend && drizzle-kit push"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.70.0",
@@ -147,23 +149,5 @@
     "zod": "^3.22.4",
     "zod-validation-error": "^2.1.0"
   },
-  "devDependencies": {
-    "@types/archiver": "^6.0.2",
-    "@types/bcrypt": "^5.0.2",
-    "@types/compression": "^1.7.5",
-    "@types/connect-pg-simple": "^7.0.6",
-    "@types/express": "^4.17.21",
-    "@types/express-session": "^1.17.10",
-    "@types/memoizee": "^0.4.9",
-    "@types/multer": "^1.4.11",
-    "@types/node": "^20.10.6",
-    "@types/nodemailer": "^6.4.14",
-    "@types/passport": "^1.0.16",
-    "@types/passport-facebook": "^2.1.11",
-    "@types/passport-local": "^1.0.38",
-    "@types/react": "^18.2.43",
-    "@types/react-dom": "^18.2.17",
-    "@types/twilio-video": "^1.19.4",
-    "@types/ws": "^8.5.10"
-  }
+  "devDependencies": {}
 }
