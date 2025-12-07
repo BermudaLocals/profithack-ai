@@ -34,18 +34,4 @@ COPY --from=stage-0 /app .
 # Start application
 EXPOSE 3000
 
-CMD ["npm", "start"]FROM node:20-alpine
-
-WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm ci --omit=dev --legacy-peer-deps
-
-COPY . .
-
-RUN npm run build
-
-EXPOSE 3000
-
 CMD ["npm", "start"]
