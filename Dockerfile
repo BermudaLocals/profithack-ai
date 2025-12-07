@@ -1,3 +1,4 @@
+# railway-builder: dockerfile
 FROM node:20-alpine
 
 # Install system dependencies (MEDIASOUP NEEDS THESE)
