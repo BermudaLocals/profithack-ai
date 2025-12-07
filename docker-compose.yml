@@ -1,39 +1,24 @@
-version: "3.9"
+version: '2'
 services:
-  web:
-    build: ./apps/web
-    command: ["npm","run","dev"]
-    ports: ["3000:3000"]
-    environment:
-      - API_URL=http://api:4000
-    depends_on: [api]
-  api:
-    build: ./services/api
-    command: ["node","index.js"]
-    ports: ["4000:4000"]
-    environment:
-      - POSTGRES_URL=postgresql://postgres:postgres@postgres:5432/profithack
-      - REDIS_URL=redis://redis:6379/0
-      - JWT_SECRET=changeme
-    depends_on: [postgres, redis]
-  x_ingestor:
-    build: ./services/x-ingestor
-    command: ["python","x_ingestor.py"]
-    environment:
-      - X_BEARER_TOKEN=${X_BEARER_TOKEN}
-      - REDIS_URL=redis://redis:6379/0
-      - X_RULES=${X_RULES}
-    depends_on: [redis]
-  redis:
-    image: redis:7-alpine
-    ports: ["6379:6379"]
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: profithack
-    ports: ["5432:5432"]
+  mariadb:
+    build: ./docker/db
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - 'nof_mariadb_data:/var/lib/mysql'
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=yes
+      - MARIADB_SKIP_TEST_DB=yes
+      - MARIADB_USER=root
+      - MARIADB_DATABASE=notonlyfans
+  app:
+    build: ./docker/app
+    depends_on:
+      - mariadb
+    ports:
+      - '80:80'
+    volumes:
+      - './www:/app'
+    
 volumes:
-  pgdata:
+  nof_mariadb_data:
+    driver: local
