@@ -8,5 +8,10 @@
     "numReplicas": 1,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
+  },
+  "variables": {
+    "NODE_ENV": "production",
+    "PORT": "3000",
+    "CLIENT_URL": "https://YOUR_APP_NAME.up.railway.app"
   }
 }
