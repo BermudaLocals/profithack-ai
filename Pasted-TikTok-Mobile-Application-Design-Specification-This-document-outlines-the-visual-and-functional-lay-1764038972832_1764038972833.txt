@@ -1,0 +1,73 @@
+TikTok Mobile Application Design Specification
+This document outlines the visual and functional layout of the TikTok mobile application, serving as a blueprint for the "better than TikTok" UI/UX required for the profithackai platform.
+1. Core Principles of TikTok's UI/UX
+TikTok's design success is built on two core principles: Immersive Content and Minimal Friction.
+Immersive Content: The video is full-screen, with UI elements overlaid and semi-transparent, ensuring the content is the primary focus.
+Minimal Friction: The primary interaction is a simple vertical swipe, which instantly loads the next video, minimizing decision fatigue and maximizing content consumption.
+2. Main Screen: The "For You" Page (FYP)
+The FYP is the heart of the application, designed for infinite consumption.
+Element
+Description
+Interaction
+Video Display
+Full-screen, auto-playing video. The video is the background for all other elements.
+Vertical swipe up/down to change videos. Horizontal swipe left to view the creator's profile.
+Top Navigation
+Two tabs: "Following" and "For You."
+Tap to switch feeds.
+Right-Side Icon Bar
+Stacked icons for Like, Comment, Share, and Creator Profile.
+Tap to interact. Long-press on the screen to pause/save.
+Bottom-Right Rotating Icon
+Small, circular icon representing the video's audio/song.
+Tap to view the audio source page.
+Bottom-Left Text Overlay
+Creator's username, video caption, and audio name.
+Tap username to go to profile. Tap audio name to go to audio source page.
+Primary Interaction
+Vertical Swipe
+Next/Previous Video. This is the most critical interaction to replicate perfectly.
+3. Navigation Bar (Bottom Tab Bar)
+The bottom navigation bar is persistent across most screens and provides access to the main functional areas.
+Icon/Label
+Function
+Equivalent profithackai Feature
+Home
+The "For You" Page (FYP) and "Following" feed.
+Video Feed / Tube / Vids
+Discover
+Search bar, trending topics, hashtags, and popular sounds.
+Discover / Search
++ (Create)
+Opens the in-app camera and video creation suite.
+Uploads / Sora 2 AI / Video Editing
+Inbox
+Notifications, Direct Messages (DMs), and system alerts.
+DMs / Calls / Notifications
+Profile
+User's personal page, video grid, saved items, and settings.
+User Profile / Marketplace / AI Twin
+4. Key Functional Screens
+A. Creator Profile Screen
+Layout: Top section with profile picture, follower/following/like counts, and a bio.
+Tabs: Typically includes tabs for: Videos, Liked Videos (private), and Saved Items.
+Action: A prominent "Follow" button and a "Message" button.
+B. Video Creation/Editing Suite
+Layout: Full-screen camera view with controls for recording, speed, filters, and effects.
+Post-Recording: Dedicated screens for adding text, stickers, voiceovers, and selecting a cover image.
+Final Post Screen: Options for caption, hashtags, tagging friends, privacy settings, and selecting the video category.
+C. Inbox/Messaging Screen
+Layout: Standard list of conversations.
+Functionality: Supports text, video, and image sharing. Crucially, it must support the WhatsApp-style E2E encryption and reliability.
+5. profithackai Augmentation Points
+To make the layout "better," the following areas must be seamlessly integrated:
+Augmentation Point
+Integration Requirement
+Dating/Rizz
+A subtle Horizontal Swipe on the FYP must transition to the dating feed, or a dedicated Rizz button must be integrated into the right-side icon bar.
+Replit Workflow
+The Profile screen must have a prominent "Creator Studio" tab that opens the Monaco Editor/Terminal, maintaining the mobile look and feel.
+Marketplace/OnlyFans
+The Profile screen must clearly display subscription tiers and virtual gift balances, integrated into the existing UI without looking like an external link.
+XAI/AI Twin
+The AI Twin must be accessible via the Profile or Inbox screen. The XAI explanation must be a subtle overlay (e.g., a small "i" icon) on the FYP.

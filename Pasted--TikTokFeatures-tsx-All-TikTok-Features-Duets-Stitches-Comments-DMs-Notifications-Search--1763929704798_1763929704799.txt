@@ -1,0 +1,760 @@
+// TikTokFeatures.tsx - All TikTok Features (Duets, Stitches, Comments, DMs, Notifications, Search, Trending, Analytics)
+
+import React, { useState, useEffect } from 'react';
+import './TikTokFeatures.css';
+
+// ============================================
+// 1. DUETS COMPONENT
+// ============================================
+export interface DuetProps {
+  videoId: string;
+  originalCreatorId: string;
+  onClose: () => void;
+}
+
+export const DuetComponent: React.FC<DuetProps> = ({ videoId, originalCreatorId, onClose }) => {
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordedVideo, setRecordedVideo] = useState<Blob | null>(null);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      setIsRecording(true);
+      // Recording logic here
+    } catch (error) {
+      console.error('Failed to start recording:', error);
+    }
+  };
+
+  const stopRecording = () => {
+    setIsRecording(false);
+    // Stop recording and save
+  };
+
+  const publishDuet = async () => {
+    if (!recordedVideo) return;
+    try {
+      const formData = new FormData();
+      formData.append('duetVideo', recordedVideo);
+      formData.append('originalVideoId', videoId);
+      formData.append('originalCreatorId', originalCreatorId);
+
+      const response = await fetch('/api/duets/create', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+
+      if (response.ok) {
+        alert('Duet published!');
+        onClose();
+      }
+    } catch (error) {
+      console.error('Failed to publish duet:', error);
+    }
+  };
+
+  return (
+    <div className="duet-modal">
+      <div className="duet-container">
+        <h2>Create a Duet</h2>
+        <div className="duet-preview">
+          {isRecording ? (
+            <div className="recording-indicator">🔴 RECORDING</div>
+          ) : (
+            <p>Click to start recording your duet</p>
+          )}
+        </div>
+        <div className="duet-controls">
+          <button onClick={isRecording ? stopRecording : startRecording}>
+            {isRecording ? 'Stop Recording' : 'Start Recording'}
+          </button>
+          <button onClick={publishDuet} disabled={!recordedVideo}>
+            Publish Duet
+          </button>
+          <button onClick={onClose}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// 2. STITCHES COMPONENT
+// ============================================
+export interface StitchProps {
+  videoId: string;
+  originalCreatorId: string;
+  onClose: () => void;
+}
+
+export const StitchComponent: React.FC<StitchProps> = ({ videoId, originalCreatorId, onClose }) => {
+  const [selectedClip, setSelectedClip] = useState<number>(0);
+  const [isRecording, setIsRecording] = useState(false);
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Failed to start recording:', error);
+    }
+  };
+
+  const publishStitch = async () => {
+    try {
+      const response = await fetch('/api/stitches/create', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          originalVideoId: videoId,
+          originalCreatorId: originalCreatorId,
+          clipDuration: selectedClip
+        })
+      });
+
+      if (response.ok) {
+        alert('Stitch published!');
+        onClose();
+      }
+    } catch (error) {
+      console.error('Failed to publish stitch:', error);
+    }
+  };
+
+  return (
+    <div className="stitch-modal">
+      <div className="stitch-container">
+        <h2>Create a Stitch</h2>
+        <div className="stitch-clip-selector">
+          <p>Select a clip from the original video:</p>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={selectedClip}
+            onChange={(e) => setSelectedClip(Number(e.target.value))}
+          />
+        </div>
+        <div className="stitch-controls">
+          <button onClick={startRecording}>
+            {isRecording ? '🔴 RECORDING' : 'Start Recording'}
+          </button>
+          <button onClick={publishStitch}>Publish Stitch</button>
+          <button onClick={onClose}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// 3. COMMENTS COMPONENT
+// ============================================
+export interface Comment {
+  id: string;
+  userId: string;
+  username: string;
+  avatar: string;
+  text: string;
+  timestamp: Date;
+  likes: number;
+  replies: Comment[];
+}
+
+export interface CommentsProps {
+  videoId: string;
+}
+
+export const CommentsComponent: React.FC<CommentsProps> = ({ videoId }) => {
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const response = await fetch(`/api/videos/${videoId}/comments`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+        const data = await response.json();
+        setComments(data);
+      } catch (error) {
+        console.error('Failed to fetch comments:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchComments();
+  }, [videoId]);
+
+  const postComment = async () => {
+    if (!newComment.trim()) return;
+
+    try {
+      const response = await fetch(`/api/videos/${videoId}/comments`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text: newComment })
+      });
+
+      if (response.ok) {
+        const comment = await response.json();
+        setComments([comment, ...comments]);
+        setNewComment('');
+      }
+    } catch (error) {
+      console.error('Failed to post comment:', error);
+    }
+  };
+
+  return (
+    <div className="comments-panel">
+      <h3>Comments ({comments.length})</h3>
+      
+      {isLoading ? (
+        <p>Loading comments...</p>
+      ) : (
+        <>
+          <div className="comments-list">
+            {comments.map((comment) => (
+              <div key={comment.id} className="comment-item">
+                <img src={comment.avatar} alt={comment.username} className="comment-avatar" />
+                <div className="comment-content">
+                  <div className="comment-header">
+                    <strong>{comment.username}</strong>
+                    <span className="comment-time">
+                      {new Date(comment.timestamp).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="comment-text">{comment.text}</p>
+                  <div className="comment-actions">
+                    <button>❤️ {comment.likes}</button>
+                    <button>Reply</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="comment-input">
+            <input
+              type="text"
+              placeholder="Add a comment..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && postComment()}
+            />
+            <button onClick={postComment}>Post</button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+// ============================================
+// 4. DIRECT MESSAGES COMPONENT
+// ============================================
+export interface Message {
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderAvatar: string;
+  text: string;
+  timestamp: Date;
+  isRead: boolean;
+}
+
+export interface Conversation {
+  id: string;
+  userId: string;
+  username: string;
+  avatar: string;
+  lastMessage: string;
+  lastMessageTime: Date;
+  unreadCount: number;
+}
+
+export const DirectMessagesComponent: React.FC = () => {
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchConversations = async () => {
+      try {
+        const response = await fetch('/api/messages/conversations', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+        const data = await response.json();
+        setConversations(data);
+      } catch (error) {
+        console.error('Failed to fetch conversations:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchConversations();
+  }, []);
+
+  const selectConversation = async (conversation: Conversation) => {
+    setSelectedConversation(conversation);
+    try {
+      const response = await fetch(`/api/messages/conversations/${conversation.id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      const data = await response.json();
+      setMessages(data);
+    } catch (error) {
+      console.error('Failed to fetch messages:', error);
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!newMessage.trim() || !selectedConversation) return;
+
+    try {
+      const response = await fetch(`/api/messages/conversations/${selectedConversation.id}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text: newMessage })
+      });
+
+      if (response.ok) {
+        const message = await response.json();
+        setMessages([...messages, message]);
+        setNewMessage('');
+      }
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    }
+  };
+
+  return (
+    <div className="dm-container">
+      <div className="dm-conversations">
+        <h2>Messages</h2>
+        {isLoading ? (
+          <p>Loading conversations...</p>
+        ) : (
+          <div className="conversations-list">
+            {conversations.map((conv) => (
+              <div
+                key={conv.id}
+                className={`conversation-item ${selectedConversation?.id === conv.id ? 'active' : ''}`}
+                onClick={() => selectConversation(conv)}
+              >
+                <img src={conv.avatar} alt={conv.username} />
+                <div className="conversation-info">
+                  <strong>{conv.username}</strong>
+                  <p>{conv.lastMessage}</p>
+                </div>
+                {conv.unreadCount > 0 && (
+                  <span className="unread-badge">{conv.unreadCount}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {selectedConversation && (
+        <div className="dm-chat">
+          <div className="chat-header">
+            <img src={selectedConversation.avatar} alt={selectedConversation.username} />
+            <h3>{selectedConversation.username}</h3>
+          </div>
+
+          <div className="messages-list">
+            {messages.map((msg) => (
+              <div key={msg.id} className="message-bubble">
+                <img src={msg.senderAvatar} alt={msg.senderName} />
+                <div className="message-content">
+                  <p>{msg.text}</p>
+                  <span className="message-time">
+                    {new Date(msg.timestamp).toLocaleTimeString()}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="message-input">
+            <input
+              type="text"
+              placeholder="Type a message..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+            />
+            <button onClick={sendMessage}>Send</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================
+// 5. NOTIFICATIONS COMPONENT
+// ============================================
+export interface Notification {
+  id: string;
+  type: 'like' | 'comment' | 'follow' | 'duet' | 'stitch' | 'mention' | 'message';
+  userId: string;
+  username: string;
+  avatar: string;
+  text: string;
+  timestamp: Date;
+  isRead: boolean;
+  actionUrl?: string;
+}
+
+export const NotificationsComponent: React.FC = () => {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch('/api/notifications', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+        const data = await response.json();
+        setNotifications(data);
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000); // Refresh every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  const markAsRead = async (notificationId: string) => {
+    try {
+      await fetch(`/api/notifications/${notificationId}/read`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+
+      setNotifications(
+        notifications.map((n) =>
+          n.id === notificationId ? { ...n, isRead: true } : n
+        )
+      );
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
+  };
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'like':
+        return '❤️';
+      case 'comment':
+        return '💬';
+      case 'follow':
+        return '👤';
+      case 'duet':
+        return '🎬';
+      case 'stitch':
+        return '✂️';
+      case 'mention':
+        return '@';
+      case 'message':
+        return '💌';
+      default:
+        return '🔔';
+    }
+  };
+
+  return (
+    <div className="notifications-panel">
+      <h2>Notifications</h2>
+      {isLoading ? (
+        <p>Loading notifications...</p>
+      ) : (
+        <div className="notifications-list">
+          {notifications.length > 0 ? (
+            notifications.map((notif) => (
+              <div
+                key={notif.id}
+                className={`notification-item ${notif.isRead ? 'read' : 'unread'}`}
+                onClick={() => markAsRead(notif.id)}
+              >
+                <img src={notif.avatar} alt={notif.username} />
+                <div className="notification-content">
+                  <p>
+                    <strong>{notif.username}</strong> {notif.text}
+                  </p>
+                  <span className="notification-time">
+                    {new Date(notif.timestamp).toLocaleDateString()}
+                  </span>
+                </div>
+                <span className="notification-icon">{getNotificationIcon(notif.type)}</span>
+              </div>
+            ))
+          ) : (
+            <p>No notifications yet</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================
+// 6. SEARCH COMPONENT
+// ============================================
+export const SearchComponent: React.FC = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'users' | 'videos' | 'sounds' | 'hashtags'>('users');
+
+  const handleSearch = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/search?q=${query}&type=${activeTab}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      const data = await response.json();
+      setSearchResults(data);
+    } catch (error) {
+      console.error('Search failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="search-container">
+      <div className="search-bar">
+        <input
+          type="text"
+          placeholder="Search users, videos, sounds, hashtags..."
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            handleSearch(e.target.value);
+          }}
+        />
+      </div>
+
+      <div className="search-tabs">
+        {(['users', 'videos', 'sounds', 'hashtags'] as const).map((tab) => (
+          <button
+            key={tab}
+            className={`tab ${activeTab === tab ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {isLoading ? (
+        <p>Searching...</p>
+      ) : (
+        <div className="search-results">
+          {searchResults.length > 0 ? (
+            searchResults.map((result) => (
+              <div key={result.id} className="search-result-item">
+                <img src={result.avatar || result.thumbnail} alt={result.name || result.title} />
+                <div>
+                  <strong>{result.name || result.title}</strong>
+                  <p>{result.handle || result.description}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>No results found</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================
+// 7. TRENDING SOUNDS COMPONENT
+// ============================================
+export interface TrendingSound {
+  id: string;
+  title: string;
+  artist: string;
+  thumbnail: string;
+  usageCount: number;
+  url: string;
+}
+
+export const TrendingSoundsComponent: React.FC = () => {
+  const [sounds, setSounds] = useState<TrendingSound[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTrendingSounds = async () => {
+      try {
+        const response = await fetch('/api/sounds/trending', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+        const data = await response.json();
+        setSounds(data);
+      } catch (error) {
+        console.error('Failed to fetch trending sounds:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTrendingSounds();
+  }, []);
+
+  return (
+    <div className="trending-sounds-panel">
+      <h2>🎵 Trending Sounds</h2>
+      {isLoading ? (
+        <p>Loading sounds...</p>
+      ) : (
+        <div className="sounds-list">
+          {sounds.map((sound, index) => (
+            <div key={sound.id} className="sound-item">
+              <span className="sound-rank">#{index + 1}</span>
+              <img src={sound.thumbnail} alt={sound.title} />
+              <div className="sound-info">
+                <strong>{sound.title}</strong>
+                <p>{sound.artist}</p>
+                <span>{sound.usageCount.toLocaleString()} uses</span>
+              </div>
+              <button className="use-sound-btn">Use</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================
+// 8. CREATOR ANALYTICS COMPONENT
+// ============================================
+export interface AnalyticsData {
+  totalViews: number;
+  totalLikes: number;
+  totalComments: number;
+  totalShares: number;
+  followers: number;
+  avgEngagementRate: number;
+  topVideo: {
+    id: string;
+    title: string;
+    views: number;
+  };
+  viewsOverTime: Array<{ date: string; views: number }>;
+}
+
+export const CreatorAnalyticsComponent: React.FC = () => {
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const response = await fetch('/api/creator/analytics', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+        const data = await response.json();
+        setAnalytics(data);
+      } catch (error) {
+        console.error('Failed to fetch analytics:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, []);
+
+  if (isLoading) return <p>Loading analytics...</p>;
+  if (!analytics) return <p>No analytics data available</p>;
+
+  return (
+    <div className="analytics-dashboard">
+      <h2>📊 Creator Analytics</h2>
+
+      <div className="analytics-grid">
+        <div className="analytics-card">
+          <h3>Total Views</h3>
+          <p className="analytics-value">{analytics.totalViews.toLocaleString()}</p>
+        </div>
+        <div className="analytics-card">
+          <h3>Total Likes</h3>
+          <p className="analytics-value">{analytics.totalLikes.toLocaleString()}</p>
+        </div>
+        <div className="analytics-card">
+          <h3>Total Comments</h3>
+          <p className="analytics-value">{analytics.totalComments.toLocaleString()}</p>
+        </div>
+        <div className="analytics-card">
+          <h3>Total Shares</h3>
+          <p className="analytics-value">{analytics.totalShares.toLocaleString()}</p>
+        </div>
+        <div className="analytics-card">
+          <h3>Followers</h3>
+          <p className="analytics-value">{analytics.followers.toLocaleString()}</p>
+        </div>
+        <div className="analytics-card">
+          <h3>Avg Engagement</h3>
+          <p className="analytics-value">{(analytics.avgEngagementRate * 100).toFixed(2)}%</p>
+        </div>
+      </div>
+
+      <div className="top-video">
+        <h3>🎬 Top Performing Video</h3>
+        <p><strong>{analytics.topVideo.title}</strong></p>
+        <p>{analytics.topVideo.views.toLocaleString()} views</p>
+      </div>
+    </div>
+  );
+};

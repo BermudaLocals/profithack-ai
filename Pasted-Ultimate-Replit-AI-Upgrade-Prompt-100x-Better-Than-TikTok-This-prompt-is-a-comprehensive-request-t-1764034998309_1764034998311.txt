@@ -1,0 +1,97 @@
+Ultimate Replit AI Upgrade Prompt: 100x Better Than TikTok
+
+This prompt is a comprehensive request to transform the existing project into a global-scale, mobile-first, video-centric distributed system that is 100x better than TikTok in performance, scalability, and feature set. All existing features must be retained and seamlessly integrated.
+
+1. Project Context and Goal
+
+Existing Technology Stack (Must be Retained and Integrated):
+
+•
+Frontend: React 18.3.1 (TypeScript), Wouter, TanStack Query v5, Shadcn UI + Radix UI, Tailwind CSS, Monaco Editor, xterm.js.
+
+•
+Backend: Node.js/Express 4.21.2 (TypeScript/tsx), PostgreSQL (Neon), Drizzle ORM 0.39.1, BullMQ 5.63.0 (Redis), WebSockets (ws), WebRTC (Mediasoup/Twilio), AWS S3.
+
+Ultimate Goal: Achieve a system that is 100x better than TikTok by combining the existing advanced features (like the in-browser code editor and terminal) with a specialized, high-performance video platform architecture.
+
+2. Technical Augmentations for 100x Performance and Scale
+
+The following changes are mandatory to surpass TikTok's infrastructure, focusing on extreme concurrency, low-latency data, and specialized processing.
+
+A. Core Backend Performance and Concurrency
+
+1.
+Introduce Golang Microservice: Create a new microservice (feed-service) using Golang and gRPC to handle all high-concurrency, low-latency requests (e.g., feed generation, real-time user interaction counts). This service must communicate with the existing Node.js/Express backend via gRPC.
+
+2.
+C/C++ Integration: Prepare a module or wrapper (callable from the new Golang service) for C/C++ to handle performance-critical tasks like advanced video filtering and encoding, ensuring maximum speed.
+
+B. Real-Time Data Pipeline (The "Hyper-Personalization" Engine)
+
+1.
+Message Queue: Integrate Apache Kafka (or a managed equivalent) to ingest all user activity logs (views, likes, swipes, editor usage, terminal commands) in real-time.
+
+2.
+Stream Processing: Introduce a lightweight, dedicated stream processing service (e.g., a simple Node.js/TypeScript service using a Kafka client) to process the raw data stream and update user/content features in Redis with sub-100ms latency.
+
+C. Video Processing and Content Delivery
+
+1.
+Dedicated Video Service: Create a new, asynchronous service (using the existing BullMQ/Redis job queue) to manage video processing. This service must utilize FFmpeg to:
+
+•
+Transcode uploaded videos to multiple adaptive streaming formats (H.264/H.265).
+
+•
+Apply dynamic, non-removable watermarking.
+
+•
+Extract detailed metadata (color palette, motion vectors) for the ML engine.
+
+
+
+2.
+Global CDN Integration: Configure the existing AWS S3-compatible storage to serve all video assets through a Global Content Delivery Network (CDN) (e.g., Cloudflare or AWS CloudFront) for ultra-low latency delivery worldwide.
+
+D. Machine Learning Foundation
+
+1.
+ML Environment Setup: Ensure the environment supports Python and the installation of PyTorch and TensorFlow for future model development.
+
+2.
+MLOps Skeleton: Create a basic directory structure and configuration file (e.g., mlops/kubeflow_config.yaml) to prepare for a full MLOps pipeline, demonstrating readiness to deploy a Two-Tower Recommendation Model that leverages the real-time data from the Kafka pipeline.
+
+3. Frontend UI/UX Implementation (TikTok or Better Feel)
+
+The existing React frontend must be modified to adopt a mobile-first, full-screen video experience while retaining the advanced editor/terminal features.
+
+1.
+Full-Screen Video Feed: Implement a full-screen, vertical infinite scroll video feed component that mimics the seamless, gesture-based navigation of TikTok.
+
+2.
+Minimalist UI Overlay: Design a minimalist UI overlay for all core interactions (like, comment, share, profile) that is non-intrusive and prioritizes the video content.
+
+3.
+Feature Integration: Seamlessly integrate the existing Monaco Editor and xterm.js Terminal as a dedicated, easily accessible "Pro Mode" or "Creator Studio" tab, ensuring the main video feed remains the primary focus.
+
+4.
+WebRTC/WebSocket Integration: Ensure live comments and video calls (via WebRTC) are integrated into the feed experience with a modern, low-latency display.
+
+4. Deliverables
+
+The Replit AI should deliver the following:
+
+1.
+Code Changes: All necessary code modifications to the existing Node.js/Express and React files.
+
+2.
+New Service Skeletons: Functional skeleton code for the Golang microservice and the FFmpeg-based Video Service.
+
+3.
+Configuration Updates: Updated configuration files for Kafka/Redis integration and the BullMQ job queue.
+
+4.
+Updated Documentation: A clear summary of the architectural changes, including a diagram of how the new services interact with the existing stack.
+
+Crucial Constraint: The final application must retain 100% of the functionality of the original stack while incorporating all the above augmentations.
+

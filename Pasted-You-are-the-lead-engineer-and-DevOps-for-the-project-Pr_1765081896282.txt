@@ -1,0 +1,264 @@
+You are the lead engineer and DevOps for the project ProfitHack AI running in this Replit:
+
+Backend: Node.js + TypeScript (Express) in server/index.ts
+
+Frontend: React + Vite
+
+DB: PostgreSQL via Drizzle ORM
+
+Deployed on Railway using GitHub.
+
+GOALS
+
+Fix all build / deploy issues by standardizing on Node 20+.
+
+Remove or neutralize PhantomJS / phantomjs-prebuilt so builds don’t fail on Railway.
+
+Reduce security risk by:
+
+Updating obviously vulnerable/outdated dependencies where safe.
+
+Moving hard-coded secrets into environment variables (Replit Secrets / .env).
+
+Replacing raw SQL string concatenation with proper parameterized queries or Drizzle.
+
+1. BUILD & NODE 20 CONFIG (RAILWAY + REPLIT)
+
+Open the root package.json for ProfitHack AI and ensure it looks like the ProfitHack backend (NOT the old whatsapp-frontend one). It should have:
+
+"name": "rest-express" (or similar)
+
+scripts including:
+
+"build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist"
+
+"start": "NODE_ENV=production node dist/index.js"
+
+Add or update the engines field in package.json:
+
+"license": "MIT",
+"engines": {
+  "node": ">=20"
+},
+
+
+Ensure the Dockerfile in project root is EXACTLY:
+
+# Stage 0: Dependencies
+FROM node:20-alpine AS stage-0
+# Install system dependencies
+RUN apk add --no-cache \
+  python3 \
+  make \
+  g++ \
+  bzip2 \
+  git
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci --omit=dev --legacy-peer-deps
+
+# Copy application code
+COPY . .
+
+# Build application (frontend + backend)
+RUN npm run build
+
+# Stage 1: Production image
+FROM node:20-alpine
+WORKDIR /app
+
+# Copy from build stage
+COPY --from=stage-0 /app .
+
+EXPOSE 3000
+CMD ["npm", "start"]
+
+
+Ensure railway.json in root is:
+
+{
+  "$schema": "https://railway.app/schema.json",
+  "build": {
+    "builder": "dockerfile"
+  },
+  "deploy": {
+    "numReplicas": 1,
+    "startCommand": "npm start",
+    "restartPolicyMaxRetries": 10
+  },
+  "variables": {
+    "NODE_ENV": "production",
+    "PORT": "3000"
+  }
+}
+
+
+If nixpacks.toml exists, neutralize it so Railway prefers the Dockerfile:
+
+# Dockerfile-based deployment. Railway will use Dockerfile instead.
+
+
+Delete any stale / corrupt package-lock.json if it doesn’t match the current package.json, and regenerate a fresh one with Node 20 if needed (npm install).
+
+2. REMOVE / NEUTRALIZE PHANTOMJS & BLOCKING DEPS
+
+Run:
+
+npm ls phantomjs-prebuilt || true
+
+
+Identify which package pulls in phantomjs-prebuilt.
+
+If possible, remove that package from dependencies or devDependencies in package.json (e.g., old test runner, karma-phantomjs, etc.), and update tests accordingly.
+
+If it must remain temporarily, set it so it doesn’t break builds:
+
+Add to .npmrc:
+
+legacy-peer-deps=true
+optional=false
+ignore-scripts=true
+
+
+or set the env var in Dockerfile:
+
+ENV PHANTOMJS_SKIP_INSTALL=true
+
+
+Verify after your changes that npm ci --omit=dev completes successfully inside this Replit.
+
+3. HANDLE SECURITY SCAN FINDINGS
+
+Use the Replit security scan results already shown (outdated axios, body-parser, lodash, ws, etc.) and:
+
+For clearly safe upgrades (patch or minor updates), update them using npm overrides instead of manually touching every dependency:
+
+Add this section to package.json if not present:
+
+"overrides": {
+  "axios": "^1.7.0",
+  "lodash": "^4.17.21",
+  "ws": "^8.17.0",
+  "body-parser": "^1.20.3"
+}
+
+
+Adjust version numbers based on the latest stable you see in this Replit.
+
+Run:
+
+npm install
+npm run build
+
+
+and fix any breaking changes only if they appear.
+
+For hardcoded API keys detected by gitleaks:
+
+Find all locations where keys / tokens / secrets are in source code (search for them).
+
+Replace them with process.env.MY_SECRET_NAME style references.
+
+Document which environment variables are required, and map them to Replit Secrets (they are already listed on the Replit Secrets page).
+
+For raw SQL string usage flagged by the scan:
+
+Locate all places where user input is concatenated into SQL strings.
+
+Replace them with parameterized queries using Drizzle ORM or a safe parameter binding API.
+
+Ensure NO direct string interpolation with user input remains in SQL.
+
+For auth tokens printed to stdout:
+
+Find any console.log or logger lines that print tokens, secrets, or full headers.
+
+Remove or mask sensitive values before logging.
+
+4. FINAL VERIFICATION
+
+After all changes:
+
+Run locally in Replit:
+
+npm run build
+npm start
+
+
+Confirm:
+
+/health or /healthz returns OK.
+
+The frontend loads and can hit basic APIs.
+
+Show me a summary:
+
+Exactly what you changed (package.json, Dockerfile, railway.json, overrides, removed deps, etc.).
+
+Whether npm ci --omit=dev passes.
+
+Any remaining high-risk items you could not safely auto-fix.
+
+If anything cannot be safely auto-fixed, clearly explain why and what manual decision the owner must make.
+
+End of instructions. Apply all changes now within this Replit project and show the diff.
+
+2️⃣ Ready-to-paste code snippets (if you want to do it by hand)
+
+If you don’t want to rely fully on the Agent, here are the key bits you can paste yourself.
+
+package.json (top meta part)
+
+Inside your real ProfitHack package.json, make sure you have:
+
+{
+  "name": "rest-express",
+  "version": "1.0.0",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "NODE_ENV=development tsx server/index.ts",
+    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "start": "NODE_ENV=production node dist/index.js",
+    "check": "tsc",
+    "db:push": "drizzle-kit push"
+  },
+  "overrides": {
+    "axios": "^1.7.0",
+    "lodash": "^4.17.21",
+    "ws": "^8.17.0",
+    "body-parser": "^1.20.3"
+  },
+  ...
+}
+
+
+(Keep the long dependencies list you already have; just adjust the header and add engines and overrides.)
+
+3️⃣ What Replit is good for here (and what it can’t do)
+
+Replit can:
+
+Edit package.json, Dockerfile, railway.json, nixpacks.toml.
+
+Remove / update dependencies and regenerate lock files.
+
+Run npm ci, npm run build, npm start to validate.
+
+Help refactor code (SQL, secrets usage, etc.) inside the repo.
+
+Replit cannot:
+
+Change your Railway project settings directly (it only edits code; Railway reads that from GitHub).
+
+Magically know your real secret values – it can only swap them to env vars, you still set the values in Replit/ Railway.
+
+Guarantee zero-breaking changes when upgrading big, major-version dependencies – it can try, but you still may need to test flows manually.

@@ -1,0 +1,40 @@
+# File: k8s/argocd-profithack-app.yaml
+# ArgoCD Application Definition for Profithack Microservices (Helm Chart)
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: profithack-microservices
+  # Deploy the Application resource into the ArgoCD namespace
+  namespace: argocd 
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    # IMPORTANT: Replace <YOUR_GIT_REPO_URL> with the actual URL of your profithack-infra repository
+    repoURL: <YOUR_GIT_REPO_URL> 
+    targetRevision: HEAD
+    # Path to the directory containing the Chart.yaml and templates
+    path: helm/profithack-services 
+    # Specify that the source is a Helm chart
+    helm:
+      valueFiles:
+        - values.yaml # References the values.yaml file in the same path
+  destination:
+    # Assumes ArgoCD is running in the same cluster where the app will be deployed
+    server: https://kubernetes.default.svc 
+    # The target namespace for the deployed services
+    namespace: profithack-prod 
+  syncPolicy:
+    automated:
+      # Allows ArgoCD to automatically apply changes when Git is updated
+      prune: true 
+      # Allows ArgoCD to fix any manual changes made to the cluster to match Git
+      selfHeal: true 
+    syncOptions:
+      # Ensures the target namespace is created if it doesn't exist
+      - CreateNamespace=true 
+      # Tells ArgoCD to wait for resources to be healthy before marking as synced
+      - RespectIgnoreDifferences=true
+      - ApplyOutOfSyncOnly=true

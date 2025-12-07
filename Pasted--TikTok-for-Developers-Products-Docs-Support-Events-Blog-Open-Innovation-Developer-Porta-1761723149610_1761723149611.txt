@@ -1,0 +1,242 @@
+
+TikTok for Developers
+
+Products
+Docs
+Support
+Events
+Blog
+Open Innovation
+
+Developer Portal
+
+
+Profit Hach Ai . com
+
+Production
+Sandbox
+
+URL properties
+
+
+Production
+
+
+Draft
+App details
+Credentials
+
+Basic information
+
+App review
+Products
+Login Kit
+
+Content Posting API
+
+Scopes
+
+Import
+This form has 4 errors.
+Review
+
+Save
+
+Submit for review
+App details
+
+Credentials
+Client key
+aw5m450oport4rz8
+Client secret
+crxzDnzIYqGTb0zt5xONyi8WxWXz7VRp
+
+Basic information
+App icon *
+This will be displayed publicly to TikTok users.
+
+Requirements:
+1024px x 1024px
+Up to 5MB
+JPEG, JPG, or PNG formats
+App name *
+This will be displayed to TikTok users
+Profithackai
+12 / 50
+Category *
+
+Social Networking
+Description *
+Describe what your website or mobile app does and how it works. This will be displayed to TikTok users.
+Examples:
+A website that sells pet supplies.
+Manage all your social media content in one place.
+Automated content scheduling and posting platform for TikTok creators. Manage multiple accounts with AI-powered tools.
+118 / 120
+Terms of Service URL *
+Link to your app or website's official Terms of Service
+https://profithackai.replit.app/terms
+This URL is not verified.
+
+Verify URL properties
+Privacy Policy URL *
+Link to your app or website's official privacy policy
+https://profithackai.replit.app/privacy
+This URL is not verified.
+
+Verify URL properties
+Platforms *
+
+Web
+
+Desktop
+
+Android
+
+iOS
+Configure for Web/Desktop
+Web/Desktop URL *
+Link to the official website for your app or service
+https://profithackai.replit.app
+This URL is not verified.
+
+Verify URL properties
+App review
+
+Required information for app submission
+Please review the App Review Guidelines for more details.
+Explain how each product and scope works within your app or website. If submitting a revision, include the changes in this version. *
+Products
+Login Kit
+Content Posting API
+Scopes
+user.info.basic
+video.publish
+video.upload
+
+PROFITHACK AI helps TikTok creators schedule and publish content using the Content Posting API.
+
+How It Works:
+1. Users connect TikTok accounts via OAuth 2.0
+2. Users create/upload videos using our editing tools
+3. Users add captions, hashtags, and set posting times
+4. Our system publishes videos to TikTok at scheduled times
+
+Key Features:
+• Video creation and editing tools
+• Schedule posts for specific times
+• Manage multiple TikTok accounts from one dashboard
+• Automated publishing with user-defined captions, hashtags, and privacy settings
+
+User Flow:
+1. Log into PROFITHACK AI
+2. Click "Connect TikTok Account"
+3. Authorize via TikTok OAuth
+4. Create/upload video
+5. Add caption, hashtags, select time
+6. System publishes to TikTok via Content Posting API
+
+All content is user-generated and explicitly approved by the account owner.
+842 / 1000
+Upload at least one demo video that shows the complete end-to-end flow of the integration with TikTok. *
+
+Upload
+Accepted formats: mp4, mov
+Maximum 5 files, up to 50MB each
+For example, it should demonstrate how you use TikTok for Developers' capabilities, such as Login Kit, Share Kit, Display API, Content Posting API, and the relevant scopes.
+If your app has not been approved before, you are required to use a sandbox environment on the Developer Portal to demonstrate the integration.
+The demo video should showcase the website or app where the features will actually be integrated.
+All selected products and scopes must be clearly demonstrated in the video. If you don't need certain products or scopes, make sure to remove them before review. Otherwise, it will delay the review result.
+The video should clearly show the user interface and user interactions.
+If you intend to integrate with a web app, make sure the domain of the website shown in the demo video matches the website URL you provide.
+If you intend to integrate with a mobile app, the demo video should start by showing the app being opened.
+Please upload at least one video
+Products
+
+Add products
+
+
+Login Kit
+
+Redirect URI
+ *
+
+Add up to 10 Redirect URIs. Users will be redirected to this path after they have authorized your app with TikTok.
+
+
+Web*
+
+Desktop
+
+Android
+
+iOS
+https://profithackai.replit.app/auth/callback
+
+Add a URI
+
+
+Content Posting API
+
+By default, Upload to TikTok is enabled, allowing you to upload content to TikTok as a draft for creators to further edit and post.
+Direct Post
+
+Directly post content to authorized users' profiles.
+Verify domains
+The video/content can be posted in two ways, push_by_file and pull_by_url. To enable pull_by_url, you have to verify your domains. Check out the Media Transfer Guide to learn more.
+
+Verify
+
+Add products
+Scopes
+
+Search
+
+Add scopes
+user.info.basic
+user.info.basic
+Read a user's profile info (open id, avatar, display name ...)
+Included in Login Kit
+video.publish
+video.publish
+Directly post content to a user's TikTok profile.
+Included in Content Posting API
+video.upload
+video.upload
+Share content to creator's account as a draft to further edit and post in TikTok.
+Included in Content Posting API
+History
+
+Changelog
+
+Review comments
+
+All
+TikTok for Developers
+Products
+Share Kit
+Login Kit
+Content Posting API
+Research API
+Display API
+Embed Videos
+Data Portability API
+Green Screen Kit
+Commercial Content API
+Other platforms
+TikTok Embeds
+TikTok for Business
+Advertise on TikTok
+TikTok Creative Center
+TikTok.com
+Company
+About TikTok
+Newsroom
+Contact
+Careers
+ByteDance
+Transparency Center
+© 2025 TikTok
+Terms of Service
+Privacy Policy
+Resources & Legal

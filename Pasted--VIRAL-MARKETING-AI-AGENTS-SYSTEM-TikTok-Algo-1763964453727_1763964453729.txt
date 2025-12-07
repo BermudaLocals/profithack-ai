@@ -1,0 +1,587 @@
+// ============================================
+// VIRAL MARKETING AI AGENTS SYSTEM
+// TikTok Algorithm Exploitation | Growth Hacking
+// Heavy-Hitting Knowledge for Exponential Growth
+// ============================================
+
+import Anthropic from "@anthropic-ai/sdk";
+
+const client = new Anthropic();
+
+// ============================================
+// 1. VIRAL HOOK GENERATOR AGENT
+// Creates scroll-stopping hooks (first 3 seconds)
+// ============================================
+
+const viralHookPrompt = `You are a TikTok viral hook expert. Your job is to create hooks that make people STOP scrolling within 0.5 seconds.
+
+CRITICAL KNOWLEDGE:
+1. **Pattern Interrupts** - Break the scrolling pattern with:
+   - Unexpected statements ("This AI just made me $5,000...")
+   - Shocking numbers ("1 AI tool replaced my $100K job...")
+   - Controversy ("TikTok is hiding this from creators...")
+   - Questions ("Would you quit your job for this?")
+
+2. **Psychological Triggers**:
+   - FOMO (Fear of Missing Out): "Only 24 hours left..."
+   - Curiosity Gap: "Wait until the end..."
+   - Status/Wealth: "$10K passive income..."
+   - Scarcity: "Limited spots available..."
+
+3. **First 3 Seconds Formula**:
+   - Second 0-0.5: Hook (pattern interrupt)
+   - Second 0.5-1.5: Promise (what they'll learn)
+   - Second 1.5-3: Retention (why they should keep watching)
+
+4. **Words That Stop Scrolls**:
+   - "Wait..." / "Hold on..." / "Actually..."
+   - "I can't believe..." / "This is insane..."
+   - "Nobody talks about..." / "They don't want you to know..."
+   - "POV: You just..." / "If you're a [creator/entrepreneur/student]..."
+
+5. **Visual Hooks** (describe for video):
+   - Jump cut to shocking image
+   - Text overlay with huge number
+   - Before/after transformation
+   - Unexpected person/location
+   - Fast-paced editing (cuts every 0.5s)
+
+TASK: Generate 5 viral hooks for ProfitHack AI (AI video generation + daily engagement system).
+Each hook should:
+- Be 5-15 words
+- Include a specific number or statistic
+- Create curiosity gap
+- Be platform-native (TikTok/Instagram Reels style)
+- Have proven conversion potential
+
+Format:
+HOOK 1: [Hook text]
+VISUAL: [How to show this visually]
+WHY IT WORKS: [Psychology behind it]
+EXPECTED CTR: [Click-through rate estimate]
+
+Generate NOW:`;
+
+// ============================================
+// 2. TRENDING TOPIC ANALYZER AGENT
+// Finds trending topics and angles
+// ============================================
+
+const trendingTopicPrompt = `You are a TikTok trend analyst. Your job is to identify trending topics and create angles for ProfitHack AI.
+
+CRITICAL KNOWLEDGE:
+1. **Current Mega-Trends** (Q4 2024):
+   - AI replacing jobs (anxiety + opportunity)
+   - Passive income (everyone wants it)
+   - Creator economy (growth mindset)
+   - Side hustles (financial independence)
+   - Automation (time freedom)
+   - Skill stacking (competitive advantage)
+
+2. **Micro-Trends** (Weekly):
+   - "POV: You're an AI..." (POV format)
+   - "This AI just..." (AI discovery)
+   - "I tested [AI tool]..." (product reviews)
+   - "Watch me make..." (time-lapse earnings)
+   - "Nobody talks about..." (hidden knowledge)
+
+3. **Viral Angles for AI/Money Content**:
+   - **The Skeptic**: "I didn't believe it until..."
+   - **The Transformation**: "I went from $0 to $X..."
+   - **The Hack**: "Here's how to get $X in 24 hours..."
+   - **The Comparison**: "AI vs Human: Who wins?"
+   - **The Tutorial**: "Step-by-step guide to $X..."
+   - **The Controversy**: "Why they don't want you to know..."
+   - **The Prediction**: "In 6 months, everyone will..."
+
+4. **Hashtag Strategy**:
+   - **Mega hashtags** (100M+): #FYP #ForYouPage #Viral
+   - **Macro hashtags** (10M-100M): #AI #PassiveIncome #Entrepreneur
+   - **Micro hashtags** (1M-10M): #AITools #CreatorEconomy #SideHustle
+   - **Niche hashtags** (100K-1M): #TikTokCreators #AIMarketing #PassiveIncomeIdeas
+   - **Long-tail hashtags** (<100K): #ProfitHackAI #DailyNexus #CreatorTools
+
+5. **Hook + Trend + Hashtag Formula**:
+   [Hook] + [Trending angle] + [Hashtag mix] = VIRAL
+
+TASK: Identify 10 trending topics this week and create ProfitHack AI angles for each.
+
+Format:
+TREND 1: [Trending topic]
+ANGLE: [How to connect ProfitHack AI]
+HOOK: [Opening line]
+HASHTAGS: [5-10 relevant hashtags]
+EXPECTED REACH: [Estimated views]
+
+Generate NOW:`;
+
+// ============================================
+// 3. ENGAGEMENT MAXIMIZER AGENT
+// Optimizes for watch time and completion rate
+// ============================================
+
+const engagementMaximizerPrompt = `You are a TikTok engagement expert. Your job is to maximize watch time and completion rate.
+
+CRITICAL KNOWLEDGE:
+1. **Watch Time Optimization** (TikTok Algorithm Priority #1):
+   - **Pacing**: Cut every 0.5-1 second (keeps attention)
+   - **Pattern Breaks**: Change scene/angle every 3 seconds
+   - **Retention Dips**: Add hook at 25%, 50%, 75% marks
+   - **Ending**: Strong CTA (Call-To-Action) in last 2 seconds
+
+2. **Completion Rate Formula**:
+   - Seconds 0-3: Hook (must be STRONG)
+   - Seconds 3-15: Value (teach/show something)
+   - Seconds 15-30: Proof (show results/testimonials)
+   - Seconds 30-45: CTA (what to do next)
+   - Seconds 45-60: Loop (can replay from start)
+
+3. **Retention Hooks** (Mid-video):
+   - "Wait, it gets better..."
+   - "But here's the crazy part..."
+   - "That's not even the best part..."
+   - "Most people miss this..."
+   - "This is where it gets insane..."
+
+4. **Visual Retention Tactics**:
+   - Text overlays (keep eyes moving)
+   - B-roll changes (every 3 seconds)
+   - Zoom effects (create urgency)
+   - Color flashes (pattern interrupt)
+   - On-screen graphics (data visualization)
+
+5. **Audio Strategy**:
+   - **Trending sounds**: Use top 10 sounds weekly
+   - **Sound design**: Whoosh, ding, pop sounds every 3-5 seconds
+   - **Music tempo**: 120+ BPM (faster = more engaging)
+   - **Voice**: Fast-paced, enthusiastic, conversational
+   - **Silence**: 1-2 second pauses for emphasis
+
+6. **CTA Strategy** (Last 5 seconds):
+   - "Follow for more..." (simple)
+   - "Comment [something]..." (engagement)
+   - "Link in bio..." (traffic)
+   - "Subscribe to see..." (retention)
+   - "Share this..." (viral)
+
+TASK: Create a complete video script for ProfitHack AI that maximizes watch time.
+
+Format:
+SECONDS 0-3 (HOOK):
+[Script + visual description]
+
+SECONDS 3-15 (VALUE):
+[Script + visual description]
+
+SECONDS 15-30 (PROOF):
+[Script + visual description]
+
+SECONDS 30-45 (CTA):
+[Script + visual description]
+
+RETENTION HOOKS:
+[5 mid-video hooks to prevent drop-off]
+
+EXPECTED COMPLETION RATE: [Percentage]
+EXPECTED ENGAGEMENT RATE: [Percentage]
+
+Generate NOW:`;
+
+// ============================================
+// 4. VIRAL COEFFICIENT OPTIMIZER AGENT
+// Maximizes sharing and word-of-mouth
+// ============================================
+
+const viralCoefficientPrompt = `You are a viral growth expert. Your job is to create content with high viral coefficient (k-factor).
+
+CRITICAL KNOWLEDGE:
+1. **Viral Coefficient Formula**:
+   k = (Shares × Conversion Rate) + (Comments × Engagement Rate)
+   k > 1 = EXPONENTIAL GROWTH
+   k = 1 = LINEAR GROWTH
+   k < 1 = DECLINING
+
+2. **Share Triggers** (Make people WANT to share):
+   - **Relatability**: "Tag someone who needs this..."
+   - **Status**: "Only [X]% of creators know this..."
+   - **Help**: "Send this to your friend who..."
+   - **Controversy**: "This will blow your mind..."
+   - **Humor**: "If you know, you know..."
+   - **Inspiration**: "This changed my life..."
+
+3. **Comment Triggers** (Increase engagement):
+   - **Questions**: "What would you do with $X?"
+   - **Polls**: "AI or Human? Comment below..."
+   - **Controversy**: "Agree or disagree?"
+   - **Storytelling**: "Here's what happened next..."
+   - **Challenges**: "Try this and comment results..."
+
+4. **Duet/Stitch Potential** (TikTok-specific):
+   - Leave space for reaction
+   - Ask question for response
+   - Show before/after for duet
+   - Create challenge format
+   - Controversial take for debate
+
+5. **Shareability Score**:
+   - Relatability: 1-10
+   - Usefulness: 1-10
+   - Entertainment: 1-10
+   - Inspiration: 1-10
+   - Controversy: 1-10
+   - Total: 50 = MAXIMUM VIRAL POTENTIAL
+
+TASK: Create 5 content ideas for ProfitHack AI with maximum viral coefficient.
+
+Format:
+IDEA 1: [Content concept]
+SHARE TRIGGER: [Why people share it]
+COMMENT TRIGGER: [Why people comment]
+DUET/STITCH POTENTIAL: [How to make it interactive]
+SHAREABILITY SCORE: [1-50]
+EXPECTED VIRAL COEFFICIENT: [k-factor]
+EXPECTED GROWTH: [Day 1, Day 3, Day 7 projections]
+
+Generate NOW:`;
+
+// ============================================
+// 5. AUDIENCE PSYCHOLOGY AGENT
+// Understands what makes people act
+// ============================================
+
+const audiencePsychologyPrompt = `You are a behavioral psychologist specializing in creator audiences.
+
+CRITICAL KNOWLEDGE:
+1. **Creator Audience Segments**:
+   - **Aspiring Creators** (Age 18-25): Want growth hacks, viral secrets, quick wins
+   - **Struggling Creators** (Age 25-35): Want passive income, automation, scaling
+   - **Entrepreneurs** (Age 25-45): Want business tools, efficiency, ROI
+   - **Students** (Age 18-22): Want side income, easy money, no experience needed
+
+2. **Pain Points by Segment**:
+   - Aspiring: "How do I get views?" / "Why am I not growing?"
+   - Struggling: "How do I make money?" / "How do I scale?"
+   - Entrepreneurs: "How do I save time?" / "How do I automate?"
+   - Students: "How do I make quick money?" / "How do I start?"
+
+3. **Motivation Drivers**:
+   - **Financial**: "Make $X in Y days"
+   - **Status**: "Join the top 1% of creators"
+   - **Freedom**: "Quit your job in 30 days"
+   - **Belonging**: "Join our community of X creators"
+   - **Mastery**: "Master the algorithm"
+   - **Impact**: "Help others while earning"
+
+4. **Objection Handlers**:
+   - "Is this a scam?" → Show proof/testimonials
+   - "Will it work for me?" → Show diverse results
+   - "How much time?" → Show time-saving benefits
+   - "How much money?" → Show income breakdown
+   - "Is it hard?" → Show simplicity
+
+5. **Trust Builders**:
+   - **Social proof**: "10K creators use this..."
+   - **Scarcity**: "Only 100 spots left..."
+   - **Authority**: "Endorsed by [creator]..."
+   - **Reciprocity**: "Free guide worth $X..."
+   - **Consistency**: "Join the daily challenge..."
+
+TASK: Create audience psychology profiles and messaging for ProfitHack AI.
+
+Format:
+SEGMENT 1: [Audience type]
+PAIN POINT: [What hurts them]
+MOTIVATION: [What drives them]
+MESSAGING: [How to speak to them]
+OBJECTIONS: [What they fear]
+TRUST BUILDERS: [How to build credibility]
+EXPECTED CONVERSION: [Percentage]
+
+Generate for all 4 segments NOW:`;
+
+// ============================================
+// 6. POSTING SCHEDULE OPTIMIZER AGENT
+// Finds optimal posting times
+// ============================================
+
+const postingSchedulePrompt = `You are a TikTok algorithm expert. Your job is to find optimal posting times.
+
+CRITICAL KNOWLEDGE:
+1. **Peak Activity Times** (TikTok):
+   - **Morning Peak**: 6am-9am (commute viewers)
+   - **Lunch Peak**: 12pm-1pm (break time)
+   - **Evening Peak**: 6pm-10pm (prime time)
+   - **Night Peak**: 10pm-2am (late-night scrollers)
+
+2. **Day-of-Week Performance**:
+   - **Monday**: 8% lower engagement (back to work)
+   - **Tuesday-Thursday**: PEAK (mid-week engagement)
+   - **Friday**: 5% lower (weekend prep)
+   - **Saturday**: 10% lower (offline activities)
+   - **Sunday**: 15% lower (prep for week)
+
+3. **Content Type Timing**:
+   - **Educational**: 8am, 1pm (learning mindset)
+   - **Entertainment**: 7pm, 11pm (relaxation)
+   - **Motivation**: 6am, 5pm (energy boost)
+   - **Trending**: Immediately (before trend dies)
+   - **Evergreen**: Any time (always relevant)
+
+4. **Frequency Strategy**:
+   - **Minimum**: 3 posts/week (stay relevant)
+   - **Optimal**: 1 post/day (consistent growth)
+   - **Maximum**: 3 posts/day (avoid algorithm suppression)
+   - **Spacing**: 8-12 hours apart (different audiences)
+
+5. **Batch Posting Strategy**:
+   - Record 7-10 videos in 1 session
+   - Schedule across 2 weeks
+   - Test different times
+   - Analyze performance
+   - Adjust schedule based on data
+
+TASK: Create optimal posting schedule for ProfitHack AI.
+
+Format:
+POSTING SCHEDULE:
+Monday: [Time 1], [Time 2]
+Tuesday: [Time 1], [Time 2]
+[... continue for all 7 days]
+
+CONTENT CALENDAR (2 weeks):
+Day 1: [Content type] at [Time]
+[... continue for 14 days]
+
+EXPECTED REACH PER POST: [Views]
+EXPECTED GROWTH PER WEEK: [Followers]
+EXPECTED GROWTH PER MONTH: [Followers]
+
+Generate NOW:`;
+
+// ============================================
+// 7. CONVERSION FUNNEL AGENT
+// Turns views into users
+// ============================================
+
+const conversionFunnelPrompt = `You are a conversion funnel expert. Your job is to turn views into paying users.
+
+CRITICAL KNOWLEDGE:
+1. **Viral Funnel** (Views → Users):
+   - **Awareness**: Video gets views (TikTok algorithm)
+   - **Interest**: Viewer watches 50%+ (engagement)
+   - **Consideration**: Viewer clicks link (CTA)
+   - **Conversion**: Visitor signs up (landing page)
+   - **Retention**: User comes back daily (product)
+
+2. **Conversion Rate Benchmarks**:
+   - Views → Clicks: 2-5% (depends on CTA)
+   - Clicks → Signups: 10-20% (depends on landing page)
+   - Signups → Active Users: 30-50% (depends on onboarding)
+   - Active Users → Paying: 5-15% (depends on pricing)
+
+3. **CTA Strategy** (Last 5 seconds):
+   - **Link in Bio**: "Link in bio to get started"
+   - **DM**: "DM me for early access"
+   - **Comment**: "Comment 'VIRAL' for guide"
+   - **Follow**: "Follow for daily tips"
+   - **Share**: "Share this with a creator friend"
+
+4. **Landing Page Optimization**:
+   - **Headline**: Matches video promise
+   - **Subheading**: Addresses main objection
+   - **Social Proof**: Testimonials + numbers
+   - **CTA Button**: Clear, contrasting color
+   - **Form**: Max 3 fields (email, name, niche)
+   - **Guarantee**: Money-back or free trial
+
+5. **Onboarding Funnel**:
+   - **Email 1** (Day 0): Welcome + quick win
+   - **Email 2** (Day 1): Show results
+   - **Email 3** (Day 3): Introduce premium
+   - **Email 4** (Day 7): Social proof
+   - **Email 5** (Day 14): Last chance
+
+TASK: Create complete conversion funnel for ProfitHack AI.
+
+Format:
+VIDEO CTA: [Exact words to use]
+LANDING PAGE HEADLINE: [Main promise]
+LANDING PAGE SUBHEADING: [Address objection]
+SOCIAL PROOF: [Testimonials/stats to show]
+FORM FIELDS: [What to ask]
+ONBOARDING SEQUENCE: [5 emails over 14 days]
+
+CONVERSION RATES:
+Views → Clicks: [Percentage]
+Clicks → Signups: [Percentage]
+Signups → Active: [Percentage]
+Active → Paying: [Percentage]
+TOTAL CONVERSION: [Percentage]
+
+EXPECTED RESULTS (1M views):
+Clicks: [Number]
+Signups: [Number]
+Active Users: [Number]
+Paying Users: [Number]
+Revenue: [Amount]
+
+Generate NOW:`;
+
+// ============================================
+// MAIN VIRAL MARKETING ORCHESTRATOR
+// ============================================
+
+export class ViralMarketingOrchestrator {
+  async generateViralStrategy() {
+    console.log("🚀 GENERATING VIRAL MARKETING STRATEGY...\n");
+
+    const strategies = [
+      {
+        name: "Viral Hooks",
+        prompt: viralHookPrompt,
+      },
+      {
+        name: "Trending Topics",
+        prompt: trendingTopicPrompt,
+      },
+      {
+        name: "Engagement Optimization",
+        prompt: engagementMaximizerPrompt,
+      },
+      {
+        name: "Viral Coefficient",
+        prompt: viralCoefficientPrompt,
+      },
+      {
+        name: "Audience Psychology",
+        prompt: audiencePsychologyPrompt,
+      },
+      {
+        name: "Posting Schedule",
+        prompt: postingSchedulePrompt,
+      },
+      {
+        name: "Conversion Funnel",
+        prompt: conversionFunnelPrompt,
+      },
+    ];
+
+    const results: Record<string, string> = {};
+
+    for (const strategy of strategies) {
+      console.log(`\n📊 Generating ${strategy.name}...`);
+
+      const message = await client.messages.create({
+        model: "claude-3-5-sonnet-20241022",
+        max_tokens: 2000,
+        messages: [
+          {
+            role: "user",
+            content: strategy.prompt,
+          },
+        ],
+      });
+
+      const content = message.content[0];
+      if (content.type === "text") {
+        results[strategy.name] = content.text;
+        console.log(`✅ ${strategy.name} generated`);
+      }
+    }
+
+    return results;
+  }
+
+  async generateDailyContent() {
+    console.log("📱 GENERATING TODAY'S VIRAL CONTENT...\n");
+
+    const dailyPrompt = `You are a viral content creator. Generate TODAY'S best content idea for ProfitHack AI.
+
+Consider:
+1. Today's trending topics
+2. Optimal posting time
+3. Audience psychology
+4. Viral hooks
+5. Engagement maximization
+
+TASK: Create 1 content idea that will go viral TODAY.
+
+Format:
+HOOK: [Opening line]
+SCRIPT: [30-second video script]
+VISUALS: [Visual descriptions]
+TRENDING ELEMENTS: [What makes it timely]
+EXPECTED VIEWS: [Projection]
+EXPECTED ENGAGEMENT: [Projection]
+EXPECTED CONVERSIONS: [Projection]
+
+Generate NOW:`;
+
+    const message = await client.messages.create({
+      model: "claude-3-5-sonnet-20241022",
+      max_tokens: 1500,
+      messages: [
+        {
+          role: "user",
+          content: dailyPrompt,
+        },
+      ],
+    });
+
+    const content = message.content[0];
+    if (content.type === "text") {
+      return content.text;
+    }
+  }
+
+  async analyzeCompetition() {
+    console.log("🔍 ANALYZING COMPETITION...\n");
+
+    const competitionPrompt = `Analyze the top 10 AI/Creator economy products and their marketing strategies.
+
+For each competitor:
+1. What's their main hook?
+2. What content performs best?
+3. What audience do they target?
+4. What's their CTA?
+5. How can ProfitHack AI do it better?
+
+TASK: Provide competitive intelligence for ProfitHack AI.
+
+Format:
+COMPETITOR 1: [Name]
+MAIN HOOK: [Their hook]
+BEST CONTENT: [What works for them]
+TARGET AUDIENCE: [Who they target]
+CTA: [Their call-to-action]
+OUR ADVANTAGE: [How we beat them]
+
+[Repeat for top 10]
+
+OVERALL STRATEGY: [How to dominate the market]
+
+Generate NOW:`;
+
+    const message = await client.messages.create({
+      model: "claude-3-5-sonnet-20241022",
+      max_tokens: 2000,
+      messages: [
+        {
+          role: "user",
+          content: competitionPrompt,
+        },
+      ],
+    });
+
+    const content = message.content[0];
+    if (content.type === "text") {
+      return content.text;
+    }
+  }
+}
+
+// ============================================
+// EXPORT
+// ============================================
+
+export default ViralMarketingOrchestrator;

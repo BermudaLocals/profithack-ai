@@ -1,0 +1,453 @@
+-- ============================================
+-- TIKTOK-BEATING DAILY SYSTEM
+-- Complete PostgreSQL Database Schema
+-- 8 Tables | Optimized Indexes | Production Ready
+-- ============================================
+
+-- ============================================
+-- 1. DAILY NEXUS TABLE
+-- Main engagement tracking
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS daily_nexus (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL UNIQUE,
+  streak INT DEFAULT 0,
+  total_rewards BIGINT DEFAULT 0,
+  today_rewards INT DEFAULT 0,
+  next_claim_time BIGINT,
+  multiplier DECIMAL(3,1) DEFAULT 1.0,
+  level INT DEFAULT 1,
+  experience INT DEFAULT 0,
+  last_claimed_at TIMESTAMP WITH TIME ZONE,
+  streak_broken_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_daily_nexus_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Indexes for daily_nexus
+CREATE INDEX IF NOT EXISTS idx_daily_nexus_user_id ON daily_nexus(user_id);
+CREATE INDEX IF NOT EXISTS idx_daily_nexus_streak ON daily_nexus(streak DESC);
+CREATE INDEX IF NOT EXISTS idx_daily_nexus_next_claim ON daily_nexus(next_claim_time);
+CREATE INDEX IF NOT EXISTS idx_daily_nexus_total_rewards ON daily_nexus(total_rewards DESC);
+CREATE INDEX IF NOT EXISTS idx_daily_nexus_level ON daily_nexus(level DESC);
+CREATE INDEX IF NOT EXISTS idx_daily_nexus_updated_at ON daily_nexus(updated_at DESC);
+
+-- ============================================
+-- 2. DAILY CHALLENGES TABLE
+-- Track user progress on daily challenges
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS daily_challenges (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  challenge_id VARCHAR(50) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  icon VARCHAR(10),
+  progress INT DEFAULT 0,
+  max_progress INT NOT NULL,
+  reward INT DEFAULT 0,
+  completed BOOLEAN DEFAULT FALSE,
+  completed_at TIMESTAMP WITH TIME ZONE,
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_daily_challenges_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT unique_user_challenge UNIQUE(user_id, challenge_id)
+);
+
+-- Indexes for daily_challenges
+CREATE INDEX IF NOT EXISTS idx_daily_challenges_user_id ON daily_challenges(user_id);
+CREATE INDEX IF NOT EXISTS idx_daily_challenges_expires_at ON daily_challenges(expires_at DESC);
+CREATE INDEX IF NOT EXISTS idx_daily_challenges_completed ON daily_challenges(completed);
+CREATE INDEX IF NOT EXISTS idx_daily_challenges_user_expires ON daily_challenges(user_id, expires_at DESC);
+
+-- ============================================
+-- 3. DAILY BONUSES TABLE
+-- Track active bonuses (time-based, social, etc)
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS daily_bonuses (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  bonus_type VARCHAR(50) NOT NULL,
+  multiplier DECIMAL(3,1) NOT NULL,
+  reason VARCHAR(255),
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_daily_bonuses_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Indexes for daily_bonuses
+CREATE INDEX IF NOT EXISTS idx_daily_bonuses_user_id ON daily_bonuses(user_id);
+CREATE INDEX IF NOT EXISTS idx_daily_bonuses_expires_at ON daily_bonuses(expires_at DESC);
+CREATE INDEX IF NOT EXISTS idx_daily_bonuses_user_expires ON daily_bonuses(user_id, expires_at DESC);
+CREATE INDEX IF NOT EXISTS idx_daily_bonuses_bonus_type ON daily_bonuses(bonus_type);
+
+-- ============================================
+-- 4. REWARD HISTORY TABLE
+-- Complete history of all rewards claimed
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS reward_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  reward_type VARCHAR(50) NOT NULL,
+  amount INT NOT NULL,
+  multiplier DECIMAL(3,1) DEFAULT 1.0,
+  streak_at_claim INT DEFAULT 0,
+  rarity VARCHAR(50),
+  claimed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_reward_history_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Indexes for reward_history
+CREATE INDEX IF NOT EXISTS idx_reward_history_user_id ON reward_history(user_id);
+CREATE INDEX IF NOT EXISTS idx_reward_history_claimed_at ON reward_history(claimed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_reward_history_user_claimed ON reward_history(user_id, claimed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_reward_history_reward_type ON reward_history(reward_type);
+CREATE INDEX IF NOT EXISTS idx_reward_history_rarity ON reward_history(rarity);
+
+-- ============================================
+-- 5. ENGAGEMENT PREDICTIONS TABLE
+-- ML predictions for rewards
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS engagement_predictions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  predicted_reward INT NOT NULL,
+  predicted_rarity VARCHAR(50),
+  prediction_confidence DECIMAL(3,2),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_engagement_predictions_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Indexes for engagement_predictions
+CREATE INDEX IF NOT EXISTS idx_engagement_predictions_user_id ON engagement_predictions(user_id);
+CREATE INDEX IF NOT EXISTS idx_engagement_predictions_created_at ON engagement_predictions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_engagement_predictions_confidence ON engagement_predictions(prediction_confidence DESC);
+
+-- ============================================
+-- 6. DAILY ANALYTICS TABLE
+-- Daily aggregated statistics
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS daily_analytics (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  date DATE NOT NULL,
+  claims_count INT DEFAULT 0,
+  total_earned INT DEFAULT 0,
+  challenges_completed INT DEFAULT 0,
+  streak_maintained BOOLEAN DEFAULT FALSE,
+  engagement_score INT DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_daily_analytics_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT unique_user_date UNIQUE(user_id, date)
+);
+
+-- Indexes for daily_analytics
+CREATE INDEX IF NOT EXISTS idx_daily_analytics_user_id ON daily_analytics(user_id);
+CREATE INDEX IF NOT EXISTS idx_daily_analytics_date ON daily_analytics(date DESC);
+CREATE INDEX IF NOT EXISTS idx_daily_analytics_user_date ON daily_analytics(user_id, date DESC);
+CREATE INDEX IF NOT EXISTS idx_daily_analytics_engagement_score ON daily_analytics(engagement_score DESC);
+
+-- ============================================
+-- 7. LEADERBOARD CACHE TABLE
+-- Materialized leaderboard for fast queries
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS leaderboard_cache (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL UNIQUE,
+  username VARCHAR(255),
+  avatar_url TEXT,
+  current_streak INT,
+  total_rewards BIGINT,
+  leaderboard_points INT,
+  period VARCHAR(50),
+  rank INT,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_leaderboard_cache_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Indexes for leaderboard_cache
+CREATE INDEX IF NOT EXISTS idx_leaderboard_cache_user_id ON leaderboard_cache(user_id);
+CREATE INDEX IF NOT EXISTS idx_leaderboard_cache_period_rank ON leaderboard_cache(period, rank);
+CREATE INDEX IF NOT EXISTS idx_leaderboard_cache_points ON leaderboard_cache(leaderboard_points DESC);
+CREATE INDEX IF NOT EXISTS idx_leaderboard_cache_streak ON leaderboard_cache(current_streak DESC);
+CREATE INDEX IF NOT EXISTS idx_leaderboard_cache_updated_at ON leaderboard_cache(updated_at DESC);
+
+-- ============================================
+-- 8. MONETIZATION TABLE
+-- Track premium purchases and subscriptions
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS monetization (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  transaction_type VARCHAR(50) NOT NULL,
+  product_name VARCHAR(255),
+  amount DECIMAL(10,2) NOT NULL,
+  currency VARCHAR(3) DEFAULT 'USD',
+  status VARCHAR(50) DEFAULT 'pending',
+  stripe_transaction_id VARCHAR(255),
+  purchased_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  expires_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_monetization_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Indexes for monetization
+CREATE INDEX IF NOT EXISTS idx_monetization_user_id ON monetization(user_id);
+CREATE INDEX IF NOT EXISTS idx_monetization_purchased_at ON monetization(purchased_at DESC);
+CREATE INDEX IF NOT EXISTS idx_monetization_status ON monetization(status);
+CREATE INDEX IF NOT EXISTS idx_monetization_transaction_type ON monetization(transaction_type);
+CREATE INDEX IF NOT EXISTS idx_monetization_stripe_id ON monetization(stripe_transaction_id);
+
+-- ============================================
+-- VIEWS FOR COMMON QUERIES
+-- ============================================
+
+-- View: User Daily Summary
+CREATE OR REPLACE VIEW user_daily_summary AS
+SELECT 
+  dn.user_id,
+  dn.streak,
+  dn.total_rewards,
+  dn.today_rewards,
+  dn.multiplier,
+  dn.level,
+  COUNT(DISTINCT dc.id) as active_challenges,
+  COUNT(DISTINCT db.id) as active_bonuses,
+  MAX(rh.claimed_at) as last_claim_time
+FROM daily_nexus dn
+LEFT JOIN daily_challenges dc ON dn.user_id = dc.user_id AND dc.expires_at > NOW()
+LEFT JOIN daily_bonuses db ON dn.user_id = db.user_id AND db.expires_at > NOW()
+LEFT JOIN reward_history rh ON dn.user_id = rh.user_id
+GROUP BY dn.user_id, dn.streak, dn.total_rewards, dn.today_rewards, dn.multiplier, dn.level;
+
+-- View: Leaderboard Top 100
+CREATE OR REPLACE VIEW leaderboard_top_100 AS
+SELECT 
+  ROW_NUMBER() OVER (ORDER BY dn.total_rewards DESC) as rank,
+  dn.user_id,
+  u.username,
+  u.profile_picture_url,
+  dn.streak,
+  dn.total_rewards,
+  dn.level
+FROM daily_nexus dn
+JOIN users u ON dn.user_id = u.id
+ORDER BY dn.total_rewards DESC
+LIMIT 100;
+
+-- View: Daily Revenue
+CREATE OR REPLACE VIEW daily_revenue AS
+SELECT 
+  DATE(purchased_at) as date,
+  COUNT(*) as transaction_count,
+  SUM(amount) as total_revenue,
+  AVG(amount) as avg_transaction,
+  COUNT(DISTINCT user_id) as unique_users
+FROM monetization
+WHERE status = 'completed'
+GROUP BY DATE(purchased_at)
+ORDER BY date DESC;
+
+-- View: User Engagement Metrics
+CREATE OR REPLACE VIEW user_engagement_metrics AS
+SELECT 
+  da.user_id,
+  DATE(da.date) as date,
+  da.claims_count,
+  da.total_earned,
+  da.challenges_completed,
+  da.engagement_score,
+  dn.streak,
+  dn.level,
+  COUNT(DISTINCT rh.id) as total_claims
+FROM daily_analytics da
+LEFT JOIN daily_nexus dn ON da.user_id = dn.user_id
+LEFT JOIN reward_history rh ON da.user_id = rh.user_id
+GROUP BY da.user_id, da.date, da.claims_count, da.total_earned, da.challenges_completed, da.engagement_score, dn.streak, dn.level;
+
+-- ============================================
+-- FUNCTIONS FOR COMMON OPERATIONS
+-- ============================================
+
+-- Function: Get User Daily State
+CREATE OR REPLACE FUNCTION get_user_daily_state(p_user_id UUID)
+RETURNS TABLE (
+  streak INT,
+  total_rewards BIGINT,
+  today_rewards INT,
+  multiplier DECIMAL,
+  level INT,
+  experience INT,
+  next_claim_time BIGINT,
+  active_challenges INT,
+  active_bonuses INT
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    dn.streak,
+    dn.total_rewards,
+    dn.today_rewards,
+    dn.multiplier,
+    dn.level,
+    dn.experience,
+    dn.next_claim_time,
+    (SELECT COUNT(*) FROM daily_challenges WHERE user_id = p_user_id AND expires_at > NOW())::INT,
+    (SELECT COUNT(*) FROM daily_bonuses WHERE user_id = p_user_id AND expires_at > NOW())::INT
+  FROM daily_nexus dn
+  WHERE dn.user_id = p_user_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function: Calculate Total Multiplier
+CREATE OR REPLACE FUNCTION calculate_total_multiplier(p_user_id UUID)
+RETURNS DECIMAL AS $$
+DECLARE
+  v_base_multiplier DECIMAL;
+  v_total_multiplier DECIMAL := 1.0;
+BEGIN
+  -- Get base multiplier from streak
+  SELECT multiplier INTO v_base_multiplier FROM daily_nexus WHERE user_id = p_user_id;
+  
+  v_total_multiplier := COALESCE(v_base_multiplier, 1.0);
+  
+  -- Apply active bonuses
+  SELECT 
+    v_total_multiplier * COALESCE(EXP(SUM(LN(multiplier))), 1.0)
+  INTO v_total_multiplier
+  FROM daily_bonuses 
+  WHERE user_id = p_user_id AND expires_at > NOW();
+  
+  RETURN v_total_multiplier;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Function: Update Leaderboard
+CREATE OR REPLACE FUNCTION update_leaderboard()
+RETURNS void AS $$
+BEGIN
+  DELETE FROM leaderboard_cache WHERE updated_at < NOW() - INTERVAL '1 hour';
+  
+  INSERT INTO leaderboard_cache (user_id, username, avatar_url, current_streak, total_rewards, leaderboard_points, period, rank)
+  SELECT 
+    dn.user_id,
+    u.username,
+    u.profile_picture_url,
+    dn.streak,
+    dn.total_rewards,
+    dn.total_rewards,
+    'weekly',
+    ROW_NUMBER() OVER (ORDER BY dn.total_rewards DESC)
+  FROM daily_nexus dn
+  JOIN users u ON dn.user_id = u.id
+  WHERE dn.updated_at > NOW() - INTERVAL '7 days'
+  ON CONFLICT (user_id) DO UPDATE SET
+    rank = EXCLUDED.rank,
+    updated_at = NOW();
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================
+-- TRIGGERS FOR AUTOMATIC UPDATES
+-- ============================================
+
+-- Trigger: Update daily_nexus updated_at
+CREATE OR REPLACE FUNCTION update_daily_nexus_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = CURRENT_TIMESTAMP;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_daily_nexus_timestamp
+BEFORE UPDATE ON daily_nexus
+FOR EACH ROW
+EXECUTE FUNCTION update_daily_nexus_timestamp();
+
+-- Trigger: Auto-create daily_analytics record
+CREATE OR REPLACE FUNCTION create_daily_analytics()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO daily_analytics (user_id, date, claims_count, total_earned)
+  VALUES (NEW.user_id, CURRENT_DATE, 1, NEW.amount)
+  ON CONFLICT (user_id, date) DO UPDATE SET
+    claims_count = claims_count + 1,
+    total_earned = total_earned + NEW.amount;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_reward_history_analytics
+AFTER INSERT ON reward_history
+FOR EACH ROW
+EXECUTE FUNCTION create_daily_analytics();
+
+-- ============================================
+-- INITIAL DATA SETUP
+-- ============================================
+
+-- Insert default challenges for new users
+CREATE OR REPLACE FUNCTION create_default_challenges(p_user_id UUID)
+RETURNS void AS $$
+BEGIN
+  INSERT INTO daily_challenges (user_id, challenge_id, name, description, icon, max_progress, reward, expires_at)
+  VALUES 
+    (p_user_id, 'watch-5', 'Watch 5 Videos', 'Watch 5 videos to complete', '👀', 5, 50, NOW() + INTERVAL '24 hours'),
+    (p_user_id, 'like-10', 'Like 10 Videos', 'Like 10 videos to complete', '❤️', 10, 75, NOW() + INTERVAL '24 hours'),
+    (p_user_id, 'share-3', 'Share 3 Videos', 'Share 3 videos to complete', '📤', 3, 100, NOW() + INTERVAL '24 hours'),
+    (p_user_id, 'comment-5', 'Comment 5 Times', 'Leave 5 comments to complete', '💬', 5, 60, NOW() + INTERVAL '24 hours')
+  ON CONFLICT DO NOTHING;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================
+-- PERFORMANCE OPTIMIZATION
+-- ============================================
+
+-- Analyze tables for query optimization
+ANALYZE daily_nexus;
+ANALYZE daily_challenges;
+ANALYZE daily_bonuses;
+ANALYZE reward_history;
+ANALYZE engagement_predictions;
+ANALYZE daily_analytics;
+ANALYZE leaderboard_cache;
+ANALYZE monetization;
+
+-- ============================================
+-- COMMENTS FOR DOCUMENTATION
+-- ============================================
+
+COMMENT ON TABLE daily_nexus IS 'Main table for tracking user daily engagement state, streaks, and rewards';
+COMMENT ON TABLE daily_challenges IS 'Tracks daily challenges and user progress toward completing them';
+COMMENT ON TABLE daily_bonuses IS 'Tracks active multiplier bonuses (time-based, social, challenge-based)';
+COMMENT ON TABLE reward_history IS 'Complete history of all rewards claimed by users';
+COMMENT ON TABLE engagement_predictions IS 'ML predictions for expected rewards and rarity tiers';
+COMMENT ON TABLE daily_analytics IS 'Daily aggregated statistics for engagement tracking';
+COMMENT ON TABLE leaderboard_cache IS 'Cached leaderboard data for fast retrieval';
+COMMENT ON TABLE monetization IS 'Tracks all premium purchases and subscriptions';
+
+COMMENT ON COLUMN daily_nexus.streak IS 'Current streak count (resets if user misses a day)';
+COMMENT ON COLUMN daily_nexus.multiplier IS 'Base multiplier from streak (1.0x to 5.0x)';
+COMMENT ON COLUMN daily_nexus.next_claim_time IS 'Unix timestamp of when user can next claim';
+COMMENT ON COLUMN daily_challenges.progress IS 'Current progress toward max_progress';
+COMMENT ON COLUMN daily_bonuses.multiplier IS 'Bonus multiplier to apply (e.g., 1.2x for morning bonus)';
+COMMENT ON COLUMN reward_history.rarity IS 'Rarity tier of reward (common, rare, epic, legendary, mythic)';
+
+-- ============================================
+-- SCHEMA COMPLETE
+-- ============================================
+-- Total: 8 tables + 4 views + 3 functions + 2 triggers
+-- Optimized for PostgreSQL 12+
+-- Ready for production deployment
+-- ============================================

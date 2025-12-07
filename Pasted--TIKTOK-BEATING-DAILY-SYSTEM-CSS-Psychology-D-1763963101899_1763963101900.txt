@@ -1,0 +1,898 @@
+/* ============================================
+   TIKTOK-BEATING DAILY SYSTEM CSS
+   Psychology-Driven | Engagement-Optimized
+   ============================================ */
+
+:root {
+  --primary: #FF007F;
+  --secondary: #00FFFF;
+  --accent: #FFD700;
+  --bg: #0a0e27;
+  --bg-light: #1a1f3a;
+  --text: #ffffff;
+  --text-secondary: #a0aec0;
+  --border: #1a202c;
+  --success: #4CAF50;
+  --warning: #FF6B6B;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ============================================
+   MAIN CONTAINER
+   ============================================ */
+
+.daily-nexus-main {
+  padding: 20px;
+  background: linear-gradient(135deg, var(--bg), var(--bg-light));
+  min-height: 100vh;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: 18px;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+
+.nexus-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.header-left h1 {
+  font-size: 32px;
+  font-weight: 900;
+  margin-bottom: 4px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-left p {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.header-right {
+  display: flex;
+  gap: 16px;
+}
+
+.social-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: rgba(255, 0, 127, 0.1);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.stat-icon {
+  font-size: 20px;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--primary);
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================
+   CLAIM SECTION
+   ============================================ */
+
+.claim-section {
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.claim-button-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.claim-button {
+  position: relative;
+  width: 280px;
+  height: 140px;
+  border: none;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 20px 60px rgba(255, 0, 127, 0.3);
+}
+
+.claim-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent);
+  pointer-events: none;
+}
+
+.claim-button.ready:hover:not(:disabled) {
+  transform: translateY(-4px);
+  box-shadow: 0 30px 80px rgba(255, 0, 127, 0.5);
+}
+
+.claim-button.ready:active:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.claim-button.cooldown {
+  background: linear-gradient(135deg, #555, #333);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.claim-button.claimed {
+  animation: claim-success 0.6s ease;
+}
+
+@keyframes claim-success {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.button-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: white;
+}
+
+.reward-icon {
+  font-size: 48px;
+  animation: icon-bounce 2s ease-in-out infinite;
+}
+
+@keyframes icon-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.reward-text {
+  text-align: left;
+}
+
+.claim-label,
+.cooldown-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+.reward-amount {
+  font-size: 28px;
+  font-weight: 900;
+  margin-top: 4px;
+}
+
+.time-display {
+  font-size: 24px;
+  font-weight: 900;
+  font-family: "Courier New", monospace;
+  margin-top: 4px;
+}
+
+.button-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+  animation: glow-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   PREDICTION TOOLTIP
+   ============================================ */
+
+.prediction-tooltip {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 12px;
+  background: rgba(0, 255, 255, 0.2);
+  border: 1px solid var(--secondary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  animation: tooltip-appear 0.3s ease;
+}
+
+@keyframes tooltip-appear {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.tooltip-icon {
+  font-size: 14px;
+}
+
+.tooltip-text {
+  color: var(--secondary);
+}
+
+/* ============================================
+   REWARD POPUP
+   ============================================ */
+
+.reward-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 40px;
+  background: linear-gradient(135deg, rgba(255, 0, 127, 0.2), rgba(0, 255, 255, 0.2));
+  border: 2px solid var(--primary);
+  border-radius: 20px;
+  text-align: center;
+  z-index: 1000;
+  animation: popup-appear 0.5s ease;
+}
+
+@keyframes popup-appear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.popup-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: icon-spin 0.6s ease;
+}
+
+@keyframes icon-spin {
+  from {
+    transform: scale(0) rotate(-180deg);
+  }
+  to {
+    transform: scale(1) rotate(0);
+  }
+}
+
+.popup-name {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.popup-amount {
+  font-size: 32px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.popup-bonus {
+  font-size: 14px;
+  color: var(--success);
+  font-weight: 700;
+}
+
+/* ============================================
+   MULTIPLIER SECTION
+   ============================================ */
+
+.multiplier-section {
+  margin-bottom: 30px;
+}
+
+.multiplier-card {
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(0, 255, 255, 0.1));
+  border: 2px solid var(--accent);
+  border-radius: 16px;
+}
+
+.multiplier-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.multiplier-value {
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--accent);
+  margin-bottom: 16px;
+  animation: multiplier-pulse 2s ease-in-out infinite;
+}
+
+@keyframes multiplier-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.multiplier-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.breakdown-item span:last-child {
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+/* ============================================
+   CHALLENGES SECTION
+   ============================================ */
+
+.challenges-section {
+  margin-bottom: 30px;
+}
+
+.challenges-section h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.challenges-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.challenge-card {
+  padding: 16px;
+  background: rgba(255, 0, 127, 0.1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.challenge-card:hover {
+  border-color: var(--primary);
+  background: rgba(255, 0, 127, 0.15);
+}
+
+.challenge-card.completed {
+  background: rgba(76, 175, 80, 0.1);
+  border-color: var(--success);
+}
+
+.challenge-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.challenge-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.challenge-name {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.challenge-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.challenge-reward {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* ============================================
+   LEVEL SECTION
+   ============================================ */
+
+.level-section {
+  margin-bottom: 30px;
+}
+
+.level-card {
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(153, 51, 255, 0.1));
+  border: 2px solid var(--secondary);
+  border-radius: 16px;
+}
+
+.level-display {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.level-number {
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--secondary);
+}
+
+.level-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.experience-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  border: 1px solid var(--secondary);
+}
+
+.experience-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  transition: width 0.3s ease;
+}
+
+.experience-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   SOCIAL SECTION
+   ============================================ */
+
+.social-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(0, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.social-section h3 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.friends-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.count-number {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--secondary);
+}
+
+.count-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.view-leaderboard-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  border: none;
+  color: var(--bg);
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-leaderboard-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+}
+
+/* ============================================
+   BONUSES SECTION
+   ============================================ */
+
+.bonuses-section {
+  margin-bottom: 30px;
+}
+
+.bonuses-section h3 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.bonuses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bonus-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: rgba(255, 215, 0, 0.1);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  animation: bonus-slide 0.3s ease;
+}
+
+@keyframes bonus-slide {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.bonus-reason {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.bonus-multiplier {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--accent);
+}
+
+/* ============================================
+   STATS SECTION
+   ============================================ */
+
+.stats-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  padding: 16px;
+  background: rgba(255, 0, 127, 0.1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  border-color: var(--primary);
+  background: rgba(255, 0, 127, 0.15);
+}
+
+.stat-card .stat-icon {
+  font-size: 28px;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-info .stat-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-info .stat-value {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--primary);
+}
+
+/* ============================================
+   WARNING BANNER
+   ============================================ */
+
+.warning-banner {
+  padding: 12px 16px;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid var(--warning);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--warning);
+  font-size: 13px;
+  animation: warning-pulse 2s ease-in-out infinite;
+}
+
+@keyframes warning-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.warning-icon {
+  font-size: 18px;
+}
+
+.warning-text {
+  font-weight: 600;
+}
+
+/* ============================================
+   PARTICLES & ANIMATIONS
+   ============================================ */
+
+.confetti-particle {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background: var(--primary);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.reward-particle {
+  position: absolute;
+  font-size: 20px;
+  pointer-events: none;
+  z-index: 999;
+}
+
+@keyframes confetti-fall {
+  to {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-burst {
+  to {
+    transform: translate(var(--tx), var(--ty)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   NOTIFICATION
+   ============================================ */
+
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 16px 24px;
+  background: var(--success);
+  color: white;
+  border-radius: 8px;
+  font-weight: 700;
+  z-index: 1001;
+  animation: notification-slide 0.3s ease, notification-fade 0.3s ease 2.7s;
+}
+
+@keyframes notification-slide {
+  from {
+    transform: translateX(-50%) translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes notification-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 768px) {
+  .daily-nexus-main {
+    padding: 16px;
+  }
+
+  .claim-button {
+    width: 240px;
+    height: 120px;
+  }
+
+  .reward-icon {
+    font-size: 40px;
+  }
+
+  .reward-amount {
+    font-size: 24px;
+  }
+
+  .challenges-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-left h1 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .daily-nexus-main {
+    padding: 12px;
+  }
+
+  .claim-button {
+    width: 100%;
+    max-width: 220px;
+    height: 110px;
+  }
+
+  .button-content {
+    gap: 12px;
+  }
+
+  .reward-icon {
+    font-size: 36px;
+  }
+
+  .reward-amount {
+    font-size: 20px;
+  }
+
+  .header-left h1 {
+    font-size: 20px;
+  }
+
+  .multiplier-value {
+    font-size: 32px;
+  }
+
+  .level-number {
+    font-size: 28px;
+  }
+
+  .stats-section {
+    grid-template-columns: 1fr;
+  }
+}
