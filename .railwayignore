@@ -1,0 +1,9 @@
+# Ignore everything except what we need for deployment
+*
+!apps/web/
+!package.json
+!package-lock.json
+!railway.json
+!Dockerfile
+!.railwayignore
+!.env.example
