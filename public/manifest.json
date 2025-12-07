@@ -1,104 +1,25 @@
 {
-  "name": "PROFITHACK AI",
-  "short_name": "PROFITHACK",
-  "description": "TikTok + OnlyFans + AI Creator Platform. Video feed, AI tools, dating, messaging, live streaming.",
-  "start_url": "/feed",
-  "scope": "/",
-  "display": "standalone",
-  "display_override": ["standalone", "fullscreen"],
-  "background_color": "#000000",
-  "theme_color": "#FF1493",
-  "orientation": "portrait-primary",
-  "lang": "en-US",
-  "dir": "ltr",
-  "prefer_related_applications": false,
+  "short_name": "React App",
+  "name": "Create React App Sample",
   "icons": [
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
     },
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
+      "src": "logo192.png",
       "type": "image/png",
-      "purpose": "maskable"
+      "sizes": "192x192"
     },
     {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
+      "src": "logo512.png",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "sizes": "512x512"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/logo-v1.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "PROFITHACK AI Video Feed"
-    }
-  ],
-  "categories": ["social", "entertainment", "productivity"],
-  "shortcuts": [
-    {
-      "name": "Video Feed",
-      "short_name": "Feed",
-      "description": "Watch trending videos",
-      "url": "/feed",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "AI Hub",
-      "short_name": "AI",
-      "description": "AI content tools",
-      "url": "/ai-hub",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Inbox",
-      "short_name": "Messages",
-      "description": "Your messages",
-      "url": "/inbox",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Dating",
-      "short_name": "Date",
-      "description": "Find matches",
-      "url": "/dating",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
-    }
-  ],
-  "share_target": {
-    "action": "/share",
-    "method": "POST",
-    "enctype": "multipart/form-data",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url",
-      "files": [
-        {
-          "name": "media",
-          "accept": ["image/*", "video/*"]
-        }
-      ]
-    }
-  },
-  "launch_handler": {
-    "client_mode": "navigate-existing"
-  },
-  "handle_links": "preferred",
-  "edge_side_panel": {
-    "preferred_width": 400
-  }
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }
