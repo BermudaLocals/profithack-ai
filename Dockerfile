@@ -1,37 +1,19 @@
-# Stage 0: Dependencies
-FROM node:20-alpine AS stage-0
-
-# Install system dependencies
-RUN apk add --no-cache \
-    python3 \
-    make \
-    g++ \
-    bzip2 \
-    git
-
+# Target your main app - MODIFY THIS PATH if needed
+FROM node:20-alpine
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy and install dependencies for the frontend
+COPY apps/web/package*.json ./
+RUN npm ci --omit=dev
 
-# Install dependencies
-RUN npm ci --omit=dev --legacy-peer-deps
+# Copy frontend source code
+COPY apps/web/ ./
 
-# Copy application code
-COPY . .
-
-# Build your application
+# Build the frontend (if using Next.js/React)
 RUN npm run build
 
-# Stage 1: Production image
-FROM node:20-alpine
-
-WORKDIR /app
-
-# Copy from build stage
-COPY --from=stage-0 /app .
-
-# Start application
+# Expose port (Next.js defaults to 3000)
 EXPOSE 3000
 
+# Start command
 CMD ["npm", "start"]
