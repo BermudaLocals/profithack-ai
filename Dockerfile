@@ -13,6 +13,8 @@ COPY apps/web/package*.json ./apps/web/
 COPY backend/package*.json ./backend/
 
 # 2. Install dependencies
+RUN apk add --no-cache bzip2 python3 make g++
+ENV PHANTOMJS_SKIP_INSTALL=true
 RUN npm ci --omit=dev
 
 # 3. Copy ALL source code
