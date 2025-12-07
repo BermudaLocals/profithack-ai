@@ -1,0 +1,3 @@
+import pg from 'pg'; const { Pool } = pg;
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export function privacyRoutes(app){app.get('/user/export',async(req,res)=>{const {email}=req.query;const data={};for(const table of ['users','posts','gifts','subscriptions']){const q=await pool.query(`select * from ${table} where email = $1 or user_id in (select id from users where email=$1)`,[email]);data[table]=q.rows;}res.json(data)});app.delete('/user',async(req,res)=>{const {email}=req.body||{};if(!email) return res.status(400).json({error:'email required'});await pool.query('delete from posts where user_id in (select id from users where email=$1)',[email]);await pool.query('delete from users where email=$1',[email]);res.json({ok:true})});}
