@@ -1,104 +1,62 @@
 {
-  "name": "PROFITHACK AI",
-  "short_name": "PROFITHACK",
-  "description": "TikTok + OnlyFans + AI Creator Platform. Video feed, AI tools, dating, messaging, live streaming.",
-  "start_url": "/feed",
-  "scope": "/",
+  "name": "PROFITHACK AI - Where Code Meets Cash Flow",
+  "short_name": "PROFITHACK AI",
+  "version": "2.0.0",
+  "description": "Global creator platform for code development, content creation, and monetization. TikTok-style feed, AI video generation, and creator economy.",
+  "start_url": "/",
   "display": "standalone",
-  "display_override": ["standalone", "fullscreen"],
-  "background_color": "#000000",
-  "theme_color": "#FF1493",
-  "orientation": "portrait-primary",
-  "lang": "en-US",
-  "dir": "ltr",
-  "prefer_related_applications": false,
+  "background_color": "#030712",
+  "theme_color": "#a855f7",
+  "orientation": "portrait",
+  "scope": "/",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/profithack-logo.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/profithack-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "/logo-v1.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "PROFITHACK AI Video Feed"
-    }
-  ],
-  "categories": ["social", "entertainment", "productivity"],
+  "categories": ["social", "productivity", "education", "finance"],
   "shortcuts": [
     {
-      "name": "Video Feed",
+      "name": "Explore Feed",
       "short_name": "Feed",
-      "description": "Watch trending videos",
-      "url": "/feed",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "description": "Browse viral content",
+      "url": "/explore",
+      "icons": [{ "src": "/profithack-logo.png", "sizes": "192x192" }]
     },
     {
-      "name": "AI Hub",
-      "short_name": "AI",
-      "description": "AI content tools",
-      "url": "/ai-hub",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "name": "AI Lab",
+      "short_name": "Code",
+      "description": "AI code workspace",
+      "url": "/workspace",
+      "icons": [{ "src": "/profithack-logo.png", "sizes": "192x192" }]
     },
     {
-      "name": "Inbox",
-      "short_name": "Messages",
-      "description": "Your messages",
-      "url": "/inbox",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Dating",
-      "short_name": "Date",
-      "description": "Find matches",
-      "url": "/dating",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "name": "Earnings",
+      "short_name": "Money",
+      "description": "Track your earnings",
+      "url": "/earnings",
+      "icons": [{ "src": "/profithack-logo.png", "sizes": "192x192" }]
     }
-  ],
-  "share_target": {
-    "action": "/share",
-    "method": "POST",
-    "enctype": "multipart/form-data",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url",
-      "files": [
-        {
-          "name": "media",
-          "accept": ["image/*", "video/*"]
-        }
-      ]
-    }
-  },
-  "launch_handler": {
-    "client_mode": "navigate-existing"
-  },
-  "handle_links": "preferred",
-  "edge_side_panel": {
-    "preferred_width": 400
-  }
+  ]
 }
