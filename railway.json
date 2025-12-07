@@ -5,13 +5,9 @@
   },
   "deploy": {
     "numReplicas": 1,
-    "startCommand": "npm start",
+    "startCommand": "node dist/index.js",
     "restartPolicyMaxRetries": 10,
     "healthcheckPath": "/healthz",
-    "healthcheckTimeout": 10
-  },
-  "variables": {
-    "NODE_ENV": "production",
-    "PORT": "3000"
+    "healthcheckTimeout": 30
   }
 }
