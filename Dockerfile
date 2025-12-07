@@ -1,4 +1,3 @@
-dockerfile
 # ============================================================================
 # PROFITHACK AI - Production Docker Build
 # Node 20 + Multi-stage build for optimal performance
