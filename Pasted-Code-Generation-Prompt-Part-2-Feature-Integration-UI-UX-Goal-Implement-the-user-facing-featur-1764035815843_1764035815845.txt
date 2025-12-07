@@ -1,0 +1,97 @@
+Code Generation Prompt - Part 2: Feature Integration & UI/UX
+
+Goal: Implement the user-facing features, video compatibility, and AI placeholders, building upon the architectural foundation created in Part 1.
+
+Prerequisite: Part 1 (Golang/gRPC & Data Pipeline Skeletons) must be successfully completed.
+
+1. Video Compatibility and Processing Skeleton
+
+Task: Ensure all videos are compatible and implement the decoupled video processing logic.
+
+Deliverables:
+
+1.
+Video Service Job:
+
+•
+Modify the existing BullMQ worker logic (e.g., in server/jobWorkers.ts) to include a new job type: PROCESS_VIDEO.
+
+•
+The PROCESS_VIDEO job handler should contain a placeholder function that calls an external FFmpeg command (e.g., via child_process.exec) to simulate transcoding and watermarking, ensuring all existing videos are processed for compatibility.
+
+
+
+2.
+S3 Upload Integration:
+
+•
+Modify the video upload route in server/routes.ts to immediately enqueue a PROCESS_VIDEO job to BullMQ after a successful S3 upload.
+
+
+
+2. Frontend UI/UX Implementation (100x Better Feel)
+
+Task: Implement the core mobile-style video feed and integrate the new feature placeholders.
+
+Deliverables:
+
+1.
+Full-Screen Video Feed Component:
+
+•
+Create a new React component: client/src/components/FullScreenVideoFeed.tsx.
+
+•
+This component must implement a basic vertical infinite scroll structure that mimics the TikTok feed.
+
+•
+It should use the TanStack Query hook to fetch video IDs from the new gRPC-connected API route (from Part 1).
+
+
+
+2.
+Minimalist UI Overlay:
+
+•
+Within FullScreenVideoFeed.tsx, create a minimalist UI overlay component for core interactions (Like, Comment, Share, Swipe-to-Match button).
+
+
+
+3.
+Feature Tab Integration:
+
+•
+Modify the main application layout (client/src/App.tsx or similar) to include a new tab/route for the "Creator Studio" which houses the existing Monaco Editor and xterm.js Terminal.
+
+
+
+3. Explainable AI (XAI) and Programmable Content Placeholders
+
+Task: Implement the user-facing placeholders for the advanced AI features.
+
+Deliverables:
+
+1.
+XAI Placeholder:
+
+•
+Add a small, clickable icon to the FullScreenVideoFeed.tsx overlay.
+
+•
+When clicked, this icon should display a simple modal or tooltip with the placeholder text: "Recommended because your preferred time-zone matches and you both follow 'Golang' content." This demonstrates the XAI concept for both the content and dating feeds.
+
+
+
+2.
+Programmable Content Hook:
+
+•
+In the "Creator Studio" tab, add a button labeled "Apply Script to Video".
+
+•
+The click handler for this button should call a new API route (e.g., /api/video/apply-script) that enqueues a new BullMQ job, demonstrating the Programmable Content feature.
+
+
+
+Constraint: All existing features (Monaco Editor, WebRTC, etc.) must remain functional and accessible through the new UI structure. The application must start without errors.
+

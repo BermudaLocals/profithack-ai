@@ -1,0 +1,223 @@
+1
+00:00:00,360 --> 00:00:01,140
+Hello there.
+
+2
+00:00:01,290 --> 00:00:08,400
+In this video, I will discuss about benefits and limitation of chat.
+
+3
+00:00:09,480 --> 00:00:11,280
+Now discuss about.
+
+4
+00:00:12,310 --> 00:00:14,500
+Benefit of chat, right?
+
+5
+00:00:15,760 --> 00:00:18,370
+Jeopardy is developed by openai.
+
+6
+00:00:18,400 --> 00:00:24,640
+We scan generate like human tests based on the input to recipes.
+
+7
+00:00:25,510 --> 00:00:32,380
+Some of the benefits of using Djibouti include natural language understanding.
+
+8
+00:00:33,870 --> 00:00:39,830
+Djibouti is strained on a large data set of human languages.
+
+9
+00:00:41,000 --> 00:00:50,720
+Making it capable of understanding natural language inputs and providing like human responses.
+
+10
+00:00:52,260 --> 00:00:53,100
+Automation.
+
+11
+00:00:54,620 --> 00:01:04,400
+Chad Djibouti allows marketers to automate repetitive tasks such as responding to frequently ask questions
+
+12
+00:01:04,400 --> 00:01:09,830
+or providing personalized recommendations to customers.
+
+13
+00:01:11,030 --> 00:01:11,990
+Versatility.
+
+14
+00:01:12,500 --> 00:01:20,960
+Chelsea Beauty can be used in a variety of application, including language, translation, text generation
+
+15
+00:01:20,960 --> 00:01:23,000
+and question answering.
+
+16
+00:01:24,410 --> 00:01:26,390
+Large data capacity.
+
+17
+00:01:28,440 --> 00:01:38,430
+Djibouti is trained on a large amount of data which allows it to have a vast knowledge and can answer
+
+18
+00:01:38,430 --> 00:01:41,160
+a variety of questions.
+
+19
+00:01:41,910 --> 00:01:42,990
+Cost effective.
+
+20
+00:01:44,400 --> 00:01:49,470
+Using DVT can be a cost effective solution for businesses.
+
+21
+00:01:49,950 --> 00:01:59,460
+Chad Djibouti can help marketers to save on labor cost and other expenses associated with managing customer
+
+22
+00:01:59,460 --> 00:02:00,660
+interactions.
+
+23
+00:02:01,470 --> 00:02:09,840
+This can help to improve the bottom line, making campaigns more profitable and sustainable.
+
+24
+00:02:09,900 --> 00:02:18,630
+According to Djibouti, can be integrated with different applications, platforms and services with
+
+25
+00:02:18,630 --> 00:02:19,710
+minimal.
+
+26
+00:02:20,780 --> 00:02:23,120
+Or no coding experience.
+
+27
+00:02:24,260 --> 00:02:32,240
+It can be used to build conversational AI, chat bot and other MPL applications.
+
+28
+00:02:32,810 --> 00:02:42,650
+High speed chat deputy can work quickly generating large amount of text in a short amount of time.
+
+29
+00:02:43,130 --> 00:02:53,060
+This can save time and increase efficiency or task such as data entry, content creation and customer
+
+30
+00:02:53,060 --> 00:02:53,960
+service.
+
+31
+00:02:54,320 --> 00:03:03,560
+Text generation chat activity can be used to generate a wide range of text, including article, blogpost,
+
+32
+00:03:03,560 --> 00:03:06,530
+product description and much more.
+
+33
+00:03:06,830 --> 00:03:16,220
+This can save time and effort for tasks such as content creation, copywriting and data entry, and
+
+34
+00:03:16,220 --> 00:03:20,420
+also last one flexibility.
+
+35
+00:03:21,110 --> 00:03:30,830
+Chat can be integrated into a range of marketing channels, including website, mobile apps and social
+
+36
+00:03:30,830 --> 00:03:32,270
+media platforms.
+
+37
+00:03:32,300 --> 00:03:41,960
+This allows marketers to connect with customers in the place where they are most likely to engage this,
+
+38
+00:03:41,960 --> 00:03:48,650
+providing a seamless and consistent experience across channels.
+
+39
+00:03:49,020 --> 00:03:57,620
+Chat activity is still in its early stages and is being updated and improved.
+
+40
+00:03:57,650 --> 00:04:07,220
+As a result, the accuracy, flexibility and other feature are expected to improve over time.
+
+41
+00:04:07,640 --> 00:04:11,420
+Now discuss about limitation of activity.
+
+42
+00:04:12,290 --> 00:04:13,610
+Look here please.
+
+43
+00:04:13,880 --> 00:04:24,500
+May occasionally generate incorrect information, may occasionally produce harmful instruction or based
+
+44
+00:04:24,500 --> 00:04:26,870
+content and also.
+
+45
+00:04:28,040 --> 00:04:31,820
+Limited knowledge of what and even after.
+
+46
+00:04:31,850 --> 00:04:44,420
+2021 Djibouti are not able to provide personal or emotional support or engages in depth conversations
+
+47
+00:04:44,420 --> 00:04:46,340
+about complex topics.
+
+48
+00:04:46,850 --> 00:04:55,340
+They are simply programmed to generate text based on pattern in the data they have been trained on.
+
+49
+00:04:55,700 --> 00:04:56,440
+Right.
+
+50
+00:04:57,050 --> 00:05:06,080
+Djibouti can generate incorrect response, confidently making it all the more difficult to trust.
+
+51
+00:05:06,680 --> 00:05:11,900
+For this reason, it is best used shadowed by a human.
+
+52
+00:05:12,080 --> 00:05:24,500
+So the most important risk, however, is that customer can mislead or even manipulate Djibouti to get
+
+53
+00:05:24,710 --> 00:05:33,140
+what they want, as I think it's the most important risk at the moment.
+
+54
+00:05:33,500 --> 00:05:40,760
+So I hope as soon as there was takeover in this hope, do you understand?
+
+55
+00:05:41,210 --> 00:05:45,290
+Benefit and limitation of chat GPT.
+
+56
+00:05:45,320 --> 00:05:47,390
+Thanks for watching this video.

@@ -1,0 +1,100 @@
+Code Generation Prompt - Part 1: Core Architectural Foundation
+
+Goal: Implement the foundational microservices and data pipeline skeletons necessary for the 100x better-than-TikTok architecture. This part focuses on the backend performance and concurrency upgrades.
+
+Assumptions: The existing project structure (client/, server/, shared/) and dependencies are in place as described in the original prompt.
+
+1. Golang Microservice and gRPC Implementation
+
+Task: Create the skeleton for the high-performance feed-service in Golang and integrate it with the existing Node.js backend via gRPC.
+
+Deliverables:
+
+1.
+Golang Service Skeleton:
+
+•
+Create a new directory: /feed-service/.
+
+•
+Create a main.go file with a basic gRPC server setup.
+
+•
+Create a feed.proto file defining a service with a single RPC method: GetFeed(FeedRequest) returns (FeedResponse).
+
+•
+The GetFeed method should return a hardcoded list of 5 video IDs.
+
+
+
+2.
+Node.js Integration:
+
+•
+Update the server/package.json to include necessary gRPC packages (@grpc/grpc-js, google-protobuf).
+
+•
+Create a new file: server/services/feedServiceClient.ts. This file should contain the TypeScript client code to connect to the Golang gRPC server.
+
+•
+Modify a simple, existing route in server/routes.ts (e.g., the main feed route) to call the new feedServiceClient.GetFeed() method and return the result.
+
+
+
+2. Data Pipeline and Polyglot Persistence Skeletons
+
+Task: Set up the skeletons for the real-time data pipeline (Kafka/Flink) and the NoSQL database integration.
+
+Deliverables:
+
+1.
+NoSQL Skeleton:
+
+•
+Create a new file: server/services/cassandraClient.ts. This file should contain a basic connection and query function placeholder for a Cassandra-like NoSQL database, demonstrating how to store a user's swipe history.
+
+
+
+2.
+Kafka/Flink Skeleton:
+
+•
+Create a new file: server/services/kafkaProducer.ts. This file should contain a basic function to produce a message to a placeholder Kafka topic (user_activity).
+
+•
+Modify the existing Node.js/Express code (e.g., in server/routes.ts or a middleware) to call kafkaProducer.produceMessage() whenever a user action (like, view, swipe) occurs.
+
+
+
+3.
+Redis Cluster Configuration:
+
+•
+Update the existing Redis configuration in server/index.ts to use a placeholder for a Redis Cluster connection string, ensuring the application is ready for a distributed cache environment.
+
+
+
+3. Production Readiness Skeletons
+
+Task: Implement basic observability and security placeholders.
+
+Deliverables:
+
+1.
+Observability:
+
+•
+Update server/index.ts to include basic Prometheus/Grafana compatible metrics instrumentation (e.g., a simple counter for total requests and a histogram for request duration).
+
+
+
+2.
+Security:
+
+•
+Create a placeholder file: server/config/mTLS.yaml with comments explaining the necessary configuration for enforcing Mutual TLS (mTLS) between microservices.
+
+
+
+Constraint: Do not modify the client/ directory in this part. Focus solely on the backend and service layer. The existing Node.js server must remain functional and start correctly.
+

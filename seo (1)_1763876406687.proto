@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package seo;
+
+option go_package = "./seo";
+
+// The SEO/ASO Submission Service definition.
+service SEOService {
+  // SubmitSitemap submits the sitemap to major search engines.
+  rpc SubmitSitemap (SitemapRequest) returns (SEOResponse);
+  // SubmitAppStoreMetadata submits app metadata to app stores.
+  rpc SubmitAppStoreMetadata (AppStoreRequest) returns (SEOResponse);
+}
+
+// Request message for sitemap submission.
+message SitemapRequest {
+  string sitemap_url = 1;
+  repeated string search_engines = 2; // e.g., "GOOGLE", "BING"
+}
+
+// Request message for app store metadata submission.
+message AppStoreRequest {
+  string app_id = 1;
+  string version = 2;
+  string description = 3;
+  repeated string keywords = 4;
+  string store = 5; // "APPLE", "GOOGLE"
+}
+
+// Response message for all SEO/ASO operations.
+message SEOResponse {
+  bool success = 1;
+  string message = 2;
+}

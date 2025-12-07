@@ -1,0 +1,90 @@
+Code Generation Prompt - Phase 1: Fix and Launch for Immediate Revenue
+
+Goal: Achieve immediate production readiness for the existing Node.js/PostgreSQL application (profithackai.com) to welcome real users today, stabilize the current 50,000+ user capacity, and begin collecting revenue. This is the Smart Hybrid Approach - Phase 1.
+
+Constraint: DO NOT implement any of the Golang, Kafka, or NoSQL architectural changes from the previous prompts. Focus only on the existing stack for maximum speed and stability.
+
+1. Immediate Deployment Fixes and Diagnostics
+
+Task: Implement the necessary code and configuration to diagnose and fix the current deployment issues.
+
+Deliverables:
+
+1.
+Domain Configuration Diagnostic:
+
+•
+Create a new file: server/diagnostics/domainCheck.ts. This file should contain a function that attempts to ping the expected external domain (profithackai.com - placeholder) and logs the result, indicating a successful connection or a configuration error.
+
+
+
+2.
+Health Check Endpoint:
+
+•
+Create a new, simple Express route: /healthz. This route must return a plain text 200 OK response with the text "OK" instantly, allowing external load balancers and monitoring systems to confirm the application is alive.
+
+
+
+3.
+Payment Processor Check:
+
+•
+Modify server/services/paymentGateway.ts to include a simple checkAllGateways() function that attempts a minimal connection test to all 7+ payment processors and logs the status of each.
+
+
+
+2. Stability and Performance Optimization (Node.js/PostgreSQL)
+
+Task: Implement quick, high-impact optimizations to ensure the existing stack is stable for the initial user load.
+
+Deliverables:
+
+1.
+Database Connection Pooling:
+
+•
+Review and optimize the PostgreSQL connection configuration (e.g., in server/db/connection.ts). Ensure a robust connection pool is configured with appropriate max connections and idleTimeoutMillis to prevent connection exhaustion under load.
+
+
+
+2.
+Slow Query Logging:
+
+•
+Implement a simple middleware in server/middleware/slowQueryLogger.ts that logs any database query taking longer than 500ms to the console, providing immediate visibility into performance bottlenecks.
+
+
+
+3.
+Gzip Compression:
+
+•
+Implement the compression middleware in the main Express application (server/index.ts) to enable Gzip compression for all outgoing responses, significantly reducing bandwidth and improving perceived load times for the frontend.
+
+
+
+3. Production Readiness and Monitoring
+
+Task: Implement the minimal monitoring required to safely welcome real users.
+
+Deliverables:
+
+1.
+Error Handler Enhancement:
+
+•
+Enhance the global error handler (server/middleware/errorHandler.ts) to log the full stack trace of all unhandled exceptions to a file (/var/log/profithack_errors.log), ensuring all critical errors are captured for post-mortem analysis.
+
+
+
+2.
+Frontend Caching Headers:
+
+•
+Modify the Express static file serving configuration (server/index.ts) to set appropriate Cache-Control headers (e.g., max-age=31536000) for all static assets (JS, CSS, images), ensuring users only download the application once.
+
+
+
+Final Action: After implementing the above changes, the Replit AI should provide the exact shell command needed to restart the application and confirm the /healthz endpoint is returning "OK".
+

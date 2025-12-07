@@ -1,0 +1,95 @@
+// backend_sfu_signaling.ts - Conceptual gRPC Service for SFU Signaling (Port 50053)
+
+// NOTE: This conceptual code assumes a high-performance SFU framework (e.g., Mediasoup) 
+// is running alongside this signaling service.
+
+import * as grpc from '@grpc/grpc-js';
+import { SignalingServiceService, ISignalingServiceServer } from './proto/signaling_grpc_pb';
+import { JoinRoomRequest, JoinRoomResponse, SignalRequest, SignalResponse } from './proto/signaling_pb';
+
+// Conceptual SFU Manager Interface
+interface SFUManager {
+    joinRoom(roomId: string, userId: string, isSpectator: boolean): Promise<string>; // Returns SFU connection token
+    handleSignal(roomId: string, userId: string, signal: string): Promise<string>; // Handles SDP/ICE exchange
+    getSpectatorStreamUrl(roomId: string): Promise<string>; // Returns HLS/DASH URL for spectators
+}
+
+// Placeholder for the actual SFU implementation
+const sfuManager: SFUManager = {
+    joinRoom: async (roomId, userId, isSpectator) => {
+        console.log(`User ${userId} joining room ${roomId}. Spectator: ${isSpectator}`);
+        // Logic to connect user to the SFU server
+        return `sfu-token-${userId}-${roomId}`;
+    },
+    handleSignal: async (roomId, userId, signal) => {
+        // Logic to pass the signal (SDP/ICE) to the SFU
+        return `sfu-response-for-${userId}`;
+    },
+    getSpectatorStreamUrl: async (roomId) => {
+        // Logic to check if the room is being transcoded and return the URL
+        return `https://cdn.profithack.ai/live/${roomId}/master.m3u8`; // HLS URL
+    }
+};
+
+// gRPC Server Implementation
+const signalingServer: ISignalingServiceServer = {
+    // Handles participants (up to 20) and spectators (unlimited)
+    joinRoom: async (call, callback) => {
+        const request = call.request as JoinRoomRequest;
+        const roomId = request.getRoomid();
+        const userId = request.getUserid();
+        const isSpectator = request.getIsspectator();
+
+        const response = new JoinRoomResponse();
+
+        if (isSpectator) {
+            // Spectators get the HLS/DASH URL
+            const streamUrl = await sfuManager.getSpectatorStreamUrl(roomId);
+            response.setStreamurl(streamUrl);
+            response.setIssfu(false);
+        } else {
+            // Participants get the SFU token and signaling is initiated
+            const sfuToken = await sfuManager.joinRoom(roomId, userId, false);
+            response.setSfutoken(sfuToken);
+            response.setIssfu(true);
+        }
+
+        callback(null, response);
+    },
+
+    // Handles the WebRTC signaling exchange (SDP/ICE) for participants
+    signal: async (call, callback) => {
+        const request = call.request as SignalRequest;
+        const roomId = request.getRoomid();
+        const userId = request.getUserid();
+        const signal = request.getSignal();
+
+        const sfuResponse = await sfuManager.handleSignal(roomId, userId, signal);
+        
+        const response = new SignalResponse();
+        response.setSignal(sfuResponse);
+        callback(null, response);
+    },
+    
+    // ... other methods like leaveRoom, kickUser, etc.
+};
+
+// Conceptual Server Start
+function startServer() {
+    const server = new grpc.Server();
+    server.addService(SignalingServiceService, signalingServer);
+    server.bindAsync(
+        '0.0.0.0:50053',
+        grpc.ServerCredentials.createInsecure(),
+        (err, port) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            console.log(`gRPC Signaling server listening on port ${port}`);
+            server.start();
+        }
+    );
+}
+
+// startServer();

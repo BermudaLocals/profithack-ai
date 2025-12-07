@@ -1,0 +1,72 @@
+// backend_payment_enforcement.ts - Conceptual gRPC Service for Payment Enforcement
+
+// This code represents the new method added to the Messaging/RTC Service (Port 50053)
+// and the logic within the Monetization Service (Port 50054).
+
+// --- Part 1: Monetization Service (Port 50054) Logic ---
+
+// Conceptual gRPC client for the Messaging/RTC Service (Port 50053)
+const rtcServiceClient = {
+    // New gRPC method to be called by the Monetization Service
+    terminateUserStream: async (roomId: string, userId: string, reason: string) => {
+        console.log(`MONETIZATION: Sending termination signal for user ${userId} in room ${roomId}. Reason: ${reason}`);
+        // Actual gRPC call implementation here
+        // await rtcServiceClient.TerminateUserStream({ roomId, userId, reason });
+    }
+};
+
+/**
+ * Logic run by the Monetization Service when a payment fails or time expires.
+ */
+export async function handlePaymentFailure(roomId: string, userId: string, reason: 'PAYMENT_FAILED' | 'TIME_EXPIRED'): Promise<void> {
+    // 1. Log the event
+    console.warn(`Payment failure detected for user ${userId} in room ${roomId}. Initiating stream termination.`);
+
+    // 2. Update the database (e.g., set call status to terminated)
+    // await db.update(privateCalls).set({ status: 'TERMINATED' }).where(eq(privateCalls.roomId, roomId));
+
+    // 3. Send the termination command to the Messaging/RTC Service
+    await rtcServiceClient.terminateUserStream(roomId, userId, reason);
+}
+
+
+// --- Part 2: Messaging/RTC Service (Port 50053) Logic ---
+
+// Conceptual implementation of the new gRPC method on the RTC server
+const rtcServerImplementation = {
+    // New gRPC method
+    TerminateUserStream: async (call: any, callback: any) => {
+        const { roomId, userId, reason } = call.request;
+
+        // 1. Find the user's connection in the SFU/Signaling layer
+        const userConnection = findUserConnection(roomId, userId);
+
+        if (userConnection) {
+            // 2. Send a specific, non-WebRTC termination signal to the client
+            const terminationSignal = {
+                type: 'TERMINATE_CALL',
+                reason: reason,
+                redirectUrl: '/models' // The "all models landing page"
+            };
+            
+            // Send the signal over the existing WebSocket/Signaling channel
+            userConnection.send(JSON.stringify(terminationSignal));
+            
+            // 3. Server-side cleanup (optional, but recommended)
+            // Close the user's WebRTC connection on the SFU side
+            // sfuManager.kickUser(roomId, userId); 
+            
+            console.log(`RTC: Sent termination signal to client ${userId}.`);
+            callback(null, { success: true });
+        } else {
+            console.warn(`RTC: Could not find active connection for user ${userId}.`);
+            callback(null, { success: false, message: "Connection not found" });
+        }
+    }
+};
+
+// Placeholder for finding the user's active signaling connection
+function findUserConnection(roomId: string, userId: string): any {
+    // In a real system, this would look up the user's WebSocket or gRPC stream connection
+    return { send: (data: string) => console.log(`Simulating send to client ${userId}: ${data}`) };
+}

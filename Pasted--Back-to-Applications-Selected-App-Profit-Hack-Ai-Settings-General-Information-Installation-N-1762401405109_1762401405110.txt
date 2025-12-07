@@ -1,0 +1,86 @@
+
+Back to Applications
+Selected App
+Profit Hack Ai
+Settings
+General Information
+Installation
+New
+OAuth2
+Bot
+Emojis
+New
+Webhooks
+New
+Rich Presence
+App Testers
+App Verification
+Discord Social SDK
+New
+Getting Started
+Activities
+Settings
+URL Mappings
+Custom Links
+Art Assets
+Monetization
+Getting Started
+General Information
+What should we call your creation? What amazing things does it do? What icon should represent it across Discord? Tell us here!
+
+Validation errors:
+interactions_endpoint_url: The specified interactions endpoint url could not be verified.
+App Icon
+
+
+No file chosen
+Dimensions: 1024x1024
+Aspect Ratio: 1:1
+File Types: PNG, GIF, JPG, WEBP
+Max Size: 10MB
+Name
+Profit Hack Ai
+Description (maximum 400 characters)
+Your description will appear in the About Me section of your bot's profile.
+💡 ProfitHack AI automates your content, marketing, and money flow — built for creators and entrepreneurs who want to grow 10x faster with smart AI systems. Create, post, and profit with one bot.
+Tags (maximum 5)
+Add up to 5 tags to describe the content and functionality of your application.
+ai
+Automation
+CreatorTools
+Business
+Productivity
+Application ID
+1435828873479585906
+
+Copy
+Public Key
+3f179d56e5fb84d1899717c8881bd2bcbe2800f23749d6b73db6e2759b94d823
+
+Copy
+Install Count
+This is an approximated number of servers and users that have installed your application. These numbers are updated daily.
+0 Servers
+0 Individual Users
+Authorization Count
+This is an approximated number of users that have OAuth2 authorizations for your application. This number is updated daily.
+0 Individual Users
+Interactions Endpoint URL
+You can optionally configure an interactions endpoint to receive interactions via HTTP POSTs rather than over Gateway with a bot user.
+https://www.profithackai.com/api/interactions
+Linked Roles Verification URL
+You can configure a verification URL to enable your application as a requirement in a server role's Links settings
+https://profithackai.com/verify-user
+Terms of Service URL
+A link to your application's Terms of Service
+https://www.profithackai.com/terms-of-service
+Privacy Policy URL
+A link to your application's Privacy Policy
+ https://profithackai.com/privacy-policy
+
+Delete App
+Careful — you have unsaved changes!
+
+Reset
+
+Save Changes

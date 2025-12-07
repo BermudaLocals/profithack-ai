@@ -1,0 +1,61 @@
+CRITICAL FIX: Temporarily Disabling Redis Caching
+
+The platform is currently failing due to the Upstash Redis free tier limit being exceeded. The fastest, lowest-risk solution is to temporarily disable Redis caching and rely on the PostgreSQL-based job queue and database for all operations.
+
+This fix requires setting a single environment variable and restarting the affected services.
+
+1. Environment Variable Update
+
+In your deployment environment (e.g., .env file, Kubernetes config, or deployment dashboard), set the following variable:
+
+Bash
+
+
+# .env file or deployment configuration
+DISABLE_REDIS_CACHE=true
+
+
+2. Conceptual Code Change (server/config.ts)
+
+Your application's configuration file (server/config.ts or similar) should read this variable and conditionally disable the Redis client initialization.
+
+TypeScript
+
+
+// server/config.ts (Conceptual Snippet)
+
+const config = {
+    // ... other settings
+    redis: {
+        host: process.env.REDIS_HOST || 'redis://localhost:6379',
+        port: process.env.REDIS_PORT || 6379,
+        // CRITICAL FIX: Check for the new environment variable
+        enabled: process.env.DISABLE_REDIS_CACHE !== 'true', 
+        maxRequests: 500000, // Still tracks the limit
+    },
+    // ...
+};
+
+// server/cache.service.ts (Conceptual Snippet)
+
+// Only initialize the Redis client if it is enabled in the config
+if (config.redis.enabled) {
+    // Initialize Redis client
+    // ...
+} else {
+    // Fallback to in-memory or no-op cache service
+    console.warn("⚠️ CRITICAL: Redis caching is temporarily disabled. Falling back to PostgreSQL/in-memory cache.");
+    // Cache operations will now return null or write to a no-op store.
+}
+
+
+3. Action Required
+
+1.
+Set the DISABLE_REDIS_CACHE=true environment variable in your production environment.
+
+2.
+Restart all microservices that rely on the Redis connection (likely all 11 gRPC services).
+
+The platform will now function without the Redis dependency, resolving the critical error. You can later remove the environment variable and restart the services once you have upgraded your Upstash plan.
+

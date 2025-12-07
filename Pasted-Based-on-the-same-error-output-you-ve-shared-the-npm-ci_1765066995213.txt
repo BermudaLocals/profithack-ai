@@ -1,0 +1,39 @@
+Based on the same error output you've shared, the `npm ci` command failed again. The previous solution likely did not work because it only addressed one of several underlying problems. The Docker build is failing due to a combination of three main issues, as shown in the table below.
+
+| Root Cause | Manifested Error | Primary Solution |
+| :--- | :--- | :--- |
+| **Node.js Version Mismatch** | `Unsupported engine` warnings for `mediasoup`, `awaitqueue`, etc. | **Upgrade your base Docker image to Node.js 20+** (required by these packages). |
+| **Missing System Dependency** | `tar (child): bzip2: Cannot exec: No such file or directory` | Install the `bzip2` package in your Docker image before `npm ci`. |
+| **Deprecated npm Syntax** | `npm warn config production Use '--omit=dev' instead` | Update the command from `npm ci --production` to `npm ci --omit=dev` . |
+
+### ⚙️ How to Fix Your Dockerfile
+You must address **all of the above issues**. Here is the corrected configuration for the key phases of your Dockerfile:
+
+1.  **Update the Base Image and Install System Dependencies**: This is non-negotiable. The packages `mediasoup@3.19.3` and others explicitly require Node.js 20 or later .
+    ```dockerfile
+    FROM node:20-alpine AS stage-0  # Changed from node:18
+    RUN apk add --no-cache bzip2  # Installs missing dependency for phantomjs
+    WORKDIR /app
+    ```
+
+2.  **Use the Correct npm Command**: If you intend to skip devDependencies, use the modern syntax.
+    ```dockerfile
+    COPY package*.json ./
+    RUN npm ci --omit=dev  # Use '--omit=dev' instead of '--production'
+    ```
+
+### 📌 Notes on Warnings and Nixpacks
+The other warnings about deprecated packages (like `rimraf@2.7.1`, `uuid@3.4.0`, `phantomjs-prebuilt`) are from your project's dependencies. While they don't cause the immediate build failure, you should update these dependencies in your `package.json` for security and performance.
+
+The command `npm config set ignore-engines true` is **not recommended**, as it could allow incompatible code to run, leading to runtime crashes.
+
+Since your log shows `NIXPACKS_PATH`, if you are using Nixpacks for builds, you can set the environment variable `NPM_CONFIG_PRODUCTION=true` as a workaround for the warning .
+
+### 🔍 Final Recommended Step
+If your build continues to fail after these changes, the next most likely cause is a corrupted or out-of-sync `package-lock.json` file .
+
+1.  On your local machine (outside Docker), delete your `node_modules` folder and `package-lock.json` file.
+2.  Run `npm install` to generate a fresh, consistent lock file.
+3.  Commit the new `package-lock.json` and rebuild your Docker image.
+
+If you try these steps and the problem persists, please share the specific error from the new Docker build logs, and I can help you analyze the next issue.

@@ -1,0 +1,670 @@
+[Coframe] Replit Enterprise watcher loaded
+183The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.Understand this error
+183The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?Understand this error
+183The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.Understand this error
+stallwart.build.js:1 stallwart: failed ping 1
+stallwart.build.js:1 stallwart: failed ping 2
+Profit-Hack-Ai:1 The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.Understand this error
+Profit-Hack-Ai:1 The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?Understand this error
+Profit-Hack-Ai:1 The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.Understand this error
+a0df91602a414c03.js:2 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+a0df91602a414c03.js:2 Download the Apollo DevTools for a better development experience: https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm
+a0df91602a414c03.js:2 [LaunchDarkly] LaunchDarkly client initialized
+stallwart.build.js:1 stallwart: failed ping 1
+a0df91602a414c03.js:2 Cache data may be lost when replacing the dealContext field of a Org object.
+
+This could cause additional (usually avoidable) network requests to fetch data that were otherwise cached.
+
+To address this problem (which is not a bug in Apollo Client), either ensure all objects of type OrgDealContext have an ID or a custom merge function, or define a custom merge function for the Org.dealContext field, so InMemoryCache can safely merge these objects:
+
+  existing: {"__typename":"OrgDealContext","dealType":"default","salesContactEmail":null}
+  incoming: {"__typename":"OrgDealContext","dealType":"default"}
+
+For more information about these options, please refer to the documentation:
+
+  * Ensuring entity objects have IDs: https://go.apollo.dev/c/generating-unique-identifiers
+  * Defining custom merge functions: https://go.apollo.dev/c/merging-non-normalized-objects
+
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+stallwart.build.js:1 stallwart: failed ping 1
+108Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.Understand this error
+ed1e693c96a75807.js:2 Unrecognized feature: 'ambient-light-sensor'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'battery'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'execution-while-not-rendered'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'execution-while-out-of-viewport'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'layout-animations'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'legacy-image-formats'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'navigation-override'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'oversized-images'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'publickey-credentials'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'speaker-selection'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'unoptimized-images'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'unsized-media'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Unrecognized feature: 'pointer-lock'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Allow attribute will take precedence over 'allowfullscreen'.
+z @ ed1e693c96a75807.js:2Understand this warning
+ed1e693c96a75807.js:2 Allow attribute will take precedence over 'allowpaymentrequest'.
+z @ ed1e693c96a75807.js:2Understand this warning
+stallwart.build.js:1 stallwart: failed ping 1
+Profit-Hack-Ai:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+3stallwart.build.js:1 stallwart: failed ping 1
+stallwart.build.js:1 stallwart: failed ping 2
+stallwart.build.js:1 stallwart: failed ping 3
+stallwart.build.js:1 stallwart: failed ping 4
+stallwart.build.js:1 stallwart: failed ping 5
+stallwart.build.js:1 stallwart: session stalled
+a0df91602a414c03.js:2 task queue exceeded allotted deadline by 148ms
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+a0df91602a414c03.js:2 Cache data may be lost when replacing the hostingBuildDeployActionUpdates field of a Subscription object.
+
+This could cause additional (usually avoidable) network requests to fetch data that were otherwise cached.
+
+To address this problem (which is not a bug in Apollo Client), either ensure all objects of type HostingBuildDeployLogAction and HostingBuildDeployStatusAction have an ID or a custom merge function, or define a custom merge function for the Subscription.hostingBuildDeployActionUpdates field, so InMemoryCache can safely merge these objects:
+
+  existing: {"__typename":"HostingBuildDeployLogAction","log":"\r\u001b[38;2;169;169;169m2025-11-22T17:59:06Z\u001b[37m \u001b[32minfo\u001b[37m: Builder connected\r\n"}
+  incoming: {"__typename":"HostingBuildDeployStatusAction","status":"building","message":null,"debugSummary":null}
+
+For more information about these options, please refer to the documentation:
+
+  * Ensuring entity objects have IDs: https://go.apollo.dev/c/generating-unique-identifiers
+  * Defining custom merge functions: https://go.apollo.dev/c/merging-non-normalized-objects
+
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+a0df91602a414c03.js:2 [Coframe] Mutation callback infinite loop protection triggered, disconnecting mutation observer Object
+(anonymous) @ a0df91602a414c03.js:2Understand this error
+a0df91602a414c03.js:2 Cache data may be lost when replacing the usageBasedBillingAlertNotifications field of a Subscription object.
+
+This could cause additional (usually avoidable) network requests to fetch data that were otherwise cached.
+
+To address this problem (which is not a bug in Apollo Client), define a custom merge function for the Subscription.usageBasedBillingAlertNotifications field, so InMemoryCache can safely merge these objects:
+
+  existing: [{"__ref":"UsageBasedBillingAlertNotification:541027"}]
+  incoming: []
+
+For more information about these options, please refer to the documentation:
+
+  * Ensuring entity objects have IDs: https://go.apollo.dev/c/generating-unique-identifiers
+  * Defining custom merge functions: https://go.apollo.dev/c/merging-non-normalized-objects
+
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+a0df91602a414c03.js:2 task queue exceeded allotted deadline by 306ms
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+2cc941ff5798b3292.js:2 Uncaught (in promise) Error: Failed to check for database diff: Too many connections attemptsUnderstand this error
+a0df91602a414c03.js:2 WARN: A component changed from uncontrolled to controlled.
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+48f324d39e922734.js:2 WebSocket connection to 'wss://eval.picard.platform.replit.com/wsv2/v2.public.Q2dZSXBhcUl5UVlTQmdqRXhvakpCaUlHY0dsallYSmtNQUE2bXdJS0pERTNPRGRsTnpabUxURmpZbU10TkRZek5TMDVaREZoTFdZMVpXVXdNR05tWldNek1CSURibWw0R2hoeVpYQnNhWFF0Y21Wd2JDMW1hV3hsY3kxd2FXTmhjbVFpRGxCeWIyWnBkQzFJWVdOckxVRnBLZzloYVhCeWIyWnBkR0Z0Y0d4cFptbENWQW9aY21Wd2JHbDBMWEpsY0d3dFlteHZZMnR6TFhCcFkyRnlaQklYY21Wd2JHbDBMWEpsY0d3dGJXVjBZUzF3YVdOaGNtUWFIbkpsY0d4cGRDMXRZWEpuWVhKcGJtVXRZbXh2WTJ0ekxYQnBZMkZ5WkVvSENOSHl2aFlRQVZBQVdnOXBiblJsYm5SZlluVnphVzVsYzNOYUZHOXVZbTloY21ScGJtZG...Q2RtaGtja3BYYldoVGJWTjJKVEpDWmxReWFHbEVjVU5JZGxRMlZFTm9jRFExVUd0aVVUaE1hMlppY2xBMFNVTktZemRGV2tvNU5EWnVNWEJxUzBKT1RFcFJlRTVGTjJvNE5HVlRSRmw2ZG5wamIycHlWVU5QUzJKRU9VZHlORWh3ZWxkeGFqVnZNbkJTY0NVeVJucE5iSGN5YVVkRmJsTlJjVWdsTWtKSk9GUnVXVGxaVkRWT1ZtaHdUVzA1YnpJM2QyaHBXWHBKYUZkTlQySktXV3BuZFRoelFtMDVVRkI1VkhCR1pHOGxNa0pFTVhOaFFXOVVhMVpwTlhkVVEweHpaRlp2U0c0MVZFeDJUblZ6YW1adVFTVXpSQ1V6UkE9PSgHIiB5sGfQLA2mNHOOHuhb0-QKsaTVXGBuEnJPgiOoo5_2nECkn8iOXHEVNG66X80c3zMdnvFW9M19jUtpiwg.Q2dad2NtOWtPak1pQ25KbGNHeHBkQzVqYjIwPQ' failed: 
+(anonymous) @ 48f324d39e922734.js:2Understand this error
+48f324d39e922734.js:2 WebSocket connection to 'wss://eval.picard.platform.replit.com/wsv2/v2.public.Q2dZSXBhcUl5UVlTQmdqRXhvakpCaUlHY0dsallYSmtNQUE2bXdJS0pERTNPRGRsTnpabUxURmpZbU10TkRZek5TMDVaREZoTFdZMVpXVXdNR05tWldNek1CSURibWw0R2hoeVpYQnNhWFF0Y21Wd2JDMW1hV3hsY3kxd2FXTmhjbVFpRGxCeWIyWnBkQzFJWVdOckxVRnBLZzloYVhCeWIyWnBkR0Z0Y0d4cFptbENWQW9aY21Wd2JHbDBMWEpsY0d3dFlteHZZMnR6TFhCcFkyRnlaQklYY21Wd2JHbDBMWEpsY0d3dGJXVjBZUzF3YVdOaGNtUWFIbkpsY0d4cGRDMXRZWEpuWVhKcGJtVXRZbXh2WTJ0ekxYQnBZMkZ5WkVvSENOSHl2aFlRQVZBQVdnOXBiblJsYm5SZlluVnphVzVsYzNOYUZHOXVZbTloY21ScGJtZG...Q2RtaGtja3BYYldoVGJWTjJKVEpDWmxReWFHbEVjVU5JZGxRMlZFTm9jRFExVUd0aVVUaE1hMlppY2xBMFNVTktZemRGV2tvNU5EWnVNWEJxUzBKT1RFcFJlRTVGTjJvNE5HVlRSRmw2ZG5wamIycHlWVU5QUzJKRU9VZHlORWh3ZWxkeGFqVnZNbkJTY0NVeVJucE5iSGN5YVVkRmJsTlJjVWdsTWtKSk9GUnVXVGxaVkRWT1ZtaHdUVzA1YnpJM2QyaHBXWHBKYUZkTlQySktXV3BuZFRoelFtMDVVRkI1VkhCR1pHOGxNa0pFTVhOaFFXOVVhMVpwTlhkVVEweHpaRlp2U0c0MVZFeDJUblZ6YW1adVFTVXpSQ1V6UkE9PSgHIiB5sGfQLA2mNHOOHuhb0-QKsaTVXGBuEnJPgiOoo5_2nECkn8iOXHEVNG66X80c3zMdnvFW9M19jUtpiwg.Q2dad2NtOWtPak1pQ25KbGNHeHBkQzVqYjIwPQ' failed: WebSocket is closed before the connection is established.
+cleanupSocket @ 48f324d39e922734.js:2Understand this warning
+a0df91602a414c03.js:2 task queue exceeded allotted deadline by 74ms
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://profithachai.co&size=32:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://profithachai.co/&size=32:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://profithachai.com&size=32:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://profithachai.com/&size=32:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+16a0df91602a414c03.js:2 If you do not provide children, you must specify an aria-label for accessibility
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+a0df91602a414c03.js:2 Cache data may be lost when replacing the domains field of a Repl object.
+
+This could cause additional (usually avoidable) network requests to fetch data that were otherwise cached.
+
+To address this problem (which is not a bug in Apollo Client), define a custom merge function for the Repl.domains field, so InMemoryCache can safely merge these objects:
+
+  existing: [{"__ref":"Domain:655566"}]
+  incoming: []
+
+For more information about these options, please refer to the documentation:
+
+  * Ensuring entity objects have IDs: https://go.apollo.dev/c/generating-unique-identifiers
+  * Defining custom merge functions: https://go.apollo.dev/c/merging-non-normalized-objects
+
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+attached_assets/logo6_1763870238610.png:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://profithackai.co/&size=32:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://profithackai.co&size=32:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+a0df91602a414c03.js:2 task queue exceeded allotted deadline by 1540ms
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+a0df91602a414c03.js:2 task queue exceeded allotted deadline by 79ms
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+a0df91602a414c03.js:2 task queue exceeded allotted deadline by 143ms
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+a0df91602a414c03.js:2 task queue exceeded allotted deadline by 23ms
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+a0df91602a414c03.js:2 task queue exceeded allotted deadline by 149ms
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+a0df91602a414c03.js:2 task queue exceeded allotted deadline by 479ms
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+/graphql:1  Failed to load resource: net::ERR_CONNECTION_CLOSEDUnderstand this error
+a0df91602a414c03.js:2 Unknown query {
+  "kind": "Document",
+  "definitions": [
+    {
+      "kind": "OperationDefinition",
+      "operation": "query",
+      "name": {
+        "kind": "Name",
+        "value": "OrgUsagePeriodInformation"
+      },
+      "variableDefinitions": [
+        {
+          "kind": "VariableDefinition",
+          "variable": {
+            "kind": "Variable",
+            "name": {
+              "kind": "Name",
+              "value": "orgId"
+            }
+          },
+          "type": {
+            "kind": "NonNullType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          "directives": []
+        }
+      ],
+      "directives": [],
+      "selectionSet": {
+        "kind": "SelectionSet",
+        "selections": [
+          {
+            "kind": "Field",
+            "name": {
+              "kind": "Name",
+              "value": "currentUser"
+            },
+            "arguments": [],
+            "directives": [],
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "kind": "Field",
+                  "name": {
+                    "kind": "Name",
+                    "value": "id"
+                  },
+                  "arguments": [],
+                  "directives": []
+                },
+                {
+                  "kind": "Field",
+                  "name": {
+                    "kind": "Name",
+                    "value": "org"
+                  },
+                  "arguments": [
+                    {
+                      "kind": "Argument",
+                      "name": {
+                        "kind": "Name",
+                        "value": "orgId"
+                      },
+                      "value": {
+                        "kind": "Variable",
+                        "name": {
+                          "kind": "Name",
+                          "value": "orgId"
+                        }
+                      }
+                    }
+                  ],
+                  "directives": [],
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "kind": "Field",
+                        "name": {
+                          "kind": "Name",
+                          "value": "__typename"
+                        },
+                        "arguments": [],
+                        "directives": []
+                      },
+                      {
+                        "kind": "InlineFragment",
+                        "typeCondition": {
+                          "kind": "NamedType",
+                          "name": {
+                            "kind": "Name",
+                            "value": "Org"
+                          }
+                        },
+                        "directives": [],
+                        "selectionSet": {
+                          "kind": "SelectionSet",
+                          "selections": [
+                            {
+                              "kind": "Field",
+                              "name": {
+                                "kind": "Name",
+                                "value": "id"
+                              },
+                              "arguments": [],
+                              "directives": []
+                            },
+                            {
+                              "kind": "FragmentSpread",
+                              "name": {
+                                "kind": "Name",
+                                "value": "TotalUsageOrg"
+                              },
+                              "directives": []
+                            },
+                            {
+                              "kind": "Field",
+                              "name": {
+                                "kind": "Name",
+                                "value": "usageInterval"
+                              },
+                              "arguments": [],
+                              "directives": [],
+                              "selectionSet": {
+                                "kind": "SelectionSet",
+                                "selections": [
+                                  {
+                                    "kind": "InlineFragment",
+                                    "typeCondition": {
+                                      "kind": "NamedType",
+                                      "name": {
+                                        "kind": "Name",
+                                        "value": "UsageInterval"
+                                      }
+                                    },
+                                    "directives": [],
+                                    "selectionSet": {
+                                      "kind": "SelectionSet",
+                                      "s
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+/graphql:1  Failed to load resource: net::ERR_CONNECTION_CLOSEDUnderstand this error
+/graphql:1  Failed to load resource: net::ERR_CONNECTION_CLOSEDUnderstand this error
+attached_assets/logo2_1763894382460.png:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+attached_assets/logo3_1763894382462.png:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+attached_assets/logo%208_1763894382458.png:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+a0df91602a414c03.js:2 Unknown query {
+  "kind": "Document",
+  "definitions": [
+    {
+      "kind": "OperationDefinition",
+      "operation": "query",
+      "name": {
+        "kind": "Name",
+        "value": "OrgUsagePeriodInformation"
+      },
+      "variableDefinitions": [
+        {
+          "kind": "VariableDefinition",
+          "variable": {
+            "kind": "Variable",
+            "name": {
+              "kind": "Name",
+              "value": "orgId"
+            }
+          },
+          "type": {
+            "kind": "NonNullType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          "directives": []
+        }
+      ],
+      "directives": [],
+      "selectionSet": {
+        "kind": "SelectionSet",
+        "selections": [
+          {
+            "kind": "Field",
+            "name": {
+              "kind": "Name",
+              "value": "currentUser"
+            },
+            "arguments": [],
+            "directives": [],
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "kind": "Field",
+                  "name": {
+                    "kind": "Name",
+                    "value": "id"
+                  },
+                  "arguments": [],
+                  "directives": []
+                },
+                {
+                  "kind": "Field",
+                  "name": {
+                    "kind": "Name",
+                    "value": "org"
+                  },
+                  "arguments": [
+                    {
+                      "kind": "Argument",
+                      "name": {
+                        "kind": "Name",
+                        "value": "orgId"
+                      },
+                      "value": {
+                        "kind": "Variable",
+                        "name": {
+                          "kind": "Name",
+                          "value": "orgId"
+                        }
+                      }
+                    }
+                  ],
+                  "directives": [],
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "kind": "Field",
+                        "name": {
+                          "kind": "Name",
+                          "value": "__typename"
+                        },
+                        "arguments": [],
+                        "directives": []
+                      },
+                      {
+                        "kind": "InlineFragment",
+                        "typeCondition": {
+                          "kind": "NamedType",
+                          "name": {
+                            "kind": "Name",
+                            "value": "Org"
+                          }
+                        },
+                        "directives": [],
+                        "selectionSet": {
+                          "kind": "SelectionSet",
+                          "selections": [
+                            {
+                              "kind": "Field",
+                              "name": {
+                                "kind": "Name",
+                                "value": "id"
+                              },
+                              "arguments": [],
+                              "directives": []
+                            },
+                            {
+                              "kind": "FragmentSpread",
+                              "name": {
+                                "kind": "Name",
+                                "value": "TotalUsageOrg"
+                              },
+                              "directives": []
+                            },
+                            {
+                              "kind": "Field",
+                              "name": {
+                                "kind": "Name",
+                                "value": "usageInterval"
+                              },
+                              "arguments": [],
+                              "directives": [],
+                              "selectionSet": {
+                                "kind": "SelectionSet",
+                                "selections": [
+                                  {
+                                    "kind": "InlineFragment",
+                                    "typeCondition": {
+                                      "kind": "NamedType",
+                                      "name": {
+                                        "kind": "Name",
+                                        "value": "UsageInterval"
+                                      }
+                                    },
+                                    "directives": [],
+                                    "selectionSet": {
+                                      "kind": "SelectionSet",
+                                      "s
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+a0df91602a414c03.js:2 Cache data may be lost when replacing the orgReplPresenceSessionEvents field of a Subscription object.
+
+This could cause additional (usually avoidable) network requests to fetch data that were otherwise cached.
+
+To address this problem (which is not a bug in Apollo Client), either ensure all objects of type OrgPresenceSessionInitEvent and OrgPresenceSessionLeaveEvent have an ID or a custom merge function, or define a custom merge function for the Subscription.orgReplPresenceSessionEvents field, so InMemoryCache can safely merge these objects:
+
+  existing: {"__typename":"OrgPresenceSessionInitEvent","sessions":[{"__ref":"OrgPresenceSession:5483e1c7-3989-4562-86ce-a9a30eff0f6e"}]}
+  incoming: {"__typename":"OrgPresenceSessionLeaveEvent","sessionId":"5483e1c7-3989-4562-86ce-a9a30eff0f6e"}
+
+For more information about these options, please refer to the documentation:
+
+  * Ensuring entity objects have IDs: https://go.apollo.dev/c/generating-unique-identifiers
+  * Defining custom merge functions: https://go.apollo.dev/c/merging-non-normalized-objects
+
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+attached_assets/logo2_1763894382460.png:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+attached_assets/logo3_1763894382462.png:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+cc941ff5798b3292.js:2 Uncaught (in promise) Error: Failed to check for database diff: Too many connections attemptsUnderstand this error
+a0df91602a414c03.js:2 task queue exceeded allotted deadline by 149ms
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+2a0df91602a414c03.js:2 Unknown query {
+  "kind": "Document",
+  "definitions": [
+    {
+      "kind": "OperationDefinition",
+      "operation": "query",
+      "name": {
+        "kind": "Name",
+        "value": "OrgUsagePeriodInformation"
+      },
+      "variableDefinitions": [
+        {
+          "kind": "VariableDefinition",
+          "variable": {
+            "kind": "Variable",
+            "name": {
+              "kind": "Name",
+              "value": "orgId"
+            }
+          },
+          "type": {
+            "kind": "NonNullType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          "directives": []
+        }
+      ],
+      "directives": [],
+      "selectionSet": {
+        "kind": "SelectionSet",
+        "selections": [
+          {
+            "kind": "Field",
+            "name": {
+              "kind": "Name",
+              "value": "currentUser"
+            },
+            "arguments": [],
+            "directives": [],
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "kind": "Field",
+                  "name": {
+                    "kind": "Name",
+                    "value": "id"
+                  },
+                  "arguments": [],
+                  "directives": []
+                },
+                {
+                  "kind": "Field",
+                  "name": {
+                    "kind": "Name",
+                    "value": "org"
+                  },
+                  "arguments": [
+                    {
+                      "kind": "Argument",
+                      "name": {
+                        "kind": "Name",
+                        "value": "orgId"
+                      },
+                      "value": {
+                        "kind": "Variable",
+                        "name": {
+                          "kind": "Name",
+                          "value": "orgId"
+                        }
+                      }
+                    }
+                  ],
+                  "directives": [],
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "kind": "Field",
+                        "name": {
+                          "kind": "Name",
+                          "value": "__typename"
+                        },
+                        "arguments": [],
+                        "directives": []
+                      },
+                      {
+                        "kind": "InlineFragment",
+                        "typeCondition": {
+                          "kind": "NamedType",
+                          "name": {
+                            "kind": "Name",
+                            "value": "Org"
+                          }
+                        },
+                        "directives": [],
+                        "selectionSet": {
+                          "kind": "SelectionSet",
+                          "selections": [
+                            {
+                              "kind": "Field",
+                              "name": {
+                                "kind": "Name",
+                                "value": "id"
+                              },
+                              "arguments": [],
+                              "directives": []
+                            },
+                            {
+                              "kind": "FragmentSpread",
+                              "name": {
+                                "kind": "Name",
+                                "value": "TotalUsageOrg"
+                              },
+                              "directives": []
+                            },
+                            {
+                              "kind": "Field",
+                              "name": {
+                                "kind": "Name",
+                                "value": "usageInterval"
+                              },
+                              "arguments": [],
+                              "directives": [],
+                              "selectionSet": {
+                                "kind": "SelectionSet",
+                                "selections": [
+                                  {
+                                    "kind": "InlineFragment",
+                                    "typeCondition": {
+                                      "kind": "NamedType",
+                                      "name": {
+                                        "kind": "Name",
+                                        "value": "UsageInterval"
+                                      }
+                                    },
+                                    "directives": [],
+                                    "selectionSet": {
+                                      "kind": "SelectionSet",
+                                      "s
+(anonymous) @ a0df91602a414c03.js:2Understand this warning
+/data/repls/1787e76f-1cbc-4635-9d1a-f5ee00cfec30/get_connection_metadata:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:32 Unrecognized feature: 'ambient-light-sensor'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:32 Unrecognized feature: 'battery'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:32 Unrecognized feature: 'execution-while-not-rendered'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:32 Unrecognized feature: 'execution-while-out-of-viewport'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:32 Unrecognized feature: 'layout-animations'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:32 Unrecognized feature: 'legacy-image-formats'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:32 Unrecognized feature: 'navigation-override'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:32 Unrecognized feature: 'oversized-images'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:32 Unrecognized feature: 'publickey-credentials'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:32 Unrecognized feature: 'speaker-selection'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:32 Unrecognized feature: 'unoptimized-images'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:32 Unrecognized feature: 'unsized-media'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:32 Allow attribute will take precedence over 'allowfullscreen'.Understand this warning
+workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:32 Allow attribute will take precedence over 'allowpaymentrequest'.Understand this warning
+(index):120 WebSocket connection to 'wss://1787e76f-1cbc-4635-9d1a-f5ee00cfec30-00-vcltxx3w54ct.picard.replit.dev/?token=wxFkQc8YadLf' failed: 
+window.WebSocket @ (index):120
+setupWebSocket @ VM26 client:536
+(anonymous) @ VM26 client:531Understand this error
+(index):120 WebSocket connection to 'wss://1787e76f-1cbc-4635-9d1a-f5ee00cfec30-00-vcltxx3w54ct.picard.replit.dev/__vite_ping__?token=wxFkQc8YadLf' failed: 
+window.WebSocket @ (index):120
+setupWebSocket @ VM26 client:536
+fallback @ VM26 client:509
+(anonymous) @ VM26 client:555Understand this error
+VM15 injected.js:37 [vite] failed to connect to websocket.
+your current setup:
+  (browser) 1787e76f-1cbc-4635-9d1a-f5ee00cfec30-00-vcltxx3w54ct.picard.replit.dev/ <--[HTTP]--> localhost:undefined/ (server)
+  (browser) 1787e76f-1cbc-4635-9d1a-f5ee00cfec30-00-vcltxx3w54ct.picard.replit.dev:/ <--[WebSocket (failing)]--> localhost:undefined/ (server)
+Check out your Vite / network configuration and https://vite.dev/config/server-options.html#server-hmr .
+(anonymous) @ VM15 injected.js:37
+(anonymous) @ VM26 client:512
+(anonymous) @ VM26 client:555Understand this error
+The script has an unsupported MIME type ('text/html').Understand this error
+workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:142  GET https://replit.com/public/js/beacon.js net::ERR_BLOCKED_BY_RESPONSE.NotSameOriginAfterDefaultedToSameOriginByCoep
+onIframeLoad @ workspace_iframe.html?initialPath=%2F&id=%3Arahv%3A:142Understand this error
+VM15 injected.js:37 ❌ PWA: Service Worker registration failed: SecurityError: Failed to register a ServiceWorker for scope ('https://1787e76f-1cbc-4635-9d1a-f5ee00cfec30-00-vcltxx3w54ct.picard.replit.dev/') with script ('https://1787e76f-1cbc-4635-9d1a-f5ee00cfec30-00-vcltxx3w54ct.picard.replit.dev/sw.js'): The script has an unsupported MIME type ('text/html').
+(anonymous) @ VM15 injected.js:37
+(anonymous) @ VM34 pwa-register.ts:32
+Promise.catch
+(anonymous) @ VM34 pwa-register.ts:31Understand this error

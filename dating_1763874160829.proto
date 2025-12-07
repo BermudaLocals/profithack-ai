@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package dating;
+
+option go_package = "./dating";
+
+// The Dating Service definition.
+service DatingService {
+  // GetMatches returns a stream of potential matches for the user.
+  rpc GetMatches (MatchRequest) returns (MatchResponse);
+  // RecordSwipe records the user's swipe action.
+  rpc RecordSwipe (SwipeRequest) returns (SwipeResponse);
+}
+
+// Request message for getting matches.
+message MatchRequest {
+  string user_id = 1;
+  int32 count = 2;
+  // Location, age, gender filters would be here
+}
+
+// Message representing a potential match.
+message MatchProfile {
+  string user_id = 1;
+  string username = 2;
+  string bio = 3;
+  repeated string interests = 4;
+  // A key field: the reason for the match, leveraging XAI data
+  string match_reason = 5; 
+}
+
+// Response message for getting matches.
+message MatchResponse {
+  repeated MatchProfile profiles = 1;
+}
+
+// Request message for recording a swipe.
+message SwipeRequest {
+  string user_id = 1;
+  string target_user_id = 2;
+  enum SwipeDirection {
+    SWIPE_LEFT = 0;
+    SWIPE_RIGHT = 1;
+  }
+  SwipeDirection direction = 3;
+}
+
+// Response message for recording a swipe.
+message SwipeResponse {
+  bool success = 1;
+  bool is_match = 2; // True if both users swiped right
+}

@@ -1,0 +1,859 @@
+🗄️ DATABASE SETUP GUIDE - TikTok-Beating Daily System
+
+Complete guide for initializing 8-table schema on PostgreSQL or SQLite
+
+
+
+
+📋 TABLE OVERVIEW
+
+#
+Table
+Purpose
+Rows
+Indexes
+1
+daily_nexus
+Main engagement tracking
+1M
+6
+2
+daily_challenges
+Daily challenge progress
+4M
+4
+3
+daily_bonuses
+Active multiplier bonuses
+2M
+4
+4
+reward_history
+Complete reward history
+50M
+5
+5
+engagement_predictions
+ML predictions
+1M
+3
+6
+daily_analytics
+Daily statistics
+30M
+4
+7
+leaderboard_cache
+Cached leaderboard
+100K
+5
+8
+monetization
+Premium purchases
+5M
+5
+
+
+Total: 93M rows, 36 indexes, 4 views, 2-3 triggers
+
+
+
+
+🚀 QUICK START (5 MINUTES)
+
+Option 1: PostgreSQL (Recommended)
+
+1.1 Create Database
+
+Bash
+
+
+# Using Supabase (recommended for Replit)
+# Go to https://supabase.com and create a new project
+
+# Or using local PostgreSQL
+psql -U postgres
+CREATE DATABASE profithack_daily;
+\c profithack_daily
+
+
+1.2 Run Schema
+
+Bash
+
+
+# Copy the schema file
+cp database-schema-postgresql.sql /tmp/
+
+# Execute schema
+psql -U postgres -d profithack_daily -f /tmp/database-schema-postgresql.sql
+
+# Verify tables
+psql -U postgres -d profithack_daily -c "\dt"
+
+
+1.3 Verify Installation
+
+SQL
+
+
+-- Check tables exist
+SELECT table_name FROM information_schema.tables 
+WHERE table_schema = 'public';
+
+-- Check indexes
+SELECT indexname FROM pg_indexes 
+WHERE schemaname = 'public';
+
+-- Check views
+SELECT viewname FROM pg_views 
+WHERE schemaname = 'public';
+
+
+
+
+
+Option 2: SQLite (Replit Compatible )
+
+2.1 Create Database
+
+Bash
+
+
+# SQLite creates database automatically
+sqlite3 profithack_daily.db
+
+# Or in Node.js
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('profithack_daily.db');
+
+
+2.2 Run Schema
+
+Bash
+
+
+# Execute schema file
+sqlite3 profithack_daily.db < database-schema-sqlite.sql
+
+# Or in Node.js
+const fs = require('fs');
+const schema = fs.readFileSync('database-schema-sqlite.sql', 'utf8');
+db.exec(schema);
+
+
+2.3 Verify Installation
+
+SQL
+
+
+-- Check tables exist
+.tables
+
+-- Check schema
+.schema daily_nexus
+
+-- Check indexes
+.indexes
+
+
+
+
+
+🔧 NODE.JS INTEGRATION
+
+PostgreSQL Setup
+
+TypeScript
+
+
+import { Pool } from 'pg';
+import fs from 'fs';
+
+const pool = new Pool({
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || '5432'),
+  database: process.env.DB_NAME,
+});
+
+// Initialize schema
+async function initializeDatabase() {
+  const schema = fs.readFileSync('./database-schema-postgresql.sql', 'utf8');
+  const statements = schema.split(';').filter(s => s.trim());
+  
+  for (const statement of statements) {
+    if (statement.trim()) {
+      await pool.query(statement);
+    }
+  }
+  
+  console.log('✅ Database initialized');
+}
+
+await initializeDatabase();
+
+
+SQLite Setup
+
+TypeScript
+
+
+import sqlite3 from 'sqlite3';
+import fs from 'fs';
+
+const db = new sqlite3.Database('profithack_daily.db');
+
+// Initialize schema
+async function initializeDatabase() {
+  return new Promise((resolve, reject) => {
+    const schema = fs.readFileSync('./database-schema-sqlite.sql', 'utf8');
+    
+    db.exec(schema, (err) => {
+      if (err) reject(err);
+      else {
+        console.log('✅ Database initialized');
+        resolve(true);
+      }
+    });
+  });
+}
+
+await initializeDatabase();
+
+
+
+
+
+📊 TABLE DETAILS
+
+1. daily_nexus
+
+Main engagement tracking table
+
+SQL
+
+
+-- Schema
+id (UUID/TEXT) - Primary key
+user_id (UUID/TEXT) - Foreign key to users
+streak (INT) - Current streak count
+total_rewards (BIGINT/INT) - Total rewards earned
+today_rewards (INT) - Rewards earned today
+next_claim_time (BIGINT/INT) - Unix timestamp
+multiplier (DECIMAL/REAL) - Current multiplier (1.0-5.0)
+level (INT) - User level (1-100+)
+experience (INT) - XP toward next level
+last_claimed_at (TIMESTAMP/DATETIME) - Last claim time
+streak_broken_at (TIMESTAMP/DATETIME) - When streak broke
+created_at (TIMESTAMP/DATETIME) - Creation time
+updated_at (TIMESTAMP/DATETIME) - Last update time
+
+-- Indexes
+idx_daily_nexus_user_id - Fast user lookups
+idx_daily_nexus_streak - Leaderboard queries
+idx_daily_nexus_next_claim - Claim time checks
+idx_daily_nexus_total_rewards - Reward leaderboard
+idx_daily_nexus_level - Level leaderboard
+idx_daily_nexus_updated_at - Recent updates
+
+
+Sample Query:
+
+SQL
+
+
+-- Get user's daily state
+SELECT * FROM daily_nexus WHERE user_id = 'user-123';
+
+-- Get top 10 by streak
+SELECT user_id, streak, total_rewards FROM daily_nexus 
+ORDER BY streak DESC LIMIT 10;
+
+-- Get users who haven't claimed today
+SELECT user_id, next_claim_time FROM daily_nexus 
+WHERE next_claim_time > CURRENT_TIMESTAMP;
+
+
+
+
+
+2. daily_challenges
+
+Track daily challenge progress
+
+SQL
+
+
+-- Schema
+id (UUID/TEXT) - Primary key
+user_id (UUID/TEXT) - Foreign key to users
+challenge_id (VARCHAR/TEXT) - Challenge identifier
+name (VARCHAR/TEXT) - Challenge name
+description (TEXT) - Challenge description
+icon (VARCHAR/TEXT) - Emoji icon
+progress (INT) - Current progress
+max_progress (INT) - Target progress
+reward (INT) - Reward for completion
+completed (BOOLEAN) - Completion status
+completed_at (TIMESTAMP/DATETIME) - Completion time
+expires_at (TIMESTAMP/DATETIME) - Challenge expiration
+created_at (TIMESTAMP/DATETIME) - Creation time
+
+-- Unique Constraint
+UNIQUE(user_id, challenge_id) - One challenge per user per day
+
+
+Sample Query:
+
+SQL
+
+
+-- Get active challenges for user
+SELECT * FROM daily_challenges 
+WHERE user_id = 'user-123' AND expires_at > NOW();
+
+-- Get completed challenges
+SELECT * FROM daily_challenges 
+WHERE user_id = 'user-123' AND completed = TRUE;
+
+-- Get challenge progress
+SELECT name, progress, max_progress, 
+  ROUND(progress * 100.0 / max_progress) as percent_complete
+FROM daily_challenges 
+WHERE user_id = 'user-123' AND expires_at > NOW();
+
+
+
+
+
+3. daily_bonuses
+
+Track active multiplier bonuses
+
+SQL
+
+
+-- Schema
+id (UUID/TEXT) - Primary key
+user_id (UUID/TEXT) - Foreign key to users
+bonus_type (VARCHAR/TEXT) - Type (morning, evening, social, challenge)
+multiplier (DECIMAL/REAL) - Bonus multiplier (e.g., 1.2x)
+reason (VARCHAR/TEXT) - Bonus reason
+expires_at (TIMESTAMP/DATETIME) - Expiration time
+created_at (TIMESTAMP/DATETIME) - Creation time
+
+
+Sample Query:
+
+SQL
+
+
+-- Get active bonuses for user
+SELECT * FROM daily_bonuses 
+WHERE user_id = 'user-123' AND expires_at > NOW();
+
+-- Calculate total multiplier
+SELECT 
+  (SELECT multiplier FROM daily_nexus WHERE user_id = 'user-123') as base_multiplier,
+  EXP(SUM(LN(multiplier))) as bonus_multiplier,
+  (SELECT multiplier FROM daily_nexus WHERE user_id = 'user-123') * 
+  EXP(SUM(LN(multiplier))) as total_multiplier
+FROM daily_bonuses 
+WHERE user_id = 'user-123' AND expires_at > NOW();
+
+-- Get bonus breakdown
+SELECT bonus_type, multiplier, reason, expires_at 
+FROM daily_bonuses 
+WHERE user_id = 'user-123' AND expires_at > NOW();
+
+
+
+
+
+4. reward_history
+
+Complete history of all rewards
+
+SQL
+
+
+-- Schema
+id (UUID/TEXT) - Primary key
+user_id (UUID/TEXT) - Foreign key to users
+reward_type (VARCHAR/TEXT) - Type (daily, challenge, bonus)
+amount (INT) - Reward amount
+multiplier (DECIMAL/REAL) - Multiplier applied
+streak_at_claim (INT) - Streak when claimed
+rarity (VARCHAR/TEXT) - Rarity tier
+claimed_at (TIMESTAMP/DATETIME) - Claim time
+
+
+Sample Query:
+
+SQL
+
+
+-- Get reward history for user
+SELECT * FROM reward_history 
+WHERE user_id = 'user-123' 
+ORDER BY claimed_at DESC 
+LIMIT 100;
+
+-- Get total earnings
+SELECT SUM(amount) as total_earned FROM reward_history 
+WHERE user_id = 'user-123';
+
+-- Get daily earnings
+SELECT DATE(claimed_at) as date, SUM(amount) as daily_total 
+FROM reward_history 
+WHERE user_id = 'user-123' 
+GROUP BY DATE(claimed_at) 
+ORDER BY date DESC;
+
+-- Get rarity distribution
+SELECT rarity, COUNT(*) as count, SUM(amount) as total 
+FROM reward_history 
+WHERE user_id = 'user-123' 
+GROUP BY rarity;
+
+
+
+
+
+5. engagement_predictions
+
+ML predictions for rewards
+
+SQL
+
+
+-- Schema
+id (UUID/TEXT) - Primary key
+user_id (UUID/TEXT) - Foreign key to users
+predicted_reward (INT) - Expected reward amount
+predicted_rarity (VARCHAR/TEXT) - Expected rarity
+prediction_confidence (DECIMAL/REAL) - Confidence 0-1
+created_at (TIMESTAMP/DATETIME) - Creation time
+
+
+Sample Query:
+
+SQL
+
+
+-- Get latest prediction for user
+SELECT * FROM engagement_predictions 
+WHERE user_id = 'user-123' 
+ORDER BY created_at DESC 
+LIMIT 1;
+
+-- Get high-confidence predictions
+SELECT * FROM engagement_predictions 
+WHERE prediction_confidence > 0.8 
+ORDER BY created_at DESC;
+
+
+
+
+
+6. daily_analytics
+
+Daily aggregated statistics
+
+SQL
+
+
+-- Schema
+id (UUID/TEXT) - Primary key
+user_id (UUID/TEXT) - Foreign key to users
+date (DATE) - Analytics date
+claims_count (INT) - Claims made that day
+total_earned (INT) - Total earned that day
+challenges_completed (INT) - Challenges completed
+streak_maintained (BOOLEAN) - Streak maintained
+engagement_score (INT) - Engagement score 0-100
+created_at (TIMESTAMP/DATETIME) - Creation time
+
+-- Unique Constraint
+UNIQUE(user_id, date) - One record per user per day
+
+
+Sample Query:
+
+SQL
+
+
+-- Get daily stats for user
+SELECT * FROM daily_analytics 
+WHERE user_id = 'user-123' 
+ORDER BY date DESC 
+LIMIT 30;
+
+-- Get engagement trend
+SELECT date, engagement_score, claims_count, total_earned 
+FROM daily_analytics 
+WHERE user_id = 'user-123' 
+ORDER BY date DESC;
+
+-- Get monthly summary
+SELECT 
+  DATE_TRUNC('month', date) as month,
+  COUNT(*) as days_active,
+  SUM(claims_count) as total_claims,
+  SUM(total_earned) as total_earned,
+  AVG(engagement_score) as avg_engagement
+FROM daily_analytics 
+WHERE user_id = 'user-123' 
+GROUP BY DATE_TRUNC('month', date);
+
+
+
+
+
+7. leaderboard_cache
+
+Cached leaderboard for fast retrieval
+
+SQL
+
+
+-- Schema
+id (UUID/TEXT) - Primary key
+user_id (UUID/TEXT) - Foreign key to users
+username (VARCHAR/TEXT) - User's username
+avatar_url (TEXT) - User's avatar
+current_streak (INT) - Current streak
+total_rewards (BIGINT/INT) - Total rewards
+leaderboard_points (INT) - Leaderboard points
+period (VARCHAR/TEXT) - Period (daily, weekly, monthly)
+rank (INT) - Rank in leaderboard
+updated_at (TIMESTAMP/DATETIME) - Last update
+
+
+Sample Query:
+
+SQL
+
+
+-- Get leaderboard
+SELECT rank, username, current_streak, total_rewards 
+FROM leaderboard_cache 
+WHERE period = 'weekly' 
+ORDER BY rank 
+LIMIT 100;
+
+-- Get user's rank
+SELECT rank, leaderboard_points 
+FROM leaderboard_cache 
+WHERE user_id = 'user-123' AND period = 'weekly';
+
+
+
+
+
+8. monetization
+
+Track premium purchases
+
+SQL
+
+
+-- Schema
+id (UUID/TEXT) - Primary key
+user_id (UUID/TEXT) - Foreign key to users
+transaction_type (VARCHAR/TEXT) - Type (streak_protection, multiplier_boost, etc)
+product_name (VARCHAR/TEXT) - Product name
+amount (DECIMAL/REAL) - Purchase amount
+currency (VARCHAR/TEXT) - Currency (USD, EUR, etc)
+status (VARCHAR/TEXT) - Status (pending, completed, failed)
+stripe_transaction_id (VARCHAR/TEXT) - Stripe transaction ID
+purchased_at (TIMESTAMP/DATETIME) - Purchase time
+expires_at (TIMESTAMP/DATETIME) - Expiration time
+created_at (TIMESTAMP/DATETIME) - Creation time
+
+
+Sample Query:
+
+SQL
+
+
+-- Get user's purchases
+SELECT * FROM monetization 
+WHERE user_id = 'user-123' AND status = 'completed' 
+ORDER BY purchased_at DESC;
+
+-- Get daily revenue
+SELECT 
+  DATE(purchased_at) as date,
+  COUNT(*) as transactions,
+  SUM(amount) as revenue,
+  COUNT(DISTINCT user_id) as customers
+FROM monetization 
+WHERE status = 'completed' 
+GROUP BY DATE(purchased_at) 
+ORDER BY date DESC;
+
+-- Get top products
+SELECT product_name, COUNT(*) as sales, SUM(amount) as revenue 
+FROM monetization 
+WHERE status = 'completed' 
+GROUP BY product_name 
+ORDER BY revenue DESC;
+
+
+
+
+
+🔍 VIEWS INCLUDED
+
+1. user_daily_summary
+
+Quick summary of user's daily state
+
+SQL
+
+
+SELECT * FROM user_daily_summary WHERE user_id = 'user-123';
+
+
+2. leaderboard_top_100
+
+Top 100 users by total rewards
+
+SQL
+
+
+SELECT * FROM leaderboard_top_100;
+
+
+3. daily_revenue
+
+Daily revenue statistics
+
+SQL
+
+
+SELECT * FROM daily_revenue LIMIT 30;
+
+
+4. user_engagement_metrics
+
+User engagement metrics
+
+SQL
+
+
+SELECT * FROM user_engagement_metrics 
+WHERE user_id = 'user-123' 
+ORDER BY date DESC;
+
+
+
+
+
+📈 PERFORMANCE TIPS
+
+1. Index Strategy
+
+•
+User lookups: idx_daily_nexus_user_id
+
+•
+Leaderboard queries: idx_daily_nexus_streak, idx_daily_nexus_total_rewards
+
+•
+Time-based queries: idx_daily_nexus_next_claim, idx_daily_bonuses_expires_at
+
+•
+Analytics: idx_daily_analytics_date, idx_daily_analytics_engagement_score
+
+2. Query Optimization
+
+SQL
+
+
+-- ✅ GOOD: Use indexes
+SELECT * FROM daily_nexus WHERE user_id = 'user-123';
+
+-- ❌ BAD: Full table scan
+SELECT * FROM daily_nexus WHERE streak > 5;
+
+-- ✅ GOOD: Use composite index
+SELECT * FROM daily_challenges 
+WHERE user_id = 'user-123' AND expires_at > NOW();
+
+-- ❌ BAD: Multiple scans
+SELECT * FROM daily_challenges 
+WHERE user_id = 'user-123' 
+AND expires_at > NOW() 
+AND completed = FALSE;
+
+
+3. Caching Strategy
+
+TypeScript
+
+
+// Cache frequently accessed data
+const cacheKey = `daily-nexus:${userId}`;
+const cached = await cache.get(cacheKey);
+
+if (cached) {
+  return cached;
+}
+
+// Query database
+const data = await db.query('SELECT * FROM daily_nexus WHERE user_id = $1', [userId]);
+
+// Cache for 5 minutes
+await cache.set(cacheKey, data, 300);
+
+return data;
+
+
+4. Batch Operations
+
+SQL
+
+
+-- ✅ GOOD: Batch insert
+INSERT INTO reward_history (user_id, reward_type, amount, claimed_at)
+VALUES 
+  ('user-1', 'daily', 50, NOW()),
+  ('user-2', 'daily', 75, NOW()),
+  ('user-3', 'daily', 100, NOW());
+
+-- ❌ BAD: Individual inserts
+INSERT INTO reward_history (user_id, reward_type, amount, claimed_at) VALUES ('user-1', 'daily', 50, NOW());
+INSERT INTO reward_history (user_id, reward_type, amount, claimed_at) VALUES ('user-2', 'daily', 75, NOW());
+INSERT INTO reward_history (user_id, reward_type, amount, claimed_at) VALUES ('user-3', 'daily', 100, NOW());
+
+
+
+
+
+🚨 COMMON ISSUES
+
+Issue: "user_id" foreign key constraint fails
+
+Solution: Ensure users table exists
+
+SQL
+
+
+CREATE TABLE IF NOT EXISTS users (
+  id UUID PRIMARY KEY,
+  username VARCHAR(255),
+  profile_picture_url TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+Issue: Indexes not being used
+
+Solution: Run ANALYZE
+
+SQL
+
+
+-- PostgreSQL
+ANALYZE;
+
+-- SQLite
+ANALYZE;
+
+
+Issue: Slow queries
+
+Solution: Check query plan
+
+SQL
+
+
+-- PostgreSQL
+EXPLAIN ANALYZE SELECT * FROM daily_nexus WHERE user_id = 'user-123';
+
+-- SQLite
+EXPLAIN QUERY PLAN SELECT * FROM daily_nexus WHERE user_id = 'user-123';
+
+
+
+
+
+✅ VERIFICATION CHECKLIST
+
+
+
+
+All 8 tables created
+
+
+
+
+All 36 indexes created
+
+
+
+
+All 4 views created
+
+
+
+
+All triggers created
+
+
+
+
+Foreign keys working
+
+
+
+
+Sample data inserted
+
+
+
+
+Queries tested
+
+
+
+
+Performance verified
+
+
+
+
+📞 SUPPORT
+
+Files:
+
+•
+database-schema-postgresql.sql - PostgreSQL schema
+
+•
+database-schema-sqlite.sql - SQLite schema
+
+•
+database-setup-guide.md - This guide
+
+Quick Commands:
+
+Bash
+
+
+# PostgreSQL
+psql -U postgres -d profithack_daily -f database-schema-postgresql.sql
+
+# SQLite
+sqlite3 profithack_daily.db < database-schema-sqlite.sql
+
+
+
+
+
+Database schema complete and ready for production! 🚀
+

@@ -1,0 +1,541 @@
+AI Influencer Model (Node.js/TypeScript)
+Package.json
+json
+{
+  "name": "ai-influencer-model",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "tensorflow": "^2.4.0",
+    "@tensorflow/tfjs-node": "^4.10.0",
+    "axios": "^1.5.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.20",
+    "@types/cors": "^2.8.13",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.2.2",
+    "ts-node": "^10.9.1"
+  }
+}
+TypeScript Interfaces
+typescript
+// src/types.ts
+export interface UserProfile {
+  age: number;
+  gender: 'male' | 'female' | 'other';
+  interests: string[];
+  location: string;
+  device: 'mobile' | 'desktop' | 'tablet';
+  sessionDuration: number;
+  previousEngagements: number;
+}
+
+export interface AdCampaign {
+  id: string;
+  category: string;
+  type: 'banner' | 'video' | 'sponsored_post' | 'story';
+  budget: number;
+  targetDemographic: string[];
+  maxBid: number;
+  duration: number;
+}
+
+export interface PredictionResult {
+  adId: string;
+  engagementScore: number;
+  clickProbability: number;
+  expectedRevenue: number;
+  recommendationReason: string;
+}
+
+export interface AIPersona {
+  name: string;
+  niche: string;
+  personalityTraits: string[];
+  contentStyle: string;
+  targetAudience: string[];
+}
+AI Influencer Model Core
+typescript
+// src/AIInfluencerModel.ts
+import * as tf from '@tensorflow/tfjs-node';
+import { UserProfile, AdCampaign, PredictionResult, AIPersona } from './types';
+
+export class AIInfluencerModel {
+  private model: tf.LayersModel | null = null;
+  private persona: AIPersona;
+  private trainingData: any[] = [];
+
+  constructor(persona: AIPersona) {
+    this.persona = persona;
+    this.initializeModel();
+  }
+
+  private initializeModel(): void {
+    // Create a neural network for ad engagement prediction
+    this.model = tf.sequential({
+      layers: [
+        tf.layers.dense({ inputShape: [15], units: 64, activation: 'relu' }),
+        tf.layers.dropout({ rate: 0.3 }),
+        tf.layers.dense({ units: 32, activation: 'relu' }),
+        tf.layers.dropout({ rate: 0.2 }),
+        tf.layers.dense({ units: 16, activation: 'relu' }),
+        tf.layers.dense({ units: 2, activation: 'sigmoid' }) // [engagement_score, click_probability]
+      ]
+    });
+
+    this.model.compile({
+      optimizer: 'adam',
+      loss: 'meanSquaredError',
+      metrics: ['accuracy']
+    });
+  }
+
+  // Feature engineering for the AI model
+  private extractFeatures(user: UserProfile, ad: AdCampaign): number[] {
+    const interestMatch = this.calculateInterestMatch(user.interests, ad.targetDemographic);
+    const demographicMatch = this.calculateDemographicMatch(user, ad);
+    const timeEffectiveness = this.calculateTimeEffectiveness();
+    const personaAlignment = this.calculatePersonaAlignment(ad.category);
+
+    return [
+      user.age / 100, // Normalized age
+      this.encodeGender(user.gender),
+      user.sessionDuration / 3600, // Hours
+      user.previousEngagements / 100, // Normalized engagements
+      interestMatch,
+      demographicMatch,
+      timeEffectiveness,
+      personaAlignment,
+      ad.budget / 10000, // Normalized budget
+      this.encodeAdType(ad.type),
+      ad.maxBid / 100, // Normalized bid
+      ad.duration / 60, // Minutes
+      this.getDeviceMultiplier(user.device),
+      this.getLocationEffectiveness(user.location),
+      this.calculateContentRelevance(ad.category)
+    ];
+  }
+
+  private calculateInterestMatch(userInterests: string[], targetDemographic: string[]): number {
+    const matches = userInterests.filter(interest => 
+      targetDemographic.some(target => 
+        target.toLowerCase().includes(interest.toLowerCase()) ||
+        interest.toLowerCase().includes(target.toLowerCase())
+      )
+    );
+    return matches.length / Math.max(userInterests.length, 1);
+  }
+
+  private calculateDemographicMatch(user: UserProfile, ad: AdCampaign): number {
+    // Simple demographic matching logic
+    let score = 0;
+    
+    // Age group matching (simplified)
+    if (user.age >= 18 && user.age <= 35) score += 0.3;
+    else if (user.age > 35 && user.age <= 55) score += 0.2;
+    else score += 0.1;
+
+    // Add more demographic logic based on your persona
+    if (this.persona.targetAudience.some(audience => 
+      ad.targetDemographic.some(target => 
+        target.toLowerCase().includes(audience.toLowerCase())
+      )
+    )) {
+      score += 0.4;
+    }
+
+    return Math.min(score, 1);
+  }
+
+  private calculatePersonaAlignment(adCategory: string): number {
+    const personaCategories = this.persona.niche.toLowerCase().split(',');
+    const adCat = adCategory.toLowerCase();
+    
+    if (personaCategories.some(cat => adCat.includes(cat.trim()))) {
+      return 1.0;
+    }
+    
+    return 0.3; // Base alignment for unrelated categories
+  }
+
+  private encodeGender(gender: string): number {
+    const encoding: { [key: string]: number } = {
+      'male': 0,
+      'female': 1,
+      'other': 0.5
+    };
+    return encoding[gender] || 0.5;
+  }
+
+  private encodeAdType(adType: string): number {
+    const encoding: { [key: string]: number } = {
+      'banner': 0.2,
+      'video': 0.8,
+      'sponsored_post': 0.9,
+      'story': 0.7
+    };
+    return encoding[adType] || 0.5;
+  }
+
+  private getDeviceMultiplier(device: string): number {
+    const multipliers: { [key: string]: number } = {
+      'mobile': 0.9,
+      'desktop': 0.7,
+      'tablet': 0.8
+    };
+    return multipliers[device] || 0.7;
+  }
+
+  private calculateTimeEffectiveness(): number {
+    const hour = new Date().getHours();
+    // Peak engagement hours (evening)
+    if (hour >= 18 && hour <= 22) return 0.9;
+    if (hour >= 12 && hour <= 14) return 0.7; // Lunch
+    return 0.5; // Other times
+  }
+
+  private getLocationEffectiveness(location: string): number {
+    // Simple location-based effectiveness
+    const highEngagementLocations = ['new york', 'los angeles', 'london', 'tokyo'];
+    return highEngagementLocations.includes(location.toLowerCase()) ? 0.8 : 0.6;
+  }
+
+  private calculateContentRelevance(adCategory: string): number {
+    // How relevant is this ad category to the AI influencer's content style
+    const contentMap: { [key: string]: number } = {
+      'fashion': 0.9,
+      'beauty': 0.8,
+      'technology': 0.6,
+      'gaming': 0.7,
+      'lifestyle': 0.9,
+      'fitness': 0.8,
+      'travel': 0.7,
+      'food': 0.6
+    };
+    return contentMap[adCategory.toLowerCase()] || 0.5;
+  }
+
+  // Generate training data
+  public async generateTrainingData(samples: number = 5000): Promise<void> {
+    console.log('Generating training data...');
+    
+    const interests = ['fashion', 'beauty', 'technology', 'gaming', 'fitness', 'travel', 'food'];
+    const locations = ['new york', 'los angeles', 'chicago', 'london', 'tokyo'];
+    const devices: Array<'mobile' | 'desktop' | 'tablet'> = ['mobile', 'desktop', 'tablet'];
+    const adTypes: Array<'banner' | 'video' | 'sponsored_post' | 'story'> = 
+      ['banner', 'video', 'sponsored_post', 'story'];
+    const categories = ['fashion', 'beauty', 'technology', 'gaming', 'lifestyle'];
+
+    for (let i = 0; i < samples; i++) {
+      const user: UserProfile = {
+        age: Math.floor(Math.random() * 40) + 18,
+        gender: Math.random() > 0.5 ? 'female' : 'male',
+        interests: this.getRandomSubset(interests, 3),
+        location: locations[Math.floor(Math.random() * locations.length)],
+        device: devices[Math.floor(Math.random() * devices.length)],
+        sessionDuration: Math.random() * 3600,
+        previousEngagements: Math.floor(Math.random() * 50)
+      };
+
+      const ad: AdCampaign = {
+        id: `ad_${i}`,
+        category: categories[Math.floor(Math.random() * categories.length)],
+        type: adTypes[Math.floor(Math.random() * adTypes.length)],
+        budget: Math.random() * 10000,
+        targetDemographic: this.getRandomSubset(interests, 2),
+        maxBid: Math.random() * 100,
+        duration: Math.random() * 120
+      };
+
+      const features = this.extractFeatures(user, ad);
+      
+      // Simulate engagement and click probability
+      const baseEngagement = 0.3;
+      const engagementScore = Math.min(1, baseEngagement + 
+        features[4] * 0.3 + // interest match
+        features[5] * 0.2 + // demographic match
+        features[6] * 0.1 + // time effectiveness
+        Math.random() * 0.2
+      );
+
+      const clickProbability = Math.min(1, engagementScore * 0.8 + Math.random() * 0.2);
+
+      this.trainingData.push({
+        features,
+        targets: [engagementScore, clickProbability]
+      });
+    }
+  }
+
+  private getRandomSubset(array: any[], count: number): any[] {
+    const shuffled = [...array].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  }
+
+  // Train the model
+  public async trainModel(epochs: number = 100): Promise<void> {
+    if (!this.model) {
+      throw new Error('Model not initialized');
+    }
+
+    await this.generateTrainingData();
+
+    const features = this.trainingData.map(d => d.features);
+    const targets = this.trainingData.map(d => d.targets);
+
+    const featureTensor = tf.tensor2d(features);
+    const targetTensor = tf.tensor2d(targets);
+
+    await this.model.fit(featureTensor, targetTensor, {
+      epochs,
+      batchSize: 32,
+      validationSplit: 0.2,
+      callbacks: {
+        onEpochEnd: (epoch, logs) => {
+          console.log(`Epoch ${epoch + 1}: loss = ${logs?.loss}`);
+        }
+      }
+    });
+
+    featureTensor.dispose();
+    targetTensor.dispose();
+  }
+
+  // Predict optimal ad
+  public async predictOptimalAd(
+    user: UserProfile, 
+    availableAds: AdCampaign[]
+  ): Promise<PredictionResult[]> {
+    if (!this.model) {
+      throw new Error('Model not trained');
+    }
+
+    const predictions: PredictionResult[] = [];
+
+    for (const ad of availableAds) {
+      const features = this.extractFeatures(user, ad);
+      const featureTensor = tf.tensor2d([features]);
+      
+      const prediction = this.model.predict(featureTensor) as tf.Tensor;
+      const values = await prediction.data();
+      
+      const [engagementScore, clickProbability] = values;
+      
+      // Calculate expected revenue (simplified)
+      const expectedRevenue = clickProbability * ad.maxBid * 0.1;
+      
+      predictions.push({
+        adId: ad.id,
+        engagementScore,
+        clickProbability,
+        expectedRevenue,
+        recommendationReason: this.generateRecommendationReason(user, ad, engagementScore)
+      });
+
+      featureTensor.dispose();
+      prediction.dispose();
+    }
+
+    return predictions.sort((a, b) => b.expectedRevenue - a.expectedRevenue);
+  }
+
+  private generateRecommendationReason(
+    user: UserProfile, 
+    ad: AdCampaign, 
+    score: number
+  ): string {
+    const reasons = [
+      `High alignment with ${this.persona.name}'s ${this.persona.niche} niche`,
+      `Perfect match for ${user.age}-year-old ${user.gender} audience`,
+      `Strong interest match with user's preferences`,
+      `Optimal timing and device placement`,
+      `High performing ad type for similar audiences`
+    ];
+    
+    return reasons[Math.floor(Math.random() * reasons.length)];
+  }
+
+  // Save and load model
+  public async saveModel(path: string): Promise<void> {
+    if (this.model) {
+      await this.model.save(`file://${path}`);
+    }
+  }
+
+  public async loadModel(path: string): Promise<void> {
+    this.model = await tf.loadLayersModel(`file://${path}/model.json`);
+  }
+}
+Express API Server
+typescript
+// src/server.ts
+import express from 'express';
+import cors from 'cors';
+import { AIInfluencerModel } from './AIInfluencerModel.js';
+import { AIPersona, UserProfile, AdCampaign } from './types.js';
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+// Define your AI influencer persona
+const influencerPersona: AIPersona = {
+  name: "Aura",
+  niche: "fashion, beauty, lifestyle",
+  personalityTraits: ["trendy", "authentic", "inspirational", "relatable"],
+  contentStyle: "high-quality visuals, engaging storytelling, trend-focused",
+  targetAudience: ["18-35", "fashion enthusiasts", "beauty lovers", "lifestyle seekers"]
+};
+
+const aiModel = new AIInfluencerModel(influencerPersona);
+
+// Initialize and train model (in production, you'd load a pre-trained model)
+aiModel.trainModel(50).then(() => {
+  console.log('AI Influencer Model trained and ready!');
+});
+
+// API Routes
+app.post('/api/predict-ads', async (req, res) => {
+  try {
+    const { user, availableAds } = req.body;
+    
+    const predictions = await aiModel.predictOptimalAd(user, availableAds);
+    
+    res.json({
+      success: true,
+      influencer: influencerPersona.name,
+      recommendations: predictions,
+      topPick: predictions[0]
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+app.get('/api/influencer-profile', (req, res) => {
+  res.json({
+    persona: influencerPersona,
+    stats: {
+      estimatedEngagement: "3.5% - 6.2%",
+      audienceReach: "50K - 100K",
+      preferredAdTypes: ["sponsored_post", "video", "story"],
+      performanceScore: 87
+    }
+  });
+});
+
+app.post('/api/record-engagement', (req, res) => {
+  // Record actual engagement for model retraining
+  const { adId, userId, engaged, revenue } = req.body;
+  
+  console.log(`Recording engagement: ${adId} - ${engaged ? 'Engaged' : 'Not Engaged'} - Revenue: $${revenue}`);
+  
+  // In production, store this data for model retraining
+  res.json({ success: true, message: 'Engagement recorded' });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`AI Influencer API running on port ${PORT}`);
+  console.log(`Influencer: ${influencerPersona.name}`);
+  console.log(`Niche: ${influencerPersona.niche}`);
+});
+Usage Example
+typescript
+// src/index.ts
+import { AIInfluencerModel } from './AIInfluencerModel.js';
+import { AIPersona, UserProfile, AdCampaign } from './types.js';
+
+// Create your AI influencer
+const myInfluencer: AIPersona = {
+  name: "TechGuru Alex",
+  niche: "technology, gadgets, reviews",
+  personalityTraits: ["knowledgeable", "enthusiastic", "trustworthy"],
+  contentStyle: "in-depth reviews, tech tutorials, gadget unboxings",
+  targetAudience: ["18-40", "tech enthusiasts", "early adopters", "gaming fans"]
+};
+
+const influencerAI = new AIInfluencerModel(myInfluencer);
+
+// Example usage
+const exampleUser: UserProfile = {
+  age: 28,
+  gender: "male",
+  interests: ["technology", "gaming", "programming"],
+  location: "san francisco",
+  device: "mobile",
+  sessionDuration: 1200,
+  previousEngagements: 15
+};
+
+const availableAds: AdCampaign[] = [
+  {
+    id: "ad_001",
+    category: "technology",
+    type: "sponsored_post",
+    budget: 5000,
+    targetDemographic: ["technology", "gaming"],
+    maxBid: 2.50,
+    duration: 30
+  },
+  {
+    id: "ad_002", 
+    category: "gaming",
+    type: "video",
+    budget: 3000,
+    targetDemographic: ["gaming", "entertainment"],
+    maxBid: 1.80,
+    duration: 15
+  }
+];
+
+// Get predictions
+influencerAI.predictOptimalAd(exampleUser, availableAds)
+  .then(predictions => {
+    console.log("AI Influencer Ad Recommendations:");
+    predictions.forEach(pred => {
+      console.log(`Ad: ${pred.adId} | Engagement: ${(pred.engagementScore * 100).toFixed(1)}% | Revenue: $${pred.expectedRevenue.toFixed(2)}`);
+    });
+  });
+🛠 Setup Instructions
+Install dependencies:
+
+bash
+npm install
+Create tsconfig.json:
+
+json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+Run the application:
+
+bash
+npm run dev

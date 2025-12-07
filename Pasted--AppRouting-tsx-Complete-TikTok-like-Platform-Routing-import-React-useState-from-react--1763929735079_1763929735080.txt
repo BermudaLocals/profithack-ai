@@ -1,0 +1,257 @@
+// AppRouting.tsx - Complete TikTok-like Platform Routing
+
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import FYPFeed from './FYPFeed_TikTok_Final';
+import LiveHostsFeed from './LiveHostsFeed';
+import {
+  CommentsComponent,
+  DirectMessagesComponent,
+  NotificationsComponent,
+  SearchComponent,
+  TrendingSoundsComponent,
+  CreatorAnalyticsComponent,
+  DuetComponent,
+  StitchComponent
+} from './TikTokFeatures';
+import './Navigation.css';
+
+// ============================================
+// BOTTOM NAVIGATION COMPONENT
+// ============================================
+const BottomNavigation: React.FC<{ currentPage: string }> = ({ currentPage }) => {
+  const navigate = useNavigate();
+
+  return (
+    <nav className="bottom-navigation">
+      <button
+        className={`nav-item ${currentPage === 'home' ? 'active' : ''}`}
+        onClick={() => navigate('/')}
+        title="Home"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+        </svg>
+        <span>Home</span>
+      </button>
+
+      <button
+        className={`nav-item ${currentPage === 'explore' ? 'active' : ''}`}
+        onClick={() => navigate('/explore')}
+        title="Explore"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5z" />
+        </svg>
+        <span>Explore</span>
+      </button>
+
+      <button
+        className={`nav-item ${currentPage === 'live' ? 'active' : ''}`}
+        onClick={() => navigate('/live')}
+        title="Live"
+      >
+        <span className="live-dot"></span>
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5z" />
+        </svg>
+        <span>Live</span>
+      </button>
+
+      <button
+        className={`nav-item ${currentPage === 'messages' ? 'active' : ''}`}
+        onClick={() => navigate('/messages')}
+        title="Messages"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+        </svg>
+        <span>Messages</span>
+      </button>
+
+      <button
+        className={`nav-item ${currentPage === 'profile' ? 'active' : ''}`}
+        onClick={() => navigate('/profile')}
+        title="Profile"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+        </svg>
+        <span>Profile</span>
+      </button>
+    </nav>
+  );
+};
+
+// ============================================
+// TOP HEADER COMPONENT
+// ============================================
+const TopHeader: React.FC<{ currentPage: string }> = ({ currentPage }) => {
+  const navigate = useNavigate();
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  return (
+    <header className="top-header">
+      <div className="header-left">
+        <h1 className="app-logo">ProfitHack AI</h1>
+      </div>
+
+      <div className="header-center">
+        {currentPage === 'explore' && (
+          <div className="search-bar-header">
+            <input type="text" placeholder="Search..." />
+          </div>
+        )}
+      </div>
+
+      <div className="header-right">
+        <button
+          className="header-icon"
+          onClick={() => setShowNotifications(!showNotifications)}
+          title="Notifications"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+          </svg>
+          {showNotifications && <NotificationsComponent />}
+        </button>
+
+        <button
+          className="header-icon"
+          onClick={() => navigate('/upload')}
+          title="Upload"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+  );
+};
+
+// ============================================
+// MAIN APP COMPONENT WITH ROUTING
+// ============================================
+const AppContent: React.FC = () => {
+  const location = useLocation();
+  const currentPage = location.pathname.split('/')[1] || 'home';
+
+  // Sample video data for FYP
+  const sampleVideos = [
+    {
+      id: '1',
+      title: 'Amazing AI-Generated Video',
+      description: 'Check out this incredible AI creation!',
+      videoUrl: 'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4',
+      hlsUrl: '',
+      thumbnail: 'https://via.placeholder.com/400x600?text=Video+1',
+      creator: {
+        id: 'creator1',
+        name: 'AI Creator',
+        handle: 'aicreator',
+        avatar: 'https://via.placeholder.com/50x50?text=Avatar',
+        isFollowing: false
+      },
+      likes: 1250,
+      comments: 342,
+      shares: 89,
+      views: 5000,
+      duration: 45,
+      hashtags: ['ai', 'viral', 'profithack'],
+      isLive: false
+    },
+    {
+      id: '2',
+      title: 'Live Stream Highlight',
+      description: 'Epic moments from todays stream!',
+      videoUrl: 'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4',
+      hlsUrl: '',
+      thumbnail: 'https://via.placeholder.com/400x600?text=Video+2',
+      creator: {
+        id: 'creator2',
+        name: 'Live Streamer',
+        handle: 'livestreamer',
+        avatar: 'https://via.placeholder.com/50x50?text=Avatar2',
+        isFollowing: false
+      },
+      likes: 2100,
+      comments: 567,
+      shares: 234,
+      views: 12000,
+      duration: 60,
+      hashtags: ['live', 'gaming', 'streaming'],
+      isLive: true
+    }
+  ];
+
+  return (
+    <div className="app-container">
+      <TopHeader currentPage={currentPage} />
+
+      <main className="main-content">
+        <Routes>
+          {/* Home - FYP Feed */}
+          <Route path="/" element={<FYPFeed videos={sampleVideos} />} />
+
+          {/* Explore - Search & Trending */}
+          <Route
+            path="/explore"
+            element={
+              <div className="explore-page">
+                <SearchComponent />
+                <TrendingSoundsComponent />
+              </div>
+            }
+          />
+
+          {/* Live - Live Hosts Feed */}
+          <Route path="/live" element={<LiveHostsFeed />} />
+          <Route path="/live/:userId" element={<div>Live Stream Player (Coming Soon)</div>} />
+
+          {/* Messages - Direct Messages */}
+          <Route path="/messages" element={<DirectMessagesComponent />} />
+
+          {/* Profile - Creator Analytics */}
+          <Route path="/profile" element={<CreatorAnalyticsComponent />} />
+
+          {/* Video Details - Comments */}
+          <Route path="/video/:videoId" element={<CommentsComponent videoId="1" />} />
+
+          {/* Duets */}
+          <Route
+            path="/duet/:videoId"
+            element={<DuetComponent videoId="1" originalCreatorId="creator1" onClose={() => window.history.back()} />}
+          />
+
+          {/* Stitches */}
+          <Route
+            path="/stitch/:videoId"
+            element={<StitchComponent videoId="1" originalCreatorId="creator1" onClose={() => window.history.back()} />}
+          />
+
+          {/* Upload */}
+          <Route path="/upload" element={<div className="upload-page">Upload Page (Coming Soon)</div>} />
+        </Routes>
+      </main>
+
+      <BottomNavigation currentPage={currentPage} />
+    </div>
+  );
+};
+
+// ============================================
+// MAIN APP WRAPPER
+// ============================================
+export const App: React.FC = () => {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
+};
+
+export default App;
+
+// Import useNavigate hook
+import { useNavigate } from 'react-router-dom';

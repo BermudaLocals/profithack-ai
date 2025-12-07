@@ -1,0 +1,342 @@
+// ============================================
+// BACKEND API - REPLIT DEPLOYMENT
+// Express.js + TikTok Algorithm + AI Agents
+// ============================================
+
+import express, { Request, Response } from "express";
+import cors from "cors";
+import Anthropic from "@anthropic-ai/sdk";
+
+const app = express();
+const client = new Anthropic();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// ============================================
+// 1. CONTENT GENERATION ENDPOINT
+// ============================================
+
+app.post("/api/generate-content", async (req: Request, res: Response) => {
+  try {
+    const { topic, niche, style } = req.body;
+
+    if (!topic) {
+      return res.status(400).json({ error: "Topic is required" });
+    }
+
+    // Generate script
+    const scriptMessage = await client.messages.create({
+      model: "claude-3-5-sonnet-20241022",
+      max_tokens: 800,
+      messages: [
+        {
+          role: "user",
+          content: `Create a viral TikTok script (15-60 seconds):
+          Topic: ${topic}
+          Niche: ${niche || "General"}
+          Style: ${style || "viral"}
+          
+          Include: [SCENE], [TEXT OVERLAY], [MUSIC CUE]
+          First 2 seconds = HOOK (critical)
+          Optimize for 90%+ completion rate
+          
+          Return ONLY the script.`,
+        },
+      ],
+    });
+
+    const script =
+      scriptMessage.content[0].type === "text" ? scriptMessage.content[0].text : "";
+
+    // Generate caption
+    const captionMessage = await client.messages.create({
+      model: "claude-3-5-sonnet-20241022",
+      max_tokens: 300,
+      messages: [
+        {
+          role: "user",
+          content: `Create a TikTok caption (max 150 chars) for: "${topic}"
+          Include emoji (2-3), call-to-action, make it shareable.
+          Return ONLY the caption.`,
+        },
+      ],
+    });
+
+    const caption =
+      captionMessage.content[0].type === "text"
+        ? captionMessage.content[0].text
+        : "";
+
+    // Generate hashtags
+    const hashtagMessage = await client.messages.create({
+      model: "claude-3-5-sonnet-20241022",
+      max_tokens: 200,
+      messages: [
+        {
+          role: "user",
+          content: `Generate 15 trending TikTok hashtags for: "${topic}"
+          Mix: 3 mega (1M+), 5 macro (100K-1M), 7 micro (10K-100K)
+          Return ONLY JSON array: ["#tag1", "#tag2", ...]`,
+        },
+      ],
+    });
+
+    let hashtags: string[] = [];
+    try {
+      const hashtagText =
+        hashtagMessage.content[0].type === "text"
+          ? hashtagMessage.content[0].text
+          : "[]";
+      hashtags = JSON.parse(hashtagText);
+    } catch {
+      hashtags = ["#profithackai", "#ai", "#viral"];
+    }
+
+    // Generate music suggestions
+    const musicMessage = await client.messages.create({
+      model: "claude-3-5-sonnet-20241022",
+      max_tokens: 300,
+      messages: [
+        {
+          role: "user",
+          content: `Suggest 3 trending TikTok songs for: "${topic}"
+          Return JSON: [{ "track": "name", "artist": "name", "duration": 30 }, ...]`,
+        },
+      ],
+    });
+
+    let musicSuggestions: any[] = [];
+    try {
+      const musicText =
+        musicMessage.content[0].type === "text"
+          ? musicMessage.content[0].text
+          : "[]";
+      musicSuggestions = JSON.parse(musicText);
+    } catch {
+      musicSuggestions = [
+        { track: "Trending Sound", artist: "TikTok", duration: 30 },
+      ];
+    }
+
+    res.json({
+      script,
+      caption,
+      hashtags,
+      musicSuggestions,
+      topic,
+      niche,
+      style,
+      generatedAt: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Generation error:", error);
+    res.status(500).json({ error: "Failed to generate content" });
+  }
+});
+
+// ============================================
+// 2. TIKTOK ALGORITHM RANKING ENDPOINT
+// ============================================
+
+interface VideoMetrics {
+  id: string;
+  views: number;
+  likes: number;
+  shares: number;
+  comments: number;
+  watchTime: number;
+  completionRate: number;
+  timestamp: number;
+  category: string;
+}
+
+interface UserProfile {
+  userId: string;
+  watchHistory: string[];
+  likedCategories: string[];
+}
+
+app.post("/api/rank-videos", (req: Request, res: Response) => {
+  try {
+    const { videos, userProfile } = req.body;
+
+    if (!videos || !Array.isArray(videos)) {
+      return res.status(400).json({ error: "Videos array is required" });
+    }
+
+    const rankedVideos = videos.map((video: VideoMetrics) => {
+      const now = Date.now();
+      const ageMinutes = (now - video.timestamp) / (1000 * 60);
+
+      // Engagement score
+      const likeWeight = 0.4;
+      const shareWeight = 0.35;
+      const commentWeight = 0.15;
+      const watchTimeWeight = 0.1;
+
+      const normalizedLikes = Math.min(video.likes / 1000, 1);
+      const normalizedShares = Math.min(video.shares / 100, 1);
+      const normalizedComments = Math.min(video.comments / 500, 1);
+      const normalizedWatchTime = Math.min(video.watchTime / 60, 1);
+
+      const engagementScore =
+        normalizedLikes * likeWeight +
+        normalizedShares * shareWeight +
+        normalizedComments * commentWeight +
+        normalizedWatchTime * watchTimeWeight;
+
+      // Completion boost
+      let completionBoost = 1.0;
+      if (video.completionRate > 0.9) completionBoost = 1.5;
+      else if (video.completionRate > 0.7) completionBoost = 1.3;
+      else if (video.completionRate > 0.5) completionBoost = 1.1;
+      else completionBoost = 0.8;
+
+      // Freshness boost
+      let freshnessBoost = 1.0;
+      if (ageMinutes < 5) freshnessBoost = 2.0;
+      else if (ageMinutes < 30) freshnessBoost = 1.8;
+      else if (ageMinutes < 60) freshnessBoost = 1.5;
+      else if (ageMinutes < 1440) freshnessBoost = 1.2;
+
+      const finalScore =
+        engagementScore * completionBoost * freshnessBoost;
+
+      return {
+        ...video,
+        finalScore,
+        rank: 0, // Will be set after sorting
+      };
+    });
+
+    // Sort by score
+    rankedVideos.sort((a: any, b: any) => b.finalScore - a.finalScore);
+
+    // Add ranks
+    rankedVideos.forEach((video: any, index: number) => {
+      video.rank = index + 1;
+    });
+
+    res.json({
+      rankedVideos: rankedVideos.slice(0, 30),
+      algorithm: "TikTok FYP Algorithm v1.0",
+    });
+  } catch (error) {
+    console.error("Ranking error:", error);
+    res.status(500).json({ error: "Failed to rank videos" });
+  }
+});
+
+// ============================================
+// 3. ANALYTICS TRACKING ENDPOINT
+// ============================================
+
+app.post("/api/track-video-watch", (req: Request, res: Response) => {
+  try {
+    const { videoId, userId, watchDuration, completionRate } = req.body;
+
+    // In production, save to database
+    console.log(`📊 Video ${videoId} watched by ${userId}`);
+    console.log(`   Duration: ${watchDuration}s, Completion: ${(completionRate * 100).toFixed(1)}%`);
+
+    res.json({
+      success: true,
+      message: "Watch tracked successfully",
+      data: {
+        videoId,
+        userId,
+        watchDuration,
+        completionRate,
+        trackedAt: new Date().toISOString(),
+      },
+    });
+  } catch (error) {
+    console.error("Tracking error:", error);
+    res.status(500).json({ error: "Failed to track watch" });
+  }
+});
+
+// ============================================
+// 4. TRENDING TOPICS ENDPOINT
+// ============================================
+
+app.get("/api/trending-topics", async (req: Request, res: Response) => {
+  try {
+    const message = await client.messages.create({
+      model: "claude-3-5-sonnet-20241022",
+      max_tokens: 300,
+      messages: [
+        {
+          role: "user",
+          content: `List 10 trending TikTok topics RIGHT NOW (as of today).
+          Focus on: AI, money, tech, viral trends.
+          Return JSON: { "topics": ["topic1", "topic2", ...] }`,
+        },
+      ],
+    });
+
+    let topics: string[] = [];
+    try {
+      const text =
+        message.content[0].type === "text" ? message.content[0].text : "{}";
+      const parsed = JSON.parse(text);
+      topics = parsed.topics || [];
+    } catch {
+      topics = [
+        "AI making money",
+        "ChatGPT hacks",
+        "Passive income automation",
+        "AI video generation",
+        "Coding tutorials",
+      ];
+    }
+
+    res.json({
+      topics,
+      category: "AI & Tech",
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Trending error:", error);
+    res.status(500).json({ error: "Failed to fetch trending topics" });
+  }
+});
+
+// ============================================
+// 5. HEALTH CHECK
+// ============================================
+
+app.get("/api/health", (req: Request, res: Response) => {
+  res.json({
+    status: "✅ ProfitHack AI Backend Running",
+    version: "1.0.0",
+    timestamp: new Date().toISOString(),
+    endpoints: [
+      "POST /api/generate-content",
+      "POST /api/rank-videos",
+      "POST /api/track-video-watch",
+      "GET /api/trending-topics",
+      "GET /api/health",
+    ],
+  });
+});
+
+// ============================================
+// 6. START SERVER
+// ============================================
+
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  console.log(`
+╔════════════════════════════════════════╗
+║   🚀 ProfitHack AI Backend Running     ║
+║   🔗 http://localhost:${PORT}           ║
+║   🤖 TikTok Algorithm + AI Agents      ║
+╚════════════════════════════════════════╝
+  `);
+});
+
+export default app;

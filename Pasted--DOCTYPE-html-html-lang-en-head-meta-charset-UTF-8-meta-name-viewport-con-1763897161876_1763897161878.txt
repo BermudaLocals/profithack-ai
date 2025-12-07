@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private Call - ProfitHack AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Assuming your final combined CSS is linked here -->
+    <link rel="stylesheet" href="profithack_combined_final.css"> 
+    <style>
+        /* Include the custom CSS generated in the next step */
+        @import url('private_call_styles.css'); 
+    </style>
+</head>
+<body class="bg-ph-bg text-ph-text font-sans antialiased min-h-screen flex items-center justify-center">
+
+    <!-- Main Call Container -->
+    <div id="call-container" class="relative w-full max-w-4xl h-[80vh] bg-gray-900 rounded-xl overflow-hidden shadow-2xl">
+        
+        <!-- 1. Remote Video Element (The main screen) -->
+        <video id="remote-video" autoplay playsinline class="w-full h-full object-cover"></video>
+        
+        <!-- 2. Local Video Element (The small picture-in-picture) -->
+        <video id="local-video" autoplay muted playsinline class="absolute bottom-4 right-4 w-32 h-48 object-cover rounded-lg border-2 border-ph-magenta shadow-neon-magenta"></video>
+
+        <!-- 3. Termination Overlay (Initially Hidden) -->
+        <div id="termination-overlay" class="absolute inset-0 bg-black flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
+            
+            <!-- Neon Alert Box -->
+            <div id="termination-alert" class="p-8 rounded-xl border-2 border-ph-magenta neon-glow-magenta text-center max-w-md transform scale-90 transition-transform duration-500">
+                <h2 class="text-2xl font-bold text-ph-magenta mb-4 text-shadow-neon-magenta">
+                    Call Terminated
+                </h2>
+                <p id="termination-message" class="text-ph-text mb-6">
+                    Your paid time has expired. Redirecting to the Models Gallery in 5 seconds...
+                </p>
+                <div class="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
+                    <!-- Progress Bar -->
+                    <div id="redirect-progress" class="h-full bg-ph-cyan transition-all duration-500" style="width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Audio Element for Remote Stream -->
+    <audio id="remote-audio" autoplay></audio>
+
+    <script>
+        // Conceptual JavaScript to trigger the overlay for demonstration
+        function simulateTermination(reason) {
+            const overlay = document.getElementById('termination-overlay');
+            const alertBox = document.getElementById('termination-alert');
+            const messageEl = document.getElementById('termination-message');
+            const progressBar = document.getElementById('redirect-progress');
+            
+            // 1. Blackout Screen
+            overlay.style.opacity = '1';
+            overlay.style.pointerEvents = 'auto';
+            
+            // 2. Show Alert
+            alertBox.style.transform = 'scale(1)';
+            messageEl.innerText = \`Your call was terminated due to \${reason.toLowerCase().replace('_', ' ')}. Redirecting to the Models Gallery in 5 seconds...\`;
+            
+            // 3. Animate Progress Bar
+            progressBar.style.transition = 'width 5s linear';
+            progressBar.style.width = '0%';
+            
+            // 4. Redirect (Conceptual)
+            // setTimeout(() => { window.location.href = '/models'; }, 5000);
+        }
+
+        // To test: call simulateTermination('TIME_EXPIRED') in the console
+    </script>
+</body>
+</html>

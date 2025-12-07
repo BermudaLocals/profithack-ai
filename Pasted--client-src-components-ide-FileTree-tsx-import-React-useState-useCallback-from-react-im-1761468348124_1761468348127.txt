@@ -1,0 +1,548 @@
+// client/src/components/ide/FileTree.tsx
+import React, { useState, useCallback } from 'react';
+import { ChevronRight, ChevronDown, Folder, FolderOpen, File, Plus, X, Edit, Download, Copy, Trash2 } from 'lucide-react';
+
+interface TreeNode {
+  id: string;
+  name: string;
+  type: 'file' | 'folder';
+  children?: TreeNode[];
+  path: string;
+}
+
+interface FileTreeProps {
+  files: TreeNode[];
+  onFileSelect: (path: string) => void;
+  onCreateFile: (path: string) => void;
+  onCreateFolder: (path: string) => void;
+  onRename: (oldPath: string, newPath: string) => void;
+  onDelete: (path: string) => void;
+  onDownload: (path: string) => void;
+  selectedPath?: string;
+}
+
+export const FileTree: React.FC<FileTreeProps> = ({
+  files,
+  onFileSelect,
+  onCreateFile,
+  onCreateFolder,
+  onRename,
+  onDelete,
+  onDownload,
+  selectedPath
+}) => {
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; node: TreeNode } | null>(null);
+  const [editingNode, setEditingNode] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState('');
+
+  const toggleFolder = useCallback((path: string) => {
+    setExpandedFolders(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(path)) {
+        newSet.delete(path);
+      } else {
+        newSet.add(path);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const renderNode = (node: TreeNode, level: number = 0): JSX.Element => {
+    const isExpanded = expandedFolders.has(node.path);
+    const isSelected = selectedPath === node.path;
+    const isEditing = editingNode === node.id;
+
+    return (
+      <div key={node.id}>
+        <div
+          className={`flex items-center px-2 py-1 hover:bg-gray-800 cursor-pointer group ${isSelected ? 'bg-gray-700' : ''}`}
+          style={{ paddingLeft: `${level * 16 + 8}px` }}
+          onClick={() => {
+            if (node.type === 'file') {
+              onFileSelect(node.path);
+            } else {
+              toggleFolder(node.path);
+            }
+          }}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            setContextMenu({ x: e.clientX, y: e.clientY, node });
+          }}
+        >
+          {node.type === 'folder' && (
+            <span className="mr-1">
+              {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+            </span>
+          )}
+          
+          <span className="mr-2">
+            {node.type === 'folder' ? (isExpanded ? <FolderOpen size={16} /> : <Folder size={16} />) : <File size={16} />}
+          </span>
+
+          {isEditing ? (
+            <input
+              type="text"
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={() => {
+                if (editValue.trim()) {
+                  onRename(node.path, node.path.replace(/[^/]+$/, editValue));
+                }
+                setEditingNode(null);
+                setEditValue('');
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  if (editValue.trim()) {
+                    onRename(node.path, node.path.replace(/[^/]+$/, editValue));
+                  }
+                  setEditingNode(null);
+                  setEditValue('');
+                }
+                if (e.key === 'Escape') {
+                  setEditingNode(null);
+                  setEditValue('');
+                }
+              }}
+              className="bg-gray-700 text-white px-1 rounded outline-none"
+              autoFocus
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <span className="text-sm text-gray-300">{node.name}</span>
+          )}
+
+          <div className="ml-auto opacity-0 group-hover:opacity-100 flex gap-1">
+            <button
+              size={16}
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditingNode(node.id);
+                setEditValue(node.name);
+              }}
+              className="p-1 hover:bg-gray-600 rounded"
+            >
+              <Edit size={12} />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDownload(node.path);
+              }}
+              className="p-1 hover:bg-gray-600 rounded"
+            >
+              <Download size={12} />
+            </button>
+          </div>
+        </div>
+
+        {node.type === 'folder' && isExpanded && node.children && (
+          <div>
+            {node.children.map(child => renderNode(child, level + 1))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="bg-gray-900 text-white h-full relative">
+      <div className="p-2 border-b border-gray-700 flex gap-2">
+        <button
+          onClick={() => {
+            const path = prompt('Enter file name:');
+            if (path) onCreateFile(path);
+          }}
+          className="px-2 py-1 bg-green-600 hover:bg-green-700 rounded text-sm flex items-center gap-1"
+        >
+          <Plus size={14} />
+          File
+        </button>
+        <button
+          onClick={() => {
+            const path = prompt('Enter folder name:');
+            if (path) onCreateFolder(path);
+          }}
+          className="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm flex items-center gap-1"
+        >
+          <Plus size={14} />
+          Folder
+        </button>
+      </div>
+
+      <div className="overflow-auto">
+        {files.map(node => renderNode(node))}
+      </div>
+
+      {contextMenu && (
+        <div
+          className="fixed bg-gray-800 border border-gray-700 rounded shadow-lg py-1 z-50"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+          onClick={() => setContextMenu(null)}
+        >
+          <button
+            className="px-4 py-2 hover:bg-gray-700 w-full text-left text-sm flex items-center gap-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              setEditingNode(contextMenu.node.id);
+              setEditValue(contextMenu.node.name);
+              setContextMenu(null);
+            }}
+          >
+            <Edit size={14} /> Rename
+          </button>
+          <button
+            className="px-4 py-2 hover:bg-gray-700 w-full text-left text-sm flex items-center gap-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDownload(contextMenu.node.path);
+              setContextMenu(null);
+            }}
+          >
+            <Download size={14} /> Download
+          </button>
+          <button
+            className="px-4 py-2 hover:bg-gray-700 w-full text-left text-sm flex items-center gap-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigator.clipboard.writeText(contextMenu.node.path);
+              setContextMenu(null);
+            }}
+          >
+            <Copy size={14} /> Copy Path
+          </button>
+          <div className="border-t border-gray-700 my-1"></div>
+          <button
+            className="px-4 py-2 hover:bg-gray-700 w-full text-left text-sm flex items-center gap-2 text-red-400"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (confirm(`Delete ${contextMenu.node.name}?`)) {
+                onDelete(contextMenu.node.path);
+              }
+              setContextMenu(null);
+            }}
+          >
+            <Trash2 size={14} /> Delete
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+LivePreview.tsx
+// client/src/components/ide/LivePreview.tsx
+import React, { useState, useEffect, useRef } from 'react';
+import { Monitor, Smartphone, Tablet, RefreshCw, ExternalLink, Maximize2, Minimize2 } from 'lucide-react';
+
+interface LivePreviewProps {
+  url: string;
+  onRefresh: () => void;
+  isLoading?: boolean;
+}
+
+export const LivePreview: React.FC<LivePreviewProps> = ({ url, onRefresh, isLoading = false }) => {
+  const [deviceMode, setDeviceMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const deviceSizes = {
+    desktop: { width: '100%', height: '100%' },
+    tablet: { width: '768px', height: '1024px' },
+    mobile: { width: '375px', height: '667px' }
+  };
+
+  const refreshPreview = () => {
+    if (iframeRef.current) {
+      iframeRef.current.src = iframeRef.current.src;
+    }
+    onRefresh();
+  };
+
+  return (
+    <div className={`bg-gray-900 flex flex-col ${isFullscreen ? 'fixed inset-0 z-50' : 'h-full'}`}>
+      <div className="bg-gray-800 px-4 py-2 flex items-center justify-between border-b border-gray-700">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-400">Preview</span>
+          {isLoading && <RefreshCw className="animate-spin size-4 text-gray-400" />}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="flex bg-gray-700 rounded-lg p-1">
+            <button
+              onClick={() => setDeviceMode('desktop')}
+              className={`p-1 rounded ${deviceMode === 'desktop' ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
+              title="Desktop"
+            >
+              <Monitor size={16} />
+            </button>
+            <button
+              onClick={() => setDeviceMode('tablet')}
+              className={`p-1 rounded ${deviceMode === 'tablet' ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
+              title="Tablet"
+            >
+              <Tablet size={16} />
+            </button>
+            <button
+              onClick={() => setDeviceMode('mobile')}
+              className={`p-1 rounded ${deviceMode === 'mobile' ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
+              title="Mobile"
+            >
+              <Smartphone size={16} />
+            </button>
+          </div>
+
+          <button onClick={refreshPreview} className="p-1 hover:bg-gray-700 rounded" title="Refresh">
+            <RefreshCw size={16} />
+          </button>
+
+          <button onClick={() => window.open(url, '_blank')} className="p-1 hover:bg-gray-700 rounded" title="Open in new tab">
+            <ExternalLink size={16} />
+          </button>
+
+          <button onClick={() => setIsFullscreen(!isFullscreen)} className="p-1 hover:bg-gray-700 rounded" title="Toggle fullscreen">
+            {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center p-4 bg-gray-950">
+        {url ? (
+          <div
+            className="bg-white rounded-lg shadow-2xl overflow-hidden border-2 border-gray-700"
+            style={{
+              width: deviceSizes[deviceMode].width,
+              height: deviceSizes[deviceMode].height,
+              maxWidth: '100%',
+              maxHeight: '100%'
+            }}
+          >
+            <iframe
+              ref={iframeRef}
+              src={url}
+              className="w-full h-full"
+              title="Live Preview"
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+              allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; microphone; midi; payment; vr"
+            />
+          </div>
+        ) : (
+          <div className="text-center text-gray-500">
+            <Monitor size={48} className="mx-auto mb-4 opacity-50" />
+            <p>Run your project to see preview</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+Console.tsx
+// client/src/components/ide/Console.tsx
+import React, { useState, useEffect, useRef } from 'react';
+import { Terminal, X, Download, Filter, Search, Copy } from 'lucide-react';
+
+interface ConsoleMessage {
+  id: string;
+  type: 'log' | 'error' | 'warn' | 'info';
+  timestamp: Date;
+  message: string;
+  source?: string;
+}
+
+interface ConsoleProps {
+  messages: ConsoleMessage[];
+  onClear: () => void;
+  onDownload: () => void;
+}
+
+export const Console: React.FC<ConsoleProps> = ({ messages, onClear, onDownload }) => {
+  const [filter, setFilter] = useState<'all' | 'log' | 'error' | 'warn' | 'info'>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isExpanded, setIsExpanded] = useState(true);
+  const consoleRef = useRef<HTMLDivElement>(null);
+
+  const filteredMessages = messages.filter(msg => {
+    if (filter !== 'all' && msg.type !== filter) return false;
+    if (searchTerm && !msg.message.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    return true;
+  });
+
+  useEffect(() => {
+    if (consoleRef.current) {
+      consoleRef.current.scrollTop = consoleRef.current.scrollHeight;
+    }
+  }, [filteredMessages]);
+
+  const getMessageColor = (type: ConsoleMessage['type']) => {
+    switch (type) {
+      case 'error': return 'text-red-400';
+      case 'warn': return 'text-yellow-400';
+      case 'info': return 'text-blue-400';
+      default: return 'text-gray-300';
+    }
+  };
+
+  const getMessageIcon = (type: ConsoleMessage['type']) => {
+    switch (type) {
+      case 'error': return '❌';
+      case 'warn': return '⚠️';
+      case 'info': return 'ℹ️';
+      default: return '📝';
+    }
+  };
+
+  return (
+    <div className={`bg-gray-900 border-t border-gray-700 ${isExpanded ? 'h-64' : 'h-8'}`}>
+      <div className="bg-gray-800 px-4 py-1 flex items-center justify-between border-b border-gray-700">
+        <div className="flex items-center gap-2">
+          <Terminal size={16} className="text-gray-400" />
+          <span className="text-sm text-gray-300">Console</span>
+          <span className="text-xs text-gray-500">({filteredMessages.length} messages)</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1">
+            {(['all', 'log', 'error', 'warn', 'info'] as const).map(type => (
+              <button
+                key={type}
+                onClick={() => setFilter(type)}
+                className={`px-2 py-1 text-xs rounded ${filter === type ? 'bg-gray-600' : 'hover:bg-gray-700'}`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-2 py-1 text-xs bg-gray-700 rounded outline-none"
+          />
+
+          <button onClick={onClear} className="p-1 hover:bg-gray-700 rounded" title="Clear console">
+            <X size={14} />
+          </button>
+
+          <button onClick={onDownload} className="p-1 hover:bg-gray-700 rounded" title="Download logs">
+            <Download size={14} />
+          </button>
+
+          <button onClick={() => setIsExpanded(!isExpanded)} className="p-1 hover:bg-gray-700 rounded" title="Toggle console">
+            {isExpanded ? '▼' : '▲'}
+          </button>
+        </div>
+      </div>
+
+      {isExpanded && (
+        <div
+          ref={consoleRef}
+          className="p-2 font-mono text-sm overflow-auto h-52"
+          onClick={() => {
+            navigator.clipboard.writeText(
+              filteredMessages.map(msg => `${msg.type}: ${msg.message}`).join('\n')
+            );
+          }}
+        >
+          {filteredMessages.length === 0 ? (
+            <div className="text-gray-500 text-center py-4">No messages</div>
+          ) : (
+            filteredMessages.map(msg => (
+              <div
+                key={msg.id}
+                className={`mb-1 ${getMessageColor(msg.type)} hover:bg-gray-800 p-1 rounded cursor-pointer`}
+              >
+                <span className="mr-2">{getMessageIcon(msg.type)}</span>
+                <span className="text-gray-500 text-xs mr-2">
+                  [{msg.timestamp.toLocaleTimeString()}]
+                </span>
+                {msg.source && <span className="text-gray-400 text-xs mr-2">[{msg.source}]</span>}
+                <span className="break-all">{msg.message}</span>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+🔧 SAFE INTEGRATION COMMANDS
+Only Install Missing Dependencies
+# Install ONLY the missing icon library
+npm install lucide-react
+
+# DON'T touch your existing packages
+# DON'T change your build system
+# DON'T overwrite existing files
+Add Components to Your Existing Workspace
+# Create missing directories ONLY if they don't exist
+mkdir -p client/src/components/ide
+
+# These files are NEW - won't overwrite anything
+# Just copy-paste the components above into your existing structure
+Update Your Existing Workspace Component
+// Add to your existing IDEWorkspace.tsx - don't replace it
+// Just import the new components:
+
+import { FileTree } from './FileTree';
+import { LivePreview } from './LivePreview';
+import { Console } from './Console';
+
+// Add to your existing JSX where appropriate:
+<div className="left-panel">
+  <FileTree 
+    files={yourFiles}
+    onFileSelect={handleFileSelect}
+    // ... other props
+  />
+</div>
+
+<div className="right-panel">
+  <LivePreview 
+    url={previewUrl}
+    onRefresh={handleRefresh}
+    isLoading={isLoading}
+  />
+</div>
+
+<div className="bottom-panel">
+  <Console 
+    messages={consoleMessages}
+    onClear={handleClear}
+    onDownload={handleDownload}
+  />
+</div>
+🎯 INTEGRATION STEPS
+Step 1: Add Components (5 minutes)
+# Create the IDE components directory (only if needed)
+mkdir -p client/src/components/ide
+
+# Add each component file manually by copy-pasting
+# FileTree.tsx
+# LivePreview.tsx  
+# Console.tsx
+Step 2: Install Icons (1 minute)
+npm install lucide-react
+Step 3: Update Existing Component (10 minutes)
+Import the new components into your existing IDE workspace
+Add them to your JSX without removing existing code
+Connect them to your existing state management
+Step 4: Test (5 minutes)
+npm run dev
+✅ WHAT THIS DOES:
+✅ Adds missing File Tree with context menus
+
+✅ Adds Live Preview with device modes
+
+✅ Adds Console with color coding
+
+✅ Keeps your existing Vite setup
+
+✅ Keeps your existing package.json
+
+✅ Keeps your existing workspace pages
+
+✅ Just adds the 20% you're missing
+
+This approach complements your existing 80% without breaking anything! 🚀

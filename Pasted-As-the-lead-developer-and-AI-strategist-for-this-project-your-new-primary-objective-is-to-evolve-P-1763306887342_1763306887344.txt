@@ -1,0 +1,29 @@
+As the lead developer and AI strategist for this project, your new primary objective is to evolve "PROFITHACK AI" to be demonstrably superior to competing platforms and courses, using the following course as our initial benchmark for analysis: https://www.contentcreator.com/the-ai-creator-course.
+STRATEGIC ANALYSIS & MANDATE:
+The benchmark course sells knowledge on how to use external AI tools. Our platform, PROFITHACK AI, provides the integrated tools themselves. This is our core strategic advantage. We are not just teaching; we are empowering. Your mission is to make the value proposition of any external course obsolete by building their promised outcomes directly into our platform as effortless, one-click features.
+YOUR DIRECTIVES:
+Phase 1: Deconstruct the Benchmark and Map Features
+Analyze the provided course text (The AI Creator Course ). Deconstruct every skill, feature, and outcome they promise. Create a feature map that categorizes their offerings. Your map should include, but not be limited to:
+AI Filmmaking: Hollywood VFX (explosions, lighting), Character Consistency, Self-Cloning, Cinematic Quality Video Generation.
+Growth Content: Viral Short-Form Video Formulas (TikTok, Reels), Long-Form YouTube Content Strategy, Profitable AI Ad Generation.
+Visual Creation: AI Image & Graphic Generation (logos, web graphics, channel art), AI Thumbnail Engineering.
+Content Strategy: AI-Powered Content Planning, Competitor Analysis, and Scriptwriting.
+Studio & Editing: AI Virtual Studio Backgrounds, AI Video Editing (auto-captioning, audio enhancement).
+Phase 2: Gap Analysis and "10x" Feature Ideation
+For each feature identified in Phase 1, perform a gap analysis against our current platform capabilities. Then, for each, devise a "10x superior" feature concept that integrates the outcome directly into PROFITHACK AI.
+Example:
+Benchmark Teaches: "How to write prompts for AI thumbnails."
+Our 10x Feature: An "AI Thumbnail Engineer" tool. The user provides their video title, and our platform automatically generates 10 high-CTR, A/B testable thumbnail options, complete with compelling graphics and expressions, requiring zero prompt engineering from the user.
+Your goal is to transform every one of their "How-To" lessons into an automated, superior "Done-For-You" tool within our ecosystem.
+Phase 3: Implementation and Integration Roadmap
+Based on your 10x feature list, generate a prioritized development roadmap. For each new or upgraded feature, provide the following:
+Feature Name & Description: A clear title and a user-focused benefit statement.
+Technical Implementation Plan: The specific backend and frontend changes required.
+Integration Points: How this new tool will connect with existing platform features (e.g., the Creator Wallet, Social Media Bots, etc.).
+Priority Level: Assign a priority (Critical, High, Medium, Low) based on its potential impact on user acquisition and retention.
+Phase 4: Execute the Roadmap
+Begin executing the development roadmap, starting with the highest-priority items.
+First Priority: Focus on the most impactful visual content tools: AI Thumbnail Engineer, Viral Short-Form Video Creator, and Profitable Ad Generator. These have the highest potential for immediate user growth.
+Continuous Integration: As you build, ensure every new tool is seamlessly integrated into the existing user interface and workflows. The user experience must feel effortless and unified.
+Show Your Work: Before implementing each major feature, present your plan for my approval.
+Begin now. Start with Phase 1 by deconstructing the course content below and presenting your feature map.

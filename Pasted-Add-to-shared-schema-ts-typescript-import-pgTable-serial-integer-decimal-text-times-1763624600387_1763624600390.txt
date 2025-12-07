@@ -1,0 +1,350 @@
+Add to `shared/schema.ts`:
+
+```typescript
+import { pgTable, serial, integer, decimal, text, timestamp, varchar, index, boolean, jsonb } from 'drizzle-orm/pg-core';
+
+// Video ad campaigns
+export const videoAdCampaigns = pgTable(
+  'video_ad_campaigns',
+  {
+    id: serial('id').primaryKey(),
+    advertiserId: integer('advertiser_id').notNull().references(() => users.id),
+    campaignName: varchar('campaign_name', { length: 255 }).notNull(),
+    campaignDescription: text('campaign_description'),
+    productName: varchar('product_name', { length: 255 }).notNull(),
+    productUrl: varchar('product_url', { length: 500 }).notNull(),
+    targetAudience: jsonb('target_audience'), // age, gender, interests, location
+    budget: decimal('budget', { precision: 10, scale: 2 }).notNull(),
+    dailyBudget: decimal('daily_budget', { precision: 10, scale: 2 }).notNull(),
+    spent: decimal('spent', { precision: 10, scale: 2 }).default('0'),
+    creatorShare: decimal('creator_share', { precision: 5, scale: 2 }).default('25'), // 25% for creators
+    status: varchar('status', { length: 20 }).default('draft'),
+    startDate: timestamp('start_date').notNull(),
+    endDate: timestamp('end_date').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    advertiserIdIdx: index('video_ad_campaigns_advertiser_id_idx').on(table.advertiserId),
+    statusIdx: index('video_ad_campaigns_status_idx').on(table.status),
+  })
+);
+
+// Video ad creatives (generated videos)
+export const videoAdCreatives = pgTable(
+  'video_ad_creatives',
+  {
+    id: serial('id').primaryKey(),
+    campaignId: integer('campaign_id').notNull().references(() => videoAdCampaigns.id),
+    videoUrl: varchar('video_url', { length: 500 }).notNull(),
+    thumbnailUrl: varchar('thumbnail_url', { length: 500 }),
+    title: varchar('title', { length: 255 }).notNull(),
+    description: text('description'),
+    duration: integer('duration').notNull(), // seconds
+    generatedBy: varchar('generated_by', { length: 50 }).notNull(), // 'ai_clone', 'bot_generated', 'user_uploaded'
+    aiCloneId: integer('ai_clone_id').references(() => aiClones.id),
+    scriptUsed: text('script_used'),
+    viralScore: decimal('viral_score', { precision: 5, scale: 2 }).default('0'), // 0-100
+    views: integer('views').default(0),
+    clicks: integer('clicks').default(0),
+    conversions: integer('conversions').default(0),
+    engagementRate: decimal('engagement_rate', { precision: 5, scale: 2 }).default('0'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    campaignIdIdx: index('video_ad_creatives_campaign_id_idx').on(table.campaignId),
+    aiCloneIdIdx: index('video_ad_creatives_ai_clone_id_idx').on(table.aiCloneId),
+  })
+);
+
+// AI clones for ad generation
+export const aiClones = pgTable(
+  'ai_clones',
+  {
+    id: serial('id').primaryKey(),
+    creatorId: integer('creator_id').notNull().references(() => users.id),
+    cloneName: varchar('clone_name', { length: 255 }).notNull(),
+    voiceUrl: varchar('voice_url', { length: 500 }),
+    faceModelUrl: varchar('face_model_url', { length: 500 }),
+    bodyModelUrl: varchar('body_model_url', { length: 500 }),
+    personalityTraits: jsonb('personality_traits'), // tone, style, mannerisms
+    videoSamples: jsonb('video_samples'), // URLs of sample videos
+    trainingDataUrl: varchar('training_data_url', { length: 500 }),
+    cloneQuality: varchar('clone_quality', { length: 20 }).default('standard'), // 'basic', 'standard', 'premium', 'ultra'
+    isPublic: boolean('is_public').default(false),
+    usageCount: integer('usage_count').default(0),
+    earnings: decimal('earnings', { precision: 12, scale: 2 }).default('0'),
+    status: varchar('status', { length: 20 }).default('training'), // 'training', 'ready', 'active'
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    creatorIdIdx: index('ai_clones_creator_id_idx').on(table.creatorId),
+    statusIdx: index('ai_clones_status_idx').on(table.status),
+  })
+);
+
+// Video ad placements (creator videos with ads)
+export const videoAdPlacements = pgTable(
+  'video_ad_placements',
+  {
+    id: serial('id').primaryKey(),
+    videoId: integer('video_id').notNull().references(() => videos.id),
+    creatorId: integer('creator_id').notNull().references(() => users.id),
+    campaignId: integer('campaign_id').notNull().references(() => videoAdCampaigns.id),
+    creativeId: integer('creative_id').notNull().references(() => videoAdCreatives.id),
+    placementType: varchar('placement_type', { length: 50 }).notNull(), // 'pre_roll', 'mid_roll', 'post_roll', 'native'
+    placementPosition: integer('placement_position').notNull(), // seconds into video
+    placementDuration: integer('placement_duration').notNull(), // seconds
+    creatorEarnings: decimal('creator_earnings', { precision: 10, scale: 2 }).default('0'),
+    platformEarnings: decimal('platform_earnings', { precision: 10, scale: 2 }).default('0'),
+    status: varchar('status', { length: 20 }).default('active'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    videoIdIdx: index('video_ad_placements_video_id_idx').on(table.videoId),
+    creatorIdIdx: index('video_ad_placements_creator_id_idx').on(table.creatorId),
+    campaignIdIdx: index('video_ad_placements_campaign_id_idx').on(table.campaignId),
+  })
+);
+
+// Video ad views/clicks
+export const videoAdMetrics = pgTable(
+  'video_ad_metrics',
+  {
+    id: serial('id').primaryKey(),
+    campaignId: integer('campaign_id').notNull().references(() => videoAdCampaigns.id),
+    creativeId: integer('creative_id').notNull().references(() => videoAdCreatives.id),
+    date: timestamp('date').notNull(),
+    views: integer('views').notNull().default(0),
+    clicks: integer('clicks').notNull().default(0),
+    conversions: integer('conversions').notNull().default(0),
+    spend: decimal('spend', { precision: 10, scale: 2 }).notNull().default('0'),
+    creatorEarnings: decimal('creator_earnings', { precision: 10, scale: 2 }).notNull().default('0'),
+    platformEarnings: decimal('platform_earnings', { precision: 10, scale: 2 }).notNull().default('0'),
+    ctr: decimal('ctr', { precision: 5, scale: 2 }).notNull().default('0'),
+    cpc: decimal('cpc', { precision: 8, scale: 2 }).notNull().default('0'),
+    cpa: decimal('cpa', { precision: 8, scale: 2 }).notNull().default('0'),
+    roi: decimal('roi', { precision: 5, scale: 2 }).notNull().default('0'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    campaignIdIdx: index('video_ad_metrics_campaign_id_idx').on(table.campaignId),
+    creativeIdIdx: index('video_ad_metrics_creative_id_idx').on(table.creativeId),
+    dateIdx: index('video_ad_metrics_date_idx').on(table.date),
+  })
+);
+
+// Advertiser discovery records
+export const advertiserDiscoveryRecords = pgTable(
+  'advertiser_discovery_records',
+  {
+    id: serial('id').primaryKey(),
+    companyName: varchar('company_name', { length: 255 }).notNull(),
+    companyWebsite: varchar('company_website', { length: 500 }).notNull().unique(),
+    companyEmail: varchar('company_email', { length: 255 }),
+    companyPhone: varchar('company_phone', { length: 20 }),
+    industry: varchar('industry', { length: 100 }).notNull(),
+    estimatedBudget: decimal('estimated_budget', { precision: 10, scale: 2 }),
+    marketingChannels: jsonb('marketing_channels'),
+    socialMediaPresence: jsonb('social_media_presence'),
+    discoverySources: jsonb('discovery_sources'), // where we found them
+    contactStatus: varchar('contact_status', { length: 20 }).default('discovered'), // 'discovered', 'contacted', 'interested', 'onboarded'
+    lastContactDate: timestamp('last_contact_date'),
+    notes: text('notes'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    companyNameIdx: index('advertiser_discovery_records_company_name_idx').on(table.companyName),
+    industryIdx: index('advertiser_discovery_records_industry_idx').on(table.industry),
+    contactStatusIdx: index('advertiser_discovery_records_contact_status_idx').on(table.contactStatus),
+  })
+);
+
+// Creator video ad earnings
+export const creatorVideoAdEarnings = pgTable(
+  'creator_video_ad_earnings',
+  {
+    id: serial('id').primaryKey(),
+    creatorId: integer('creator_id').notNull().references(() => users.id),
+    campaignId: integer('campaign_id').notNull().references(() => videoAdCampaigns.id),
+    videoId: integer('video_id').notNull().references(() => videos.id),
+    placementId: integer('placement_id').notNull().references(() => videoAdPlacements.id),
+    totalEarnings: decimal('total_earnings', { precision: 10, scale: 2 }).notNull().default('0'),
+    views: integer('views').notNull().default(0),
+    clicks: integer('clicks').notNull().default(0),
+    conversions: integer('conversions').notNull().default(0),
+    payoutStatus: varchar('payout_status', { length: 20 }).default('pending'), // 'pending', 'processed', 'paid'
+    payoutDate: timestamp('payout_date'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    creatorIdIdx: index('creator_video_ad_earnings_creator_id_idx').on(table.creatorId),
+    campaignIdIdx: index('creator_video_ad_earnings_campaign_id_idx').on(table.campaignId),
+    videoIdIdx: index('creator_video_ad_earnings_video_id_idx').on(table.videoId),
+  })
+);
+
+// Ad generation jobs (for bot/AI)
+export const adGenerationJobs = pgTable(
+  'ad_generation_jobs',
+  {
+    id: serial('id').primaryKey(),
+    campaignId: integer('campaign_id').notNull().references(() => videoAdCampaigns.id),
+    jobType: varchar('job_type', { length: 50 }).notNull(), // 'script_generation', 'video_synthesis', 'clone_generation'
+    status: varchar('status', { length: 20 }).default('queued'), // 'queued', 'processing', 'completed', 'failed'
+    inputData: jsonb('input_data'),
+    outputData: jsonb('output_data'),
+    generatedVideoUrl: varchar('generated_video_url', { length: 500 }),
+    generatedScriptUrl: varchar('generated_script_url', { length: 500 }),
+    processingTime: integer('processing_time'), // seconds
+    quality: varchar('quality', { length: 20 }).default('standard'),
+    aiModel: varchar('ai_model', { length: 100 }).default('claude-3.5-sonnet'),
+    errorMessage: text('error_message'),
+    retryCount: integer('retry_count').default(0),
+    maxRetries: integer('max_retries').default(3),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    completedAt: timestamp('completed_at'),
+  },
+  (table) => ({
+    campaignIdIdx: index('ad_generation_jobs_campaign_id_idx').on(table.campaignId),
+    statusIdx: index('ad_generation_jobs_status_idx').on(table.status),
+    jobTypeIdx: index('ad_generation_jobs_job_type_idx').on(table.jobType),
+  })
+);
+```
+
+### Database Migration
+
+Create `migrations/006_video_ads_system.sql`:
+
+```sql
+-- Video ad campaigns
+CREATE TABLE IF NOT EXISTS video_ad_campaigns (
+  id SERIAL PRIMARY KEY,
+  advertiser_id INTEGER NOT NULL REFERENCES users(id),
+  campaign_name VARCHAR(255) NOT NULL,
+  campaign_description TEXT,
+  product_name VARCHAR(255) NOT NULL,
+  product_url VARCHAR(500) NOT NULL,
+  target_audience JSONB,
+  budget DECIMAL(10, 2) NOT NULL,
+  daily_budget DECIMAL(10, 2) NOT NULL,
+  spent DECIMAL(10, 2) DEFAULT 0,
+  creator_share DECIMAL(5, 2) DEFAULT 25,
+  status VARCHAR(20) DEFAULT 'draft',
+  start_date TIMESTAMP NOT NULL,
+  end_date TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+CREATE INDEX video_ad_campaigns_advertiser_id_idx ON video_ad_campaigns(advertiser_id);
+CREATE INDEX video_ad_campaigns_status_idx ON video_ad_campaigns(status);
+
+-- Video ad creatives
+CREATE TABLE IF NOT EXISTS video_ad_creatives (
+  id SERIAL PRIMARY KEY,
+  campaign_id INTEGER NOT NULL REFERENCES video_ad_campaigns(id),
+  video_url VARCHAR(500) NOT NULL,
+  thumbnail_url VARCHAR(500),
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  duration INTEGER NOT NULL,
+  generated_by VARCHAR(50) NOT NULL,
+  ai_clone_id INTEGER REFERENCES ai_clones(id),
+  script_used TEXT,
+  viral_score DECIMAL(5, 2) DEFAULT 0,
+  views INTEGER DEFAULT 0,
+  clicks INTEGER DEFAULT 0,
+  conversions INTEGER DEFAULT 0,
+  engagement_rate DECIMAL(5, 2) DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+CREATE INDEX video_ad_creatives_campaign_id_idx ON video_ad_creatives(campaign_id);
+CREATE INDEX video_ad_creatives_ai_clone_id_idx ON video_ad_creatives(ai_clone_id);
+
+-- AI clones
+CREATE TABLE IF NOT EXISTS ai_clones (
+  id SERIAL PRIMARY KEY,
+  creator_id INTEGER NOT NULL REFERENCES users(id),
+  clone_name VARCHAR(255) NOT NULL,
+  voice_url VARCHAR(500),
+  face_model_url VARCHAR(500),
+  body_model_url VARCHAR(500),
+  personality_traits JSONB,
+  video_samples JSONB,
+  training_data_url VARCHAR(500),
+  clone_quality VARCHAR(20) DEFAULT 'standard',
+  is_public BOOLEAN DEFAULT false,
+  usage_count INTEGER DEFAULT 0,
+  earnings DECIMAL(12, 2) DEFAULT 0,
+  status VARCHAR(20) DEFAULT 'training',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+CREATE INDEX ai_clones_creator_id_idx ON ai_clones(creator_id);
+CREATE INDEX ai_clones_status_idx ON ai_clones(status);
+
+-- Video ad placements
+CREATE TABLE IF NOT EXISTS video_ad_placements (
+  id SERIAL PRIMARY KEY,
+  video_id INTEGER NOT NULL REFERENCES videos(id),
+  creator_id INTEGER NOT NULL REFERENCES users(id),
+  campaign_id INTEGER NOT NULL REFERENCES video_ad_campaigns(id),
+  creative_id INTEGER NOT NULL REFERENCES video_ad_creatives(id),
+  placement_type VARCHAR(50) NOT NULL,
+  placement_position INTEGER NOT NULL,
+  placement_duration INTEGER NOT NULL,
+  creator_earnings DECIMAL(10, 2) DEFAULT 0,
+  platform_earnings DECIMAL(10, 2) DEFAULT 0,
+  status VARCHAR(20) DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+CREATE INDEX video_ad_placements_video_id_idx ON video_ad_placements(video_id);
+CREATE INDEX video_ad_placements_creator_id_idx ON video_ad_placements(creator_id);
+CREATE INDEX video_ad_placements_campaign_id_idx ON video_ad_placements(campaign_id);
+
+-- Video ad metrics
+CREATE TABLE IF NOT EXISTS video_ad_metrics (
+  id SERIAL PRIMARY KEY,
+  campaign_id INTEGER NOT NULL REFERENCES video_ad_campaigns(id),
+  creative_id INTEGER NOT NULL REFERENCES video_ad_creatives(id),
+  date TIMESTAMP NOT NULL,
+  views INTEGER NOT NULL DEFAULT 0,
+  clicks INTEGER NOT NULL DEFAULT 0,
+  conversions INTEGER NOT NULL DEFAULT 0,
+  spend DECIMAL(10, 2) NOT NULL DEFAULT 0,
+  creator_earnings DECIMAL(10, 2) NOT NULL DEFAULT 0,
+  platform_earnings DECIMAL(10, 2) NOT NULL DEFAULT 0,
+  ctr DECIMAL(5, 2) NOT NULL DEFAULT 0,
+  cpc DECIMAL(8, 2) NOT NULL DEFAULT 0,
+  cpa DECIMAL(8, 2) NOT NULL DEFAULT 0,
+  roi DECIMAL(5, 2) NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+CREATE INDEX video_ad_metrics_campaign_id_idx ON video_ad_metrics(campaign_id);
+CREATE INDEX video_ad_metrics_creative_id_idx ON video_ad_metrics(creative_id);
+CREATE INDEX video_ad_metrics_date_idx ON video_ad_metrics(date);
+
+-- Advertiser discovery
+CREATE TABLE IF NOT EXISTS advertiser_discovery_records (
+  id SERIAL PRIMARY KEY,
+  company_name VARCHAR(255) NOT NULL,
+  company_website VARCHAR(500) NOT NULL UNIQUE,
+  company_email VARCHAR(255),
+  company_phone VARCHAR(20),
+  industry VARCHAR(100) NOT NULL,
+  estimated_budget DECIMAL(10, 2),
+  marketing_channels JSONB,
+  social_media_presence JSONB,
+  discovery_sources JSONB,
+  contact_status VARCHAR(20) DEFAULT 'discovered',
+  last_contact_date TIMESTAMP,
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIME
+(Content truncated due to size limit. Use page ranges or line ranges to read remaining content)
+
+
+live

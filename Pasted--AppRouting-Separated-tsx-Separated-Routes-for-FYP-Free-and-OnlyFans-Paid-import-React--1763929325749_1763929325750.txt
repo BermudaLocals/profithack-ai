@@ -1,0 +1,377 @@
+// AppRouting_Separated.tsx - Separated Routes for FYP (Free) and OnlyFans (Paid)
+
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import FYPFeed from './FYPFeed_TikTok_Final';
+import PrivateOnlyFansFeed from './PrivateOnlyFansFeed';
+import LiveHostsFeed from './LiveHostsFeed';
+import PaymentGate from './PaymentGate';
+import {
+  CommentsComponent,
+  DirectMessagesComponent,
+  NotificationsComponent,
+  SearchComponent,
+  TrendingSoundsComponent,
+  CreatorAnalyticsComponent,
+  DuetComponent,
+  StitchComponent
+} from './TikTokFeatures';
+import './Navigation.css';
+import './PrivateOnlyFansFeed.css';
+import './PaymentGate.css';
+
+// ============================================
+// BOTTOM NAVIGATION COMPONENT
+// ============================================
+const BottomNavigation: React.FC<{ currentPage: string }> = ({ currentPage }) => {
+  const navigate = useNavigate();
+
+  return (
+    <nav className="bottom-navigation">
+      {/* HOME - FYP FEED (FREE) */}
+      <button
+        className={`nav-item ${currentPage === 'home' ? 'active' : ''}`}
+        onClick={() => navigate('/')}
+        title="Home - Free Videos"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+        </svg>
+        <span>Home</span>
+      </button>
+
+      {/* EXPLORE */}
+      <button
+        className={`nav-item ${currentPage === 'explore' ? 'active' : ''}`}
+        onClick={() => navigate('/explore')}
+        title="Explore"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5z" />
+        </svg>
+        <span>Explore</span>
+      </button>
+
+      {/* LIVE */}
+      <button
+        className={`nav-item ${currentPage === 'live' ? 'active' : ''}`}
+        onClick={() => navigate('/live')}
+        title="Live Streams"
+      >
+        <span className="live-dot"></span>
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5z" />
+        </svg>
+        <span>Live</span>
+      </button>
+
+      {/* ONLYFANS - PRIVATE CONTENT (PAID) */}
+      <button
+        className={`nav-item ${currentPage === 'onlyfans' ? 'active' : ''}`}
+        onClick={() => navigate('/onlyfans')}
+        title="OnlyFans - Exclusive Content"
+      >
+        <span className="exclusive-badge">🔒</span>
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.72-7 8.77V12H5V6.3l7-3.11v8.8z" />
+        </svg>
+        <span>OnlyFans</span>
+      </button>
+
+      {/* MESSAGES */}
+      <button
+        className={`nav-item ${currentPage === 'messages' ? 'active' : ''}`}
+        onClick={() => navigate('/messages')}
+        title="Messages"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+        </svg>
+        <span>Messages</span>
+      </button>
+
+      {/* PROFILE */}
+      <button
+        className={`nav-item ${currentPage === 'profile' ? 'active' : ''}`}
+        onClick={() => navigate('/profile')}
+        title="Profile"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+        </svg>
+        <span>Profile</span>
+      </button>
+    </nav>
+  );
+};
+
+// ============================================
+// TOP HEADER COMPONENT
+// ============================================
+const TopHeader: React.FC<{ currentPage: string }> = ({ currentPage }) => {
+  const navigate = useNavigate();
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const getHeaderTitle = () => {
+    switch (currentPage) {
+      case 'home':
+        return 'For You - Free Videos';
+      case 'onlyfans':
+        return 'OnlyFans - Exclusive Content';
+      case 'live':
+        return 'Live Streams';
+      case 'explore':
+        return 'Explore';
+      case 'messages':
+        return 'Messages';
+      case 'profile':
+        return 'Profile';
+      default:
+        return 'ProfitHack AI';
+    }
+  };
+
+  return (
+    <header className="top-header">
+      <div className="header-left">
+        <h1 className="app-logo">ProfitHack AI</h1>
+        <span className="page-title">{getHeaderTitle()}</span>
+      </div>
+
+      <div className="header-center">
+        {currentPage === 'explore' && (
+          <div className="search-bar-header">
+            <input type="text" placeholder="Search..." />
+          </div>
+        )}
+      </div>
+
+      <div className="header-right">
+        <button
+          className="header-icon"
+          onClick={() => setShowNotifications(!showNotifications)}
+          title="Notifications"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+          </svg>
+          {showNotifications && <NotificationsComponent />}
+        </button>
+
+        <button
+          className="header-icon"
+          onClick={() => navigate('/upload')}
+          title="Upload"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+  );
+};
+
+// ============================================
+// MAIN APP CONTENT
+// ============================================
+const AppContent: React.FC = () => {
+  const location = useLocation();
+  const currentPage = location.pathname.split('/')[1] || 'home';
+
+  // Sample video data for FYP (FREE)
+  const freeVideos = [
+    {
+      id: '1',
+      title: 'Amazing AI-Generated Video',
+      description: 'Check out this incredible AI creation!',
+      videoUrl: 'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4',
+      hlsUrl: '',
+      thumbnail: 'https://via.placeholder.com/400x600?text=Video+1',
+      creator: {
+        id: 'creator1',
+        name: 'AI Creator',
+        handle: 'aicreator',
+        avatar: 'https://via.placeholder.com/50x50?text=Avatar',
+        isFollowing: false
+      },
+      likes: 1250,
+      comments: 342,
+      shares: 89,
+      views: 5000,
+      duration: 45,
+      hashtags: ['ai', 'viral', 'profithack'],
+      isPrivate: false,
+      subscriptionRequired: false
+    },
+    {
+      id: '2',
+      title: 'Live Stream Highlight',
+      description: 'Epic moments from today\'s stream!',
+      videoUrl: 'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4',
+      hlsUrl: '',
+      thumbnail: 'https://via.placeholder.com/400x600?text=Video+2',
+      creator: {
+        id: 'creator2',
+        name: 'Live Streamer',
+        handle: 'livestreamer',
+        avatar: 'https://via.placeholder.com/50x50?text=Avatar2',
+        isFollowing: false
+      },
+      likes: 2100,
+      comments: 567,
+      shares: 234,
+      views: 12000,
+      duration: 60,
+      hashtags: ['live', 'gaming', 'streaming'],
+      isPrivate: false,
+      subscriptionRequired: false
+    }
+  ];
+
+  // Sample video data for OnlyFans (PAID)
+  const privateVideos = [
+    {
+      id: 'private1',
+      title: 'Exclusive Behind-The-Scenes',
+      description: 'Exclusive content for subscribers only',
+      videoUrl: 'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4',
+      hlsUrl: '',
+      thumbnail: 'https://via.placeholder.com/400x600?text=Private+1',
+      creator: {
+        id: 'model1',
+        name: 'Premium Model',
+        handle: 'premiummodel',
+        avatar: 'https://via.placeholder.com/50x50?text=Model1',
+        isFollowing: false,
+        isLive: false
+      },
+      likes: 5200,
+      comments: 1240,
+      shares: 450,
+      views: 25000,
+      duration: 120,
+      hashtags: ['exclusive', 'onlyfans', 'premium'],
+      isPrivate: true,
+      subscriptionRequired: true,
+      subscriptionPrice: 9.99
+    },
+    {
+      id: 'private2',
+      title: 'Custom Request Video',
+      description: 'Made just for my subscribers',
+      videoUrl: 'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4',
+      hlsUrl: '',
+      thumbnail: 'https://via.placeholder.com/400x600?text=Private+2',
+      creator: {
+        id: 'model2',
+        name: 'Elite Creator',
+        handle: 'elitecreator',
+        avatar: 'https://via.placeholder.com/50x50?text=Model2',
+        isFollowing: false,
+        isLive: false
+      },
+      likes: 8900,
+      comments: 2100,
+      shares: 670,
+      views: 45000,
+      duration: 180,
+      hashtags: ['custom', 'exclusive', 'vip'],
+      isPrivate: true,
+      subscriptionRequired: true,
+      subscriptionPrice: 14.99
+    }
+  ];
+
+  return (
+    <div className="app-container">
+      <TopHeader currentPage={currentPage} />
+
+      <main className="main-content">
+        <Routes>
+          {/* ========================================
+              FREE ROUTES (NO PAYMENT GATE)
+              ======================================== */}
+
+          {/* HOME - FYP FEED (FREE) */}
+          <Route path="/" element={<FYPFeed videos={freeVideos} />} />
+
+          {/* EXPLORE - SEARCH & TRENDING */}
+          <Route
+            path="/explore"
+            element={
+              <div className="explore-page">
+                <SearchComponent />
+                <TrendingSoundsComponent />
+              </div>
+            }
+          />
+
+          {/* LIVE - LIVE HOSTS FEED */}
+          <Route path="/live" element={<LiveHostsFeed />} />
+          <Route path="/live/:userId" element={<div>Live Stream Player (Coming Soon)</div>} />
+
+          {/* ========================================
+              PAID ROUTES (WITH PAYMENT GATE)
+              ======================================== */}
+
+          {/* ONLYFANS - PRIVATE CONTENT (PAID) */}
+          <Route
+            path="/onlyfans"
+            element={
+              <PaymentGate requiredSubscription={true}>
+                <PrivateOnlyFansFeed videos={privateVideos} />
+              </PaymentGate>
+            }
+          />
+
+          {/* ========================================
+              SHARED ROUTES
+              ======================================== */}
+
+          {/* MESSAGES - DIRECT MESSAGES */}
+          <Route path="/messages" element={<DirectMessagesComponent />} />
+
+          {/* PROFILE - CREATOR ANALYTICS */}
+          <Route path="/profile" element={<CreatorAnalyticsComponent />} />
+
+          {/* VIDEO DETAILS - COMMENTS */}
+          <Route path="/video/:videoId" element={<CommentsComponent videoId="1" />} />
+
+          {/* DUETS */}
+          <Route
+            path="/duet/:videoId"
+            element={<DuetComponent videoId="1" originalCreatorId="creator1" onClose={() => window.history.back()} />}
+          />
+
+          {/* STITCHES */}
+          <Route
+            path="/stitch/:videoId"
+            element={<StitchComponent videoId="1" originalCreatorId="creator1" onClose={() => window.history.back()} />}
+          />
+
+          {/* UPLOAD */}
+          <Route path="/upload" element={<div className="upload-page">Upload Page (Coming Soon)</div>} />
+
+          {/* MODELS LANDING PAGE */}
+          <Route path="/models" element={<div className="models-page">Models Landing Page (Coming Soon)</div>} />
+        </Routes>
+      </main>
+
+      <BottomNavigation currentPage={currentPage} />
+    </div>
+  );
+};
+
+// ============================================
+// MAIN APP WRAPPER
+// ============================================
+export const App: React.FC = () => {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
+};
+
+export default App;

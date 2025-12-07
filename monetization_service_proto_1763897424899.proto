@@ -1,0 +1,34 @@
+// monetization_service_proto.proto - Conceptual gRPC Definition for Monetization Service
+
+// This is the .proto file that defines the service contract.
+// It is used to generate the client and server code for gRPC.
+
+syntax = "proto3";
+
+package monetization;
+
+// The Monetization Service (Port 50054)
+service MonetizationService {
+    // This method is NOT for the RTC service, but is the core of the Monetization Service.
+    // It is triggered by webhooks or cron jobs to enforce payment status.
+    rpc CheckAndEnforcePayment (CheckAndEnforcePaymentRequest) returns (CheckAndEnforcePaymentResponse);
+}
+
+// Request message for checking and enforcing payment status
+message CheckAndEnforcePaymentRequest {
+    string call_id = 1; // The ID of the private call
+    string user_id = 2; // The ID of the user whose payment is being checked
+}
+
+// Response message for checking and enforcing payment status
+message CheckAndEnforcePaymentResponse {
+    bool success = 1; // True if the check was performed
+    string status = 2; // The final status of the call (e.g., "VALID", "TERMINATED")
+    string reason = 3; // The reason for termination, if applicable
+}
+
+// --- Note on Integration ---
+// The core logic is that the Monetization Service (Port 50054) acts as the master.
+// It calls the TerminateUserStream method on the RTC Service (Port 50053) when a payment fails.
+// The RTC Service does NOT need to call the Monetization Service for this specific feature.
+// The Monetization Service is triggered by external events (Stripe webhook, internal timer).

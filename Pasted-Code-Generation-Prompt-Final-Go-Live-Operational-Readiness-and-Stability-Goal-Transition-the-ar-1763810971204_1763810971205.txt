@@ -1,0 +1,129 @@
+Code Generation Prompt - Final Go-Live: Operational Readiness and Stability
+
+Goal: Transition the architecturally complete application from a development environment to a production-ready state by deploying the full Observability Stack, conducting final stability checks, and preparing for the first wave of real users.
+
+Prerequisite: All previous architectural prompts (Part 1, Part 2, Part 4) must be successfully completed, meaning all services (Node.js, Golang, Python XAI) are instrumented and communicating via gRPC.
+
+1. Full Observability Stack Deployment
+
+Task: Deploy and configure the full monitoring stack to ensure real-time visibility into the health of all microservices.
+
+Deliverables:
+
+1.
+Prometheus/Grafana Deployment:
+
+•
+Create a monitoring/ directory.
+
+•
+Create a monitoring/prometheus.yml configuration file that scrapes metrics from the Node.js, Golang, and Python XAI services (assuming they expose a /metrics endpoint as per previous instrumentation).
+
+•
+Create a placeholder script (monitoring/start_monitoring.sh) to simulate the deployment of Prometheus and Grafana, and log the expected Grafana dashboard URL.
+
+
+
+2.
+Centralized Logging (ELK/Loki Skeleton):
+
+•
+Create a configuration file (logging/log_shipper.conf) to simulate shipping all service logs (from /var/log/profithack_*.log) to a centralized logging system, ensuring all errors are aggregated.
+
+
+
+3.
+Alerting Configuration:
+
+•
+Create a placeholder file (monitoring/alert_rules.yml) with critical alert rules, such as:
+
+•
+HighLatency: Golang feed-service P95 latency > 50ms for 5 minutes.
+
+•
+ErrorRate: Any service error rate > 1% for 1 minute.
+
+•
+QueueDepth: Kafka/BullMQ queue depth > 1000 for 10 minutes.
+
+
+
+
+
+2. Final Stability and Load Testing Preparation
+
+Task: Prepare the environment for the final load test and conduct a critical pre-launch stability check.
+
+Deliverables:
+
+1.
+Load Testing Script Skeleton:
+
+•
+Create a directory load-testing/.
+
+•
+Create a Python script (load-testing/load_test.py) using a library like locust or requests that simulates the following critical user flows:
+
+•
+Fetching the video feed (calls Golang gRPC).
+
+•
+Liking a video (calls Node.js/Kafka).
+
+•
+Sending a message (calls WebSockets).
+
+
+
+
+
+2.
+Chaos Engineering Check:
+
+•
+Create a simple script (load-testing/chaos_check.sh) that simulates the graceful shutdown and restart of the Golang feed-service to confirm the Node.js service handles the temporary gRPC failure correctly (circuit breaker pattern).
+
+
+
+3.
+Payment Gateway Final Check:
+
+•
+Modify the server/services/paymentGateway.ts from the previous prompt to execute a live, minimal transaction (e.g., $0.01 test charge) against all 7+ payment processors and log the success or failure.
+
+
+
+3. Pre-Launch Security and Compliance Check
+
+Task: Implement the final security measures and compliance placeholders.
+
+Deliverables:
+
+1.
+WAF/DDoS Configuration Placeholder:
+
+•
+Create a file (security/waf_rules.conf) with comments outlining the necessary rules for the WAF (Web Application Firewall) to block common attacks (SQL injection, XSS) and to rate-limit traffic for DDoS mitigation.
+
+
+
+2.
+Data Retention Policy Implementation:
+
+•
+Implement a database migration (using Drizzle Kit) to add a deleted_at column to the users table and a retention_date column to the user_activity table, demonstrating the implementation of a data retention policy for GDPR/CCPA compliance.
+
+
+
+3.
+Final Security Audit Checklist:
+
+•
+Create a Markdown file (security/pre_launch_checklist.md) that lists the final, non-code steps required before launch (e.g., "Penetration Test Complete," "Legal Sign-Off Received," "All Secrets Rotated").
+
+
+
+Final Action: The Replit AI should provide the exact shell command needed to run the load test script skeleton and confirm the application remains stable.
+

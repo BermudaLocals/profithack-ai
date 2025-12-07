@@ -1,0 +1,195 @@
+1
+00:00:00,300 --> 00:00:01,020
+Hello there.
+
+2
+00:00:01,320 --> 00:00:06,390
+In this video, I will discuss about what is Chad Djibouti, Right.
+
+3
+00:00:07,260 --> 00:00:16,500
+Since the opening night released its blockbuster Bow tie in Heart in November 2020.
+
+4
+00:00:16,500 --> 00:00:25,770
+To that Pools has sparked ongoing Caswell experiments, including some by reporter trying to simulate
+
+5
+00:00:25,770 --> 00:00:30,480
+news stories or mass potential deaths.
+
+6
+00:00:31,440 --> 00:00:36,060
+Open air chiefs Sam Altman said on Twitter.
+
+7
+00:00:36,250 --> 00:00:40,220
+Chad Djibouti launched on Wednesday to day.
+
+8
+00:00:40,650 --> 00:00:43,740
+It scores 1 million users.
+
+9
+00:00:43,950 --> 00:00:45,330
+Really awesome.
+
+10
+00:00:46,320 --> 00:00:52,380
+Altmann told mask average is probably single digit percent.
+
+11
+00:00:53,750 --> 00:00:56,540
+Trying to figure out more.
+
+12
+00:00:57,260 --> 00:01:01,730
+More precisely and also how we can optimize.
+
+13
+00:01:03,530 --> 00:01:13,550
+So, Chad, Djibouti are powered by large amount of data and computing technique to make predictions
+
+14
+00:01:13,550 --> 00:01:18,500
+about stringing world together in a meaningful way.
+
+15
+00:01:20,340 --> 00:01:29,460
+Chat deputy can be used to write and edit letters, memos, stories, journals and one other via human
+
+16
+00:01:29,470 --> 00:01:29,940
+problem.
+
+17
+00:01:30,210 --> 00:01:39,240
+It currently responds to prompt in the English language, but can translate right off in the other languages
+
+18
+00:01:39,240 --> 00:01:40,440
+into English.
+
+19
+00:01:43,180 --> 00:01:50,500
+Similarly, other tech companies like Google and Metra have developed their own large language model
+
+20
+00:01:50,500 --> 00:02:00,640
+tools with use programs that response to human prompts and devise sophisticated responses.
+
+21
+00:02:01,210 --> 00:02:13,060
+Openai is a revolutionary move, also created a user interface that is leading the general public,
+
+22
+00:02:13,060 --> 00:02:16,630
+experimenting with it directly.
+
+23
+00:02:17,560 --> 00:02:23,500
+The chat bot currently use technology like Google Dialogflow.
+
+24
+00:02:24,770 --> 00:02:27,020
+Another large language model tool.
+
+25
+00:02:27,230 --> 00:02:38,000
+Also, GPT is coming for classroom, hospital, marketing department and everything else as the next
+
+26
+00:02:38,000 --> 00:02:42,800
+great startup boom emerges.
+
+27
+00:02:43,610 --> 00:02:56,060
+It has been reported that a based on a student build an F we can detect if chat gpt oth and essay to
+
+28
+00:02:56,150 --> 00:02:59,930
+combat AI based plagiarism.
+
+29
+00:03:00,710 --> 00:03:12,020
+You can access GPT simply by visiting openai dot com or chat dot openai dot com and creating an openai
+
+30
+00:03:12,020 --> 00:03:12,890
+account.
+
+31
+00:03:13,670 --> 00:03:18,140
+You can use CBT to start chatting after logging.
+
+32
+00:03:19,230 --> 00:03:25,650
+Ask a question is a wonderful approach to start a conversation.
+
+33
+00:03:27,100 --> 00:03:38,680
+You can use Djibouti for free and as many times as you like, because it's still in the reserve systems.
+
+34
+00:03:39,690 --> 00:03:41,790
+How does it work?
+
+35
+00:03:43,550 --> 00:03:47,540
+With an understanding of what is Jeopardy.
+
+36
+00:03:47,750 --> 00:03:53,090
+Let's explore how it works at its foundation.
+
+37
+00:03:53,330 --> 00:03:56,580
+Djibouti is a chad, Djibouti three and Chad.
+
+38
+00:03:56,600 --> 00:04:01,280
+Djibouti 3.5 based last language model.
+
+39
+00:04:02,750 --> 00:04:14,180
+This AI tool applies machine learning algorithm to a massive corpus of text to response to user request
+
+40
+00:04:14,180 --> 00:04:20,480
+using words that sound surprisingly like human.
+
+41
+00:04:21,630 --> 00:04:30,900
+According to Openai, to enhance its capacity through reinforcement reinforcement learning.
+
+42
+00:04:31,680 --> 00:04:34,140
+We depend on human feedback.
+
+43
+00:04:35,470 --> 00:04:45,640
+The business hired human trainers to interact with the model while assume the roles of both a user and
+
+44
+00:04:45,640 --> 00:04:47,230
+a chat bot.
+
+45
+00:04:47,260 --> 00:04:48,070
+Right.
+
+46
+00:04:48,810 --> 00:04:59,940
+So trainers compare a response given by CBT to human replace and get their quality to reinforce like
+
+47
+00:04:59,940 --> 00:05:02,340
+human conversation across.
+
+48
+00:05:03,210 --> 00:05:10,920
+Hope Do you understand what is good and how good you are were.
+
+49
+00:05:11,400 --> 00:05:12,990
+Thanks for watching this video.
