@@ -1,0 +1,66 @@
+# File: watermark_config.py
+# Configuration script for the video processing service (FFmpeg) to apply the watermark.
+
+import os
+
+# --- 1. Define Logo Paths and Colors ---
+# We will use logo6.png as the primary watermark image due to its clear, high-contrast design.
+# NOTE: In a real deployment, these paths would be S3 URLs or a shared volume path.
+WATERMARK_IMAGE_PATH = "/home/ubuntu/assets/logos/logo6.png"
+
+# Define the neon colors for text watermarks/overlays
+NEON_CYAN = "00F2EA"
+NEON_MAGENTA = "FF00FF"
+
+# --- 2. FFmpeg Watermark Filter Configuration ---
+# This function generates the FFmpeg filter string for applying the watermark.
+# It assumes the video is 1080p (1920x1080) and places the logo in the bottom right corner.
+def generate_ffmpeg_watermark_filter(input_video_path: str, output_video_path: str) -> str:
+    """
+    Generates the FFmpeg command to apply a scaled logo watermark and a text watermark.
+    """
+    # Filter 1: Scale the logo to 10% of the video height (e.g., 108px for 1080p)
+    # Filter 2: Overlay the logo in the bottom right corner (x=W-w-20, y=H-h-20)
+    # Filter 3: Add a scrolling text watermark (e.g., @profithackai)
+    
+    logo_filter = (
+        f"movie={WATERMARK_IMAGE_PATH},scale=iw/10:-1[logo];"
+        f"[in][logo] overlay=W-w-20:H-h-20:enable='between(t,0,99999)'[watermarked]"
+    )
+
+    text_filter = (
+        f"[watermarked] drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:"
+        f"text='@PROFITHACKAI':"
+        f"fontcolor={NEON_CYAN}AA:" # AA is for 66% opacity
+        f"fontsize=36:"
+        f"x=w-t*w/10:" # Scrolling from right to left
+        f"y=h-50:"
+        f"enable='between(t,0,99999)'[out]"
+    )
+
+    # Full FFmpeg command (simplified for demonstration)
+    ffmpeg_command = (
+        f"ffmpeg -i {input_video_path} -filter_complex \"{logo_filter};{text_filter}\" "
+        f"-c:v libx264 -crf 23 -preset veryfast {output_video_path}"
+    )
+    
+    return ffmpeg_command
+
+# --- 3. Logo Integration into AppShell (Example) ---
+# This is a placeholder for the React component to use the logo in the top bar.
+# The logo will be placed in the /home/ubuntu/assets/logos/ directory.
+APP_LOGO_PATH = "/home/ubuntu/assets/logos/logo3.png"
+
+def get_app_logo_html():
+    """
+    Returns the HTML/JSX snippet for the top bar logo.
+    """
+    return (
+        f'<img src="{APP_LOGO_PATH}" alt="PROFITHACK AI Logo" style={{height: "30px", marginRight: "10px"}} />'
+    )
+
+if __name__ == "__main__":
+    print("FFmpeg Watermark Filter Example:")
+    print(generate_ffmpeg_watermark_filter("input.mp4", "output_watermarked.mp4"))
+    print("\nApp Logo Path:")
+    print(APP_LOGO_PATH)

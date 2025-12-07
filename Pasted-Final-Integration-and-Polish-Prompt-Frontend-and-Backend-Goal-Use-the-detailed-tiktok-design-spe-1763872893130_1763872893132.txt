@@ -1,0 +1,113 @@
+Final Integration and Polish Prompt - Frontend and Backend
+
+Goal: Use the detailed tiktok_design_spec.md as the definitive blueprint to apply final polish, styling, and integration logic to both the frontend and backend, ensuring the application is visually superior, fully functional, and ready for production launch.
+
+Prerequisite: All architectural skeletons (Golang, Kafka, XAI) and core feature logic are in place. The tiktok_design_spec.md file is available in the root directory.
+
+1. Frontend (UI/UX) Finalization
+
+Task: Refine all React/TypeScript components to perfectly match the visual and interaction specifications in tiktok_design_spec.md.
+
+Deliverables:
+
+1.
+Full-Screen Video Feed Polish:
+
+•
+Refine the FullScreenVideoFeed.tsx component to ensure pixel-perfect alignment with the FYP layout, including semi-transparent overlays, correct font sizing, and placement of the right-side icon bar.
+
+•
+Implement gesture-based interaction logic (vertical swipe for next video, horizontal swipe for profile) with smooth, native-like transitions.
+
+
+
+2.
+Navigation Bar Implementation:
+
+•
+Implement the final, persistent Bottom Tab Bar across the application, ensuring the icons and labels match the tiktok_design_spec.md and correctly map to the profithackai features (e.g., Home -> Video Feed, Profile -> Creator Studio).
+
+
+
+3.
+Effects and Sounds Integration:
+
+•
+Implement the frontend UI for a comprehensive Effects and Sounds Library within the video creation suite, allowing users to browse, preview, and select filters, effects, and licensed audio tracks.
+
+
+
+4.
+Augmentation Integration:
+
+•
+Implement the final UI/UX for the Dating/Rizz feature integration (e.g., the subtle horizontal swipe or dedicated button) and the Creator Studio (Monaco Editor/Terminal) access point from the Profile screen.
+
+
+
+2. Backend (Integration) Finalization
+
+Task: Implement the final API endpoints and logic to support the polished frontend and ensure all data flows are optimized for the new UI/UX.
+
+Deliverables:
+
+1.
+Golang Feed Service Optimization:
+
+•
+Optimize the Golang feed-service gRPC response to include all necessary metadata for the polished UI (e.g., user profile picture URL, video aspect ratio, music title, and the XAI explanation text).
+
+
+
+2.
+Agents-to-FYP Content Seeding Logic:
+
+•
+Implement a final logic hook in the 200 Agents System to automatically trigger the video upload and processing pipeline (via BullMQ) for all generated content.
+
+•
+Ensure all agent-generated videos are tagged with the designated "Founders Account" user ID before being inserted into the content database, guaranteeing immediate visibility on the FYP.
+
+
+
+3.
+API Gateway (Node.js) Refinement:
+
+•
+Review and refine all Node.js/Express API gateway endpoints to ensure they correctly translate the polished frontend requests into gRPC calls to the Golang service and back, with minimal latency overhead.
+
+
+
+4.
+Effects and Sounds Processing Integration:
+
+•
+Modify the FFmpeg-based Video Processing Service to accept metadata for selected effects and sounds and apply them during the final video rendering and transcoding process.
+
+
+
+5.
+Video Processing Status Integration:
+
+•
+Implement a final API endpoint in the Node.js service that allows the frontend to query the real-time status of a video upload (e.g., "Processing," "Transcoding," "Ready") from the FFmpeg service, providing a smooth user experience in the Video Creation/Editing Suite.
+
+
+
+3. Final Code Review and Cleanup
+
+Task: Perform a final pass to ensure code quality and production readiness.
+
+Deliverables:
+
+1.
+Dead Code Removal: Remove all placeholder code, dummy data, and unused imports from the entire codebase.
+
+2.
+TypeScript Strictness: Ensure all new and modified TypeScript files pass strict type checking without errors.
+
+3.
+Final Documentation Update: Update the main README.md to reflect the final, polished state of the application and its superior architecture.
+
+Final Action: The Replit AI should confirm that the application is now visually and functionally complete according to the tiktok_design_spec.md and ready for the final Go-Live security audit.
+

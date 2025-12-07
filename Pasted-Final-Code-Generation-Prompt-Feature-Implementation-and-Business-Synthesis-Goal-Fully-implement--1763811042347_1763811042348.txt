@@ -1,0 +1,83 @@
+Final Code Generation Prompt - Feature Implementation and Business Synthesis
+
+Goal: Fully implement and configure all core profithackai features, including the newly introduced advanced features, to work seamlessly within the completed microservices architecture. Upon completion, the Replit AI must provide a comprehensive business analysis.
+
+Prerequisite: All previous architectural and operational prompts (Part 1, Part 2, Part 4, Go-Live) must be successfully completed.
+
+1. Full Feature Implementation and Configuration
+
+Task: Implement the full, working logic for all features, ensuring they utilize the new Golang, Kafka, and XAI services and maintain the "better than" look and feel.
+
+Deliverables:
+
+1.
+Core Feature Logic Integration:
+
+•
+Video Feed/Tube/Vids/Discover: Implement the full logic in the Golang feed-service to serve content based on the XAI recommendations, including filtering for the new Battles and Discover features.
+
+•
+Dating/Rizz: Implement the full matching and "Rizz" logic within the Golang service, utilizing the NoSQL database for swipe history and the XAI service for advanced matching.
+
+•
+Messaging/DMs/Calls: Implement the full logic for end-to-end encrypted DMs and secure WebRTC calls, ensuring the WhatsApp-style reliability and security.
+
+•
+OnlyFans/Marketplace: Implement the full logic for premium content access, virtual gift economy, and the creator marketplace, ensuring all 7+ payment processors are fully integrated and functional.
+
+
+
+2.
+Advanced Feature Implementation:
+
+•
+Sora 2 AI / Video Editing: Implement the full logic for the Sora 2 AI feature, utilizing the existing FFmpeg service to process and generate high-quality video content.
+
+•
+AI Twin / 200 Agents: Implement the full logic for the AI Twin generation and the 200 Agents system, ensuring they can interact with users via messaging and the Creator Studio.
+
+•
+Replit-Style Workflow: Fully implement the logic for the Collaborative Coding/Live Share feature within the Monaco Editor/Terminal, utilizing WebSockets for real-time synchronization.
+
+
+
+3.
+UI/UX Final Polish:
+
+•
+Apply final CSS/Tailwind polish to all components to ensure the look and feel is better than the emulated sites (TikTok, WhatsApp, OnlyFans, YouTube, Dating Apps) and that the user transition is seamless.
+
+
+
+2. Business and Technical Synthesis
+
+Task: After confirming all features are implemented and working, the Replit AI must provide a comprehensive analysis of the final product.
+
+Deliverables:
+
+1.
+Pressure Prompt Rating:
+
+•
+Provide a single integer rating from 1 to 6 (1-3 is bad, 4-6 is great) for the final product's overall readiness and potential.
+
+
+
+2.
+Viability Check (Go/No-Go):
+
+•
+Provide a concise, two-paragraph summary of the final product's viability, explicitly stating whether it is a Go for launch or No-Go and why. This must include a summary of the technical resilience and feature superiority.
+
+
+
+3.
+Per-Week Revenue Potential:
+
+•
+Provide a calculated estimate of the Per-Week Revenue Potential based on the $63 million per month goal, the hyper-monetization features, and the global-scale architecture. The estimate should be presented as a range (e.g., "$X to $Y per week").
+
+
+
+Final Action: The Replit AI should present the final analysis in a clear, professional Markdown table format.
+

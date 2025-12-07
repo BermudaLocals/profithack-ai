@@ -1,0 +1,396 @@
+/* FYPFeed.css - TikTok-Style FYP Feed Styling */
+
+/* Root Container */
+.fyp-feed-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: #0a0a0a;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fyp-feed-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #00ffff;
+  font-size: 1.5rem;
+  background-color: #0a0a0a;
+}
+
+/* Video Wrapper */
+.fyp-video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 600px;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+
+/* Video Element */
+.fyp-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background-color: #000;
+}
+
+/* Video Overlay Gradient (Dark at bottom for text readability) */
+.fyp-video-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Mute Button (Top Right) */
+.fyp-mute-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 2px solid #00ffff;
+  color: #00ffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+}
+
+.fyp-mute-btn:hover {
+  background-color: rgba(0, 255, 255, 0.2);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+}
+
+.fyp-mute-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Video Info (Bottom Left) */
+.fyp-video-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 1.5rem 1rem;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Creator Info */
+.fyp-creator-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fyp-creator-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ff00ff;
+  flex-shrink: 0;
+}
+
+.fyp-creator-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fyp-creator-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.fyp-creator-handle {
+  font-size: 0.75rem;
+  color: #00ffff;
+  margin: 0;
+}
+
+.fyp-follow-btn {
+  padding: 0.5rem 1rem;
+  background-color: #ff00ff;
+  border: none;
+  border-radius: 0.25rem;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
+}
+
+.fyp-follow-btn:hover {
+  background-color: #ff1493;
+  box-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
+}
+
+/* Video Title */
+.fyp-video-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Video Description */
+.fyp-video-description {
+  font-size: 0.75rem;
+  color: #cccccc;
+  margin: 0;
+  line-height: 1.3;
+  max-height: 2.2em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Hashtags */
+.fyp-hashtags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.fyp-hashtag {
+  font-size: 0.75rem;
+  color: #00ffff;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.fyp-hashtag:hover {
+  color: #ff00ff;
+  text-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+}
+
+/* Sound Badge (Bottom Left Corner) */
+.fyp-sound-badge {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  z-index: 5;
+  border: 1px solid #00ffff;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.fyp-sound-badge svg {
+  width: 16px;
+  height: 16px;
+  color: #00ffff;
+}
+
+.fyp-sound-badge span {
+  font-size: 0.75rem;
+  color: #00ffff;
+  font-weight: 600;
+}
+
+/* Right Sidebar - Actions */
+.fyp-actions-sidebar {
+  position: absolute;
+  right: 1rem;
+  bottom: 50%;
+  transform: translateY(50%);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  z-index: 10;
+}
+
+/* Action Button Base */
+.fyp-action-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: 2px solid #ff00ff;
+  color: #ff00ff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.fyp-action-btn:hover {
+  background-color: rgba(255, 0, 127, 0.2);
+  box-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
+  transform: scale(1.1);
+}
+
+.fyp-action-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Like Button */
+.fyp-like-btn {
+  border-color: #ff00ff;
+}
+
+.fyp-like-btn.liked {
+  background-color: rgba(255, 0, 127, 0.3);
+  color: #ff00ff;
+  box-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
+}
+
+.fyp-like-btn.liked svg {
+  fill: #ff00ff;
+}
+
+/* Comment Button */
+.fyp-comment-btn {
+  border-color: #00ffff;
+  color: #00ffff;
+}
+
+.fyp-comment-btn:hover {
+  background-color: rgba(0, 255, 255, 0.2);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+}
+
+/* Share Button */
+.fyp-share-btn {
+  border-color: #ff00ff;
+}
+
+/* Bookmark Button */
+.fyp-bookmark-btn {
+  border-color: #00ffff;
+  color: #00ffff;
+}
+
+.fyp-bookmark-btn:hover {
+  background-color: rgba(0, 255, 255, 0.2);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+}
+
+/* Loading Indicator */
+.fyp-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #00ffff;
+  padding: 1rem 2rem;
+  border-radius: 0.5rem;
+  z-index: 20;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid #00ffff;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+/* Scroll Indicator */
+.fyp-scroll-indicator {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #00ffff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid #00ffff;
+  z-index: 10;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .fyp-video-wrapper {
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  .fyp-actions-sidebar {
+    right: 0.5rem;
+    gap: 1rem;
+  }
+
+  .fyp-action-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 0.6rem;
+  }
+
+  .fyp-action-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .fyp-video-info {
+    padding: 1rem;
+  }
+
+  .fyp-mute-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .fyp-mute-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Animations */
+@keyframes neon-pulse {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
+  }
+}
+
+.fyp-action-btn:active {
+  animation: neon-pulse 0.6s ease-in-out;
+}

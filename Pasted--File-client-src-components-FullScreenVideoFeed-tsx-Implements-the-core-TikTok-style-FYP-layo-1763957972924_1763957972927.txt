@@ -1,0 +1,120 @@
+// File: client/src/components/FullScreenVideoFeed.tsx
+// Implements the core TikTok-style FYP layout and overlay structure.
+
+import React, { useState, useCallback } from 'react';
+import { Heart, MessageCircle, Share2, User, Music, ChevronUp, ChevronDown } from 'lucide-react';
+
+// --- Types for Video Data ---
+interface VideoData {
+  id: string;
+  videoUrl: string;
+  caption: string;
+  username: string;
+  audioName: string;
+  likes: number;
+  comments: number;
+}
+
+// --- Mock Data (Replaced by Golang gRPC service in final app) ---
+const MOCK_FEED: VideoData[] = [
+  { id: 'v1', videoUrl: '/videos/v1.mp4', caption: 'Building a microservice in Golang!', username: '@profithack_dev', audioName: 'Tech Hype Beat', likes: 1500, comments: 45 },
+  { id: 'v2', videoUrl: '/videos/v2.mp4', caption: 'My new AI Twin is wild!', username: '@ai_twin_creator', audioName: 'Chill Lo-Fi', likes: 8900, comments: 120 },
+  { id: 'v3', videoUrl: '/videos/v3.mp4', caption: 'Swipe right for code review! #rizz', username: '@dating_dev', audioName: 'Rizz Anthem', likes: 420, comments: 15 },
+];
+
+// --- Sub-Component: Right-Side Icon Bar ---
+const RightSideBar: React.FC<{ video: VideoData }> = ({ video }) => (
+  <div className="absolute bottom-24 right-4 flex flex-col items-center space-y-6 text-white z-20">
+    {/* Like Button */}
+    <div className="flex flex-col items-center">
+      <Heart className="w-8 h-8 cursor-pointer hover:text-red-500 transition-colors" />
+      <span className="text-xs font-semibold">{video.likes.toLocaleString()}</span>
+    </div>
+    {/* Comment Button */}
+    <div className="flex flex-col items-center">
+      <MessageCircle className="w-8 h-8 cursor-pointer hover:text-blue-400 transition-colors" />
+      <span className="text-xs font-semibold">{video.comments.toLocaleString()}</span>
+    </div>
+    {/* Share Button */}
+    <div className="flex flex-col items-center">
+      <Share2 className="w-8 h-8 cursor-pointer hover:text-green-400 transition-colors" />
+      <span className="text-xs font-semibold">Share</span>
+    </div>
+    {/* Profile Icon (Placeholder for Creator Profile) */}
+    <div className="flex flex-col items-center">
+      <User className="w-8 h-8 cursor-pointer border-2 border-white rounded-full p-1" />
+    </div>
+    {/* Rotating Music Icon */}
+    <div className="flex flex-col items-center">
+      <Music className="w-6 h-6 animate-spin-slow" />
+    </div>
+  </div>
+);
+
+// --- Sub-Component: Bottom-Left Text Overlay ---
+const BottomTextOverlay: React.FC<{ video: VideoData }> = ({ video }) => (
+  <div className="absolute bottom-24 left-4 text-white z-20 max-w-[70%]">
+    <h2 className="font-bold text-lg cursor-pointer hover:underline">{video.username}</h2>
+    <p className="text-sm mt-1">{video.caption}</p>
+    <div className="flex items-center mt-2 text-sm">
+      <Music className="w-4 h-4 mr-1" />
+      <span className="font-semibold cursor-pointer hover:underline">{video.audioName}</span>
+    </div>
+  </div>
+);
+
+// --- Main Component: FullScreenVideoFeed ---
+const FullScreenVideoFeed: React.FC = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const currentVideo = MOCK_FEED[currentIndex];
+
+  // Placeholder for the critical vertical swipe logic
+  const handleSwipe = useCallback((direction: 'up' | 'down') => {
+    if (direction === 'up') {
+      setCurrentIndex(prev => (prev + 1) % MOCK_FEED.length);
+    } else if (direction === 'down') {
+      setCurrentIndex(prev => (prev - 1 + MOCK_FEED.length) % MOCK_FEED.length);
+    }
+  }, []);
+
+  if (!currentVideo) {
+    return <div className="flex items-center justify-center h-screen bg-black text-white">Loading Feed...</div>;
+  }
+
+  return (
+    <div className="relative w-full h-screen bg-black overflow-hidden">
+      {/* Video Player (Full Screen) */}
+      <video
+        key={currentVideo.id} // Key ensures video re-renders and plays when index changes
+        className="absolute top-0 left-0 w-full h-full object-cover"
+        src={currentVideo.videoUrl}
+        autoPlay
+        loop
+        muted // Muted for autoplay compliance
+        playsInline
+      />
+
+      {/* Top Navigation (Following / For You) */}
+      <div className="absolute top-10 left-0 w-full flex justify-center space-x-6 text-white font-bold text-xl z-20">
+        <span className="opacity-70 cursor-pointer hover:opacity-100">Following</span>
+        <span className="border-b-2 border-white cursor-pointer">For You</span>
+      </div>
+
+      {/* Minimalist UI Overlays */}
+      <RightSideBar video={currentVideo} />
+      <BottomTextOverlay video={currentVideo} />
+
+      {/* Debug/Testing Controls for Swipe Logic */}
+      <div className="absolute top-1/2 right-1/2 transform translate-x-1/2 -translate-y-1/2 flex flex-col space-y-4 z-30">
+        <button onClick={() => handleSwipe('up')} className="p-2 bg-white/20 rounded-full text-white hover:bg-white/40">
+          <ChevronUp className="w-6 h-6" />
+        </button>
+        <button onClick={() => handleSwipe('down')} className="p-2 bg-white/20 rounded-full text-white hover:bg-white/40">
+          <ChevronDown className="w-6 h-6" />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default FullScreenVideoFeed;

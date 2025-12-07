@@ -1,0 +1,121 @@
+Final Diagnostic Prompt - System Audit and TikTok Comparison
+
+Goal: Perform a comprehensive system audit to verify the final state of the application against the original goal of achieving a look, feel, and function that is equal to or better than TikTok, while incorporating all profithackai features.
+
+Prerequisite: The final_synthesis_prompt.md must have been executed, and all code changes must be complete.
+
+1. System Overview and Functionality Check
+
+Task: Provide a high-level summary of the final application and confirm the operational status of the core microservices.
+
+Deliverables:
+
+1.
+Application Summary:
+
+•
+Provide a concise, one-paragraph description of the final application, including its core value proposition (e.g., "The world's first hyper-scalable, multi-modal content platform with integrated AI-driven dating and programmable content.").
+
+
+
+2.
+Microservice Status Table:
+
+•
+Generate a table listing the status of the four core services: Node.js (Frontend/API Gateway), Golang (Feed/Dating), Python (XAI), and FFmpeg (Video Processing). The status must be "Operational" or "Error" with a brief explanation.
+
+
+
+2. TikTok Look, Feel, and Functionality Comparison
+
+Task: Directly compare the final application's UI/UX and core features against the TikTok standard.
+
+Deliverables:
+
+1.
+Look and Feel Audit:
+
+•
+Provide a detailed analysis of the FullScreenVideoFeed.tsx component, explicitly confirming if the look and feel is "exactly like TikTok" or "better" in terms of:
+
+•
+Vertical Infinite Scroll smoothness.
+
+•
+Minimalist UI Overlay design.
+
+•
+profithackai branding integration.
+
+
+
+
+
+2.
+Functionality Comparison Table:
+
+•
+Generate a table comparing the following core features against the TikTok standard:
+
+
+
+Feature
+TikTok Standard
+profithackai Status (Working/Not Working)
+Discrepancy (If Any)
+Video Feed
+Seamless, sub-10ms load
+
+
+
+
+User Profile
+Clean, accessible content tabs
+
+
+
+
+Video Upload
+Multi-clip editing, fast processing
+
+
+
+
+Live Streaming
+Low-latency, interactive
+
+
+
+
+Messaging (DMs)
+Simple, reliable
+
+
+
+
+
+
+3. Feature Discrepancy Report
+
+Task: Explicitly list any features that are NOT working or NOT implemented to the "better than TikTok" standard.
+
+Deliverables:
+
+1.
+Discrepancy List:
+
+•
+Provide a bulleted list of all features that are currently not working or are placeholders that require further manual development (e.g., "Sora 2 AI is a placeholder calling the FFmpeg service, not a true generative model").
+
+
+
+2.
+Final Verdict:
+
+•
+Provide a final, one-sentence verdict on whether the application is ready for the final launch, based on the audit.
+
+
+
+Final Action: The Replit AI should present the entire audit in a clear, professional Markdown format.
+

@@ -1,0 +1,125 @@
+// frontend_sfu_client.ts - Conceptual TypeScript for SFU Client
+
+import { CameraService } from './CameraService'; // Assuming the previously generated CameraService
+
+/**
+ * Manages the WebRTC connection to the SFU for participants (up to 20).
+ */
+export class SFUClient {
+    private roomId: string;
+    private userId: string;
+    private signalingClient: any; // Conceptual gRPC client for Port 50053
+    private peerConnection: RTCPeerConnection | null = null;
+    private cameraService: CameraService;
+    
+    // Callback to notify the UI when a new remote stream arrives
+    public onRemoteStream: (stream: MediaStream, userId: string) => void = () => {};
+
+    constructor(roomId: string, userId: string, signalingClient: any, cameraService: CameraService) {
+        this.roomId = roomId;
+        this.userId = userId;
+        this.signalingClient = signalingClient;
+        this.cameraService = cameraService;
+    }
+
+    /**
+     * Initializes the WebRTC connection and joins the room as a participant.
+     */
+    public async joinAsParticipant(): Promise<void> {
+        // 1. Get local media stream (using the CameraService)
+        const localStream = await this.cameraService.startCamera('user'); // Start with front camera
+
+        // 2. Call the backend signaling service to get the SFU token
+        const joinRequest = { roomId: this.roomId, userId: this.userId, isSpectator: false };
+        const joinResponse = await this.signalingClient.joinRoom(joinRequest);
+        const sfuToken = joinResponse.sfuToken;
+
+        // 3. Initialize RTCPeerConnection
+        this.peerConnection = new RTCPeerConnection({
+            // Use your STUN/TURN servers here
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        });
+
+        // 4. Add local tracks to the connection
+        localStream.getTracks().forEach(track => {
+            this.peerConnection!.addTrack(track, localStream);
+        });
+
+        // 5. Handle remote tracks (the other 19 participants)
+        this.peerConnection.ontrack = (event) => {
+            // The SFU sends one stream per remote participant
+            this.onRemoteStream(event.streams[0], event.transceiver.mid!); // mid can be used as a temporary user ID
+        };
+
+        // 6. Handle ICE candidates and signaling
+        this.peerConnection.onicecandidate = (event) => {
+            if (event.candidate) {
+                // Send ICE candidate to the SFU via the signaling service
+                this.signalingClient.signal({
+                    roomId: this.roomId,
+                    userId: this.userId,
+                    signal: JSON.stringify(event.candidate)
+                });
+            }
+        };
+
+        // 7. Create and send the initial offer (SDP)
+        const offer = await this.peerConnection.createOffer();
+        await this.peerConnection.setLocalDescription(offer);
+        
+        // Send the offer to the SFU via the signaling service
+        const sfuAnswer = await this.signalingClient.signal({
+            roomId: this.roomId,
+            userId: this.userId,
+            signal: JSON.stringify(this.peerConnection.localDescription)
+        });
+
+        // 8. Set the SFU's answer as the remote description
+        await this.peerConnection.setRemoteDescription(JSON.parse(sfuAnswer.signal));
+    }
+    
+    /**
+     * Joins the room as an unlimited viewer (spectator).
+     */
+    public async joinAsSpectator(): Promise<string> {
+        // 1. Call the backend signaling service to get the HLS/DASH URL
+        const joinRequest = { roomId: this.roomId, userId: this.userId, isSpectator: true };
+        const joinResponse = await this.signalingClient.joinRoom(joinRequest);
+        
+        // 2. Return the URL for the HLS/DASH player
+        return joinResponse.streamUrl;
+    }
+
+    /**
+     * Closes the WebRTC connection.
+     */
+    public close(): void {
+        this.cameraService.stopCamera();
+        if (this.peerConnection) {
+            this.peerConnection.close();
+            this.peerConnection = null;
+        }
+    }
+}
+
+// Example Usage for a Battle Room UI:
+/*
+const cameraService = new CameraService();
+const signalingClient = new YourGrpcClient(); // Initialize your gRPC client
+const sfuClient = new SFUClient('battle-room-123', 'user-456', signalingClient, cameraService);
+
+// 1. Participant joins
+await sfuClient.joinAsParticipant();
+
+// 2. Set up the UI to handle incoming streams
+sfuClient.onRemoteStream = (stream, remoteUserId) => {
+    const videoElement = document.createElement('video');
+    videoElement.srcObject = stream;
+    document.getElementById('video-grid').appendChild(videoElement);
+};
+
+// Example for a Spectator:
+// const streamUrl = await sfuClient.joinAsSpectator();
+// // Use a standard video player (e.g., video.js) to play the HLS stream
+// document.getElementById('hls-player').src = streamUrl;
+*/

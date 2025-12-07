@@ -1,0 +1,755 @@
+// ============================================
+// ENTERPRISE CRM DASHBOARD
+// Content Calendar | Analytics | Automation
+// Multi-Platform Management
+// ============================================
+
+import React, { useState, useEffect } from "react";
+import "./crm-dashboard.css";
+
+// ============================================
+// TYPES
+// ============================================
+
+interface ContentPost {
+  id: string;
+  title: string;
+  description: string;
+  platforms: string[];
+  scheduledAt: Date;
+  status: "draft" | "scheduled" | "published" | "failed";
+  content: {
+    text: string;
+    images?: string[];
+    video?: string;
+    hashtags: string[];
+  };
+}
+
+interface SocialAccount {
+  id: string;
+  platform: string;
+  handle: string;
+  followers: number;
+  connected: boolean;
+}
+
+interface Analytics {
+  platform: string;
+  totalPosts: number;
+  totalViews: number;
+  totalLikes: number;
+  totalComments: number;
+  totalShares: number;
+  avgEngagement: number;
+  totalConversions: number;
+  totalRevenue: number;
+}
+
+// ============================================
+// MAIN DASHBOARD COMPONENT
+// ============================================
+
+const CRMDashboard: React.FC<{ userId: string }> = ({ userId }) => {
+  const [activeTab, setActiveTab] = useState<"calendar" | "analytics" | "generate" | "automation">(
+    "calendar"
+  );
+  const [posts, setPosts] = useState<ContentPost[]>([]);
+  const [analytics, setAnalytics] = useState<Analytics[]>([]);
+  const [accounts, setAccounts] = useState<SocialAccount[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchData();
+  }, [userId]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Fetch calendar
+      const calendarRes = await fetch(`/api/crm/calendar/${userId}?startDate=2024-01-01&endDate=2024-12-31`);
+      const calendarData = await calendarRes.json();
+      setPosts(calendarData.posts || []);
+
+      // Fetch analytics
+      const analyticsRes = await fetch(`/api/crm/analytics/${userId}?days=30`);
+      const analyticsData = await analyticsRes.json();
+      setAnalytics(analyticsData.analytics || []);
+    } catch (error) {
+      console.error("Fetch error", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="crm-dashboard">
+      {/* Header */}
+      <div className="crm-header">
+        <div className="header-left">
+          <h1>📱 Content CRM</h1>
+          <p>Multi-Platform Content Management</p>
+        </div>
+        <div className="header-right">
+          <div className="stat-card">
+            <span className="stat-label">Total Posts</span>
+            <span className="stat-value">{posts.length}</span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-label">Total Views</span>
+            <span className="stat-value">
+              {analytics.reduce((sum, a) => sum + a.totalViews, 0).toLocaleString()}
+            </span>
+          </div>
+          <div className="stat-card">
+            <span className="stat-label">Avg Engagement</span>
+            <span className="stat-value">
+              {(analytics.reduce((sum, a) => sum + a.avgEngagement, 0) / analytics.length || 0).toFixed(1)}%
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <div className="crm-nav">
+        <button
+          className={`nav-btn ${activeTab === "calendar" ? "active" : ""}`}
+          onClick={() => setActiveTab("calendar")}
+        >
+          📅 Calendar
+        </button>
+        <button
+          className={`nav-btn ${activeTab === "generate" ? "active" : ""}`}
+          onClick={() => setActiveTab("generate")}
+        >
+          ✨ Generate
+        </button>
+        <button
+          className={`nav-btn ${activeTab === "analytics" ? "active" : ""}`}
+          onClick={() => setActiveTab("analytics")}
+        >
+          📊 Analytics
+        </button>
+        <button
+          className={`nav-btn ${activeTab === "automation" ? "active" : ""}`}
+          onClick={() => setActiveTab("automation")}
+        >
+          ⚙️ Automation
+        </button>
+      </div>
+
+      {/* Content Sections */}
+      {activeTab === "calendar" && <ContentCalendarSection posts={posts} onRefresh={fetchData} />}
+      {activeTab === "generate" && <ContentGeneratorSection userId={userId} onGenerate={fetchData} />}
+      {activeTab === "analytics" && <AnalyticsSection analytics={analytics} />}
+      {activeTab === "automation" && <AutomationSection userId={userId} />}
+    </div>
+  );
+};
+
+// ============================================
+// CONTENT CALENDAR SECTION
+// ============================================
+
+const ContentCalendarSection: React.FC<{ posts: ContentPost[]; onRefresh: () => void }> = ({
+  posts,
+  onRefresh,
+}) => {
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedPost, setSelectedPost] = useState<ContentPost | null>(null);
+
+  const postsForDate = posts.filter((p) => {
+    const postDate = new Date(p.scheduledAt).toDateString();
+    return postDate === selectedDate.toDateString();
+  });
+
+  return (
+    <div className="section calendar-section">
+      <div className="section-header">
+        <h2>📅 Content Calendar</h2>
+        <button className="btn btn-primary" onClick={() => setSelectedPost(null)}>
+          ➕ New Post
+        </button>
+      </div>
+
+      <div className="calendar-container">
+        <div className="calendar-left">
+          <div className="mini-calendar">
+            {/* Mini calendar would go here */}
+            <div className="date-picker">
+              <input
+                type="date"
+                value={selectedDate.toISOString().split("T")[0]}
+                onChange={(e) => setSelectedDate(new Date(e.target.value))}
+              />
+            </div>
+          </div>
+
+          <div className="posts-list">
+            <h3>Posts for {selectedDate.toDateString()}</h3>
+            {postsForDate.length === 0 ? (
+              <div className="empty-state">No posts scheduled for this date</div>
+            ) : (
+              postsForDate.map((post) => (
+                <div
+                  key={post.id}
+                  className={`post-item ${selectedPost?.id === post.id ? "selected" : ""}`}
+                  onClick={() => setSelectedPost(post)}
+                >
+                  <div className="post-title">{post.title}</div>
+                  <div className="post-platforms">
+                    {post.platforms.map((p) => (
+                      <span key={p} className="platform-badge">
+                        {p}
+                      </span>
+                    ))}
+                  </div>
+                  <div className={`post-status ${post.status}`}>{post.status}</div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="calendar-right">
+          {selectedPost ? (
+            <PostDetailView post={selectedPost} onClose={() => setSelectedPost(null)} onPublish={onRefresh} />
+          ) : (
+            <CreatePostView onSave={onRefresh} />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// POST DETAIL VIEW
+// ============================================
+
+const PostDetailView: React.FC<{
+  post: ContentPost;
+  onClose: () => void;
+  onPublish: () => void;
+}> = ({ post, onClose, onPublish }) => {
+  const [publishing, setPublishing] = useState(false);
+
+  const handlePublish = async () => {
+    setPublishing(true);
+    try {
+      const response = await fetch(`/api/crm/publish-post/${post.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: "current-user" }),
+      });
+
+      if (response.ok) {
+        alert("Post published successfully!");
+        onPublish();
+        onClose();
+      }
+    } catch (error) {
+      console.error("Publish error", error);
+      alert("Failed to publish post");
+    } finally {
+      setPublishing(false);
+    }
+  };
+
+  return (
+    <div className="post-detail">
+      <div className="detail-header">
+        <h3>{post.title}</h3>
+        <button className="btn-close" onClick={onClose}>
+          ✕
+        </button>
+      </div>
+
+      <div className="detail-content">
+        <div className="field">
+          <label>Description</label>
+          <p>{post.description}</p>
+        </div>
+
+        <div className="field">
+          <label>Content</label>
+          <div className="content-preview">{post.content.text}</div>
+        </div>
+
+        <div className="field">
+          <label>Platforms</label>
+          <div className="platforms">
+            {post.platforms.map((p) => (
+              <span key={p} className="platform-tag">
+                {p}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="field">
+          <label>Hashtags</label>
+          <div className="hashtags">
+            {post.content.hashtags.map((tag) => (
+              <span key={tag} className="hashtag">
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="field">
+          <label>Scheduled</label>
+          <p>{new Date(post.scheduledAt).toLocaleString()}</p>
+        </div>
+
+        <div className="field">
+          <label>Status</label>
+          <span className={`status-badge ${post.status}`}>{post.status}</span>
+        </div>
+      </div>
+
+      <div className="detail-actions">
+        {post.status === "scheduled" && (
+          <button className="btn btn-primary" onClick={handlePublish} disabled={publishing}>
+            {publishing ? "Publishing..." : "Publish Now"}
+          </button>
+        )}
+        <button className="btn btn-secondary" onClick={onClose}>
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// CREATE POST VIEW
+// ============================================
+
+const CreatePostView: React.FC<{ onSave: () => void }> = ({ onSave }) => {
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    platforms: [] as string[],
+    scheduledAt: new Date().toISOString().split("T")[0],
+    content: {
+      text: "",
+      hashtags: [] as string[],
+    },
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("/api/crm/schedule-post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: "current-user",
+          content: formData,
+          platforms: formData.platforms,
+          scheduledAt: new Date(formData.scheduledAt),
+        }),
+      });
+
+      if (response.ok) {
+        alert("Post scheduled successfully!");
+        onSave();
+        setFormData({
+          title: "",
+          description: "",
+          platforms: [],
+          scheduledAt: new Date().toISOString().split("T")[0],
+          content: { text: "", hashtags: [] },
+        });
+      }
+    } catch (error) {
+      console.error("Save error", error);
+      alert("Failed to schedule post");
+    }
+  };
+
+  return (
+    <div className="create-post">
+      <h3>Create New Post</h3>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Title</label>
+          <input
+            type="text"
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            placeholder="Post title"
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Description</label>
+          <textarea
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            placeholder="Post description"
+            rows={3}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Platforms</label>
+          <div className="checkbox-group">
+            {["TikTok", "Instagram", "YouTube", "Twitter", "LinkedIn"].map((platform) => (
+              <label key={platform}>
+                <input
+                  type="checkbox"
+                  checked={formData.platforms.includes(platform)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setFormData({
+                        ...formData,
+                        platforms: [...formData.platforms, platform],
+                      });
+                    } else {
+                      setFormData({
+                        ...formData,
+                        platforms: formData.platforms.filter((p) => p !== platform),
+                      });
+                    }
+                  }}
+                />
+                {platform}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label>Scheduled Date</label>
+          <input
+            type="date"
+            value={formData.scheduledAt}
+            onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Content</label>
+          <textarea
+            value={formData.content.text}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                content: { ...formData.content, text: e.target.value },
+              })
+            }
+            placeholder="Post content"
+            rows={5}
+            required
+          />
+        </div>
+
+        <button type="submit" className="btn btn-primary">
+          Schedule Post
+        </button>
+      </form>
+    </div>
+  );
+};
+
+// ============================================
+// CONTENT GENERATOR SECTION
+// ============================================
+
+const ContentGeneratorSection: React.FC<{ userId: string; onGenerate: () => void }> = ({
+  userId,
+  onGenerate,
+}) => {
+  const [topic, setTopic] = useState("");
+  const [platform, setPlatform] = useState("TikTok");
+  const [style, setStyle] = useState("viral");
+  const [tone, setTone] = useState("energetic");
+  const [generating, setGenerating] = useState(false);
+  const [generated, setGenerated] = useState<any>(null);
+
+  const handleGenerate = async () => {
+    setGenerating(true);
+    try {
+      const response = await fetch("/api/crm/generate-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, topic, platform, style, tone }),
+      });
+
+      const data = await response.json();
+      setGenerated(data.content);
+    } catch (error) {
+      console.error("Generate error", error);
+      alert("Failed to generate content");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  return (
+    <div className="section generator-section">
+      <div className="section-header">
+        <h2>✨ AI Content Generator</h2>
+      </div>
+
+      <div className="generator-container">
+        <div className="generator-form">
+          <div className="form-group">
+            <label>Topic</label>
+            <input
+              type="text"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              placeholder="What do you want to create content about?"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Platform</label>
+            <select value={platform} onChange={(e) => setPlatform(e.target.value)}>
+              <option>TikTok</option>
+              <option>Instagram</option>
+              <option>YouTube</option>
+              <option>Twitter</option>
+              <option>LinkedIn</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Style</label>
+            <select value={style} onChange={(e) => setStyle(e.target.value)}>
+              <option value="viral">Viral</option>
+              <option value="educational">Educational</option>
+              <option value="entertaining">Entertaining</option>
+              <option value="inspirational">Inspirational</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Tone</label>
+            <select value={tone} onChange={(e) => setTone(e.target.value)}>
+              <option value="energetic">Energetic</option>
+              <option value="professional">Professional</option>
+              <option value="casual">Casual</option>
+              <option value="humorous">Humorous</option>
+            </select>
+          </div>
+
+          <button className="btn btn-primary" onClick={handleGenerate} disabled={!topic || generating}>
+            {generating ? "Generating..." : "Generate Content"}
+          </button>
+        </div>
+
+        {generated && (
+          <div className="generated-content">
+            <h3>Generated Content</h3>
+            <div className="content-box">
+              <div className="content-field">
+                <label>Hook</label>
+                <p>{generated.hook}</p>
+              </div>
+              <div className="content-field">
+                <label>Content</label>
+                <p>{generated.text}</p>
+              </div>
+              <div className="content-field">
+                <label>CTA</label>
+                <p>{generated.cta}</p>
+              </div>
+              <div className="content-field">
+                <label>Hashtags</label>
+                <div className="hashtags">
+                  {generated.hashtags.map((tag: string) => (
+                    <span key={tag} className="hashtag">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// ANALYTICS SECTION
+// ============================================
+
+const AnalyticsSection: React.FC<{ analytics: Analytics[] }> = ({ analytics }) => {
+  const totalViews = analytics.reduce((sum, a) => sum + a.totalViews, 0);
+  const totalEngagement = analytics.reduce((sum, a) => sum + a.totalLikes + a.totalComments + a.totalShares, 0);
+  const totalRevenue = analytics.reduce((sum, a) => sum + a.totalRevenue, 0);
+
+  return (
+    <div className="section analytics-section">
+      <div className="section-header">
+        <h2>📊 Analytics</h2>
+      </div>
+
+      <div className="analytics-grid">
+        <div className="analytics-card">
+          <span className="analytics-label">Total Views</span>
+          <span className="analytics-value">{totalViews.toLocaleString()}</span>
+        </div>
+        <div className="analytics-card">
+          <span className="analytics-label">Total Engagement</span>
+          <span className="analytics-value">{totalEngagement.toLocaleString()}</span>
+        </div>
+        <div className="analytics-card">
+          <span className="analytics-label">Total Revenue</span>
+          <span className="analytics-value">${totalRevenue.toFixed(2)}</span>
+        </div>
+        <div className="analytics-card">
+          <span className="analytics-label">Avg Engagement Rate</span>
+          <span className="analytics-value">
+            {(analytics.reduce((sum, a) => sum + a.avgEngagement, 0) / analytics.length || 0).toFixed(1)}%
+          </span>
+        </div>
+      </div>
+
+      <div className="analytics-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Platform</th>
+              <th>Posts</th>
+              <th>Views</th>
+              <th>Engagement</th>
+              <th>Conversions</th>
+              <th>Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            {analytics.map((a) => (
+              <tr key={a.platform}>
+                <td>{a.platform}</td>
+                <td>{a.totalPosts}</td>
+                <td>{a.totalViews.toLocaleString()}</td>
+                <td>{a.avgEngagement.toFixed(1)}%</td>
+                <td>{a.totalConversions}</td>
+                <td>${a.totalRevenue.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// AUTOMATION SECTION
+// ============================================
+
+const AutomationSection: React.FC<{ userId: string }> = ({ userId }) => {
+  const [rules, setRules] = useState<any[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
+    ruleName: "",
+    triggerType: "daily",
+    actionType: "post",
+    conditions: {},
+  });
+
+  const handleCreateRule = async () => {
+    try {
+      const response = await fetch("/api/crm/automation/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, ...formData }),
+      });
+
+      if (response.ok) {
+        alert("Automation rule created!");
+        setShowForm(false);
+        setFormData({ ruleName: "", triggerType: "daily", actionType: "post", conditions: {} });
+      }
+    } catch (error) {
+      console.error("Create rule error", error);
+      alert("Failed to create rule");
+    }
+  };
+
+  return (
+    <div className="section automation-section">
+      <div className="section-header">
+        <h2>⚙️ Automation Rules</h2>
+        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+          ➕ New Rule
+        </button>
+      </div>
+
+      {showForm && (
+        <div className="automation-form">
+          <div className="form-group">
+            <label>Rule Name</label>
+            <input
+              type="text"
+              value={formData.ruleName}
+              onChange={(e) => setFormData({ ...formData, ruleName: e.target.value })}
+              placeholder="e.g., Daily Post at 9am"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Trigger Type</label>
+            <select
+              value={formData.triggerType}
+              onChange={(e) => setFormData({ ...formData, triggerType: e.target.value })}
+            >
+              <option value="daily">Daily</option>
+              <option value="on_engagement">On Engagement</option>
+              <option value="on_schedule">On Schedule</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Action Type</label>
+            <select
+              value={formData.actionType}
+              onChange={(e) => setFormData({ ...formData, actionType: e.target.value })}
+            >
+              <option value="post">Post</option>
+              <option value="notify">Notify</option>
+              <option value="repost">Repost</option>
+            </select>
+          </div>
+
+          <button className="btn btn-primary" onClick={handleCreateRule}>
+            Create Rule
+          </button>
+        </div>
+      )}
+
+      <div className="rules-list">
+        {rules.length === 0 ? (
+          <div className="empty-state">No automation rules created yet</div>
+        ) : (
+          rules.map((rule) => (
+            <div key={rule.id} className="rule-item">
+              <div className="rule-name">{rule.ruleName}</div>
+              <div className="rule-details">
+                Trigger: {rule.triggerType} | Action: {rule.actionType}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// EXPORT
+// ============================================
+
+export default CRMDashboard;

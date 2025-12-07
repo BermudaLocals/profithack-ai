@@ -1,0 +1,273 @@
+export interface User {
+  id: string;
+  username: string;
+  displayName: string;
+  avatar: string;
+  followers: number;
+  following: number;
+  likes: number;
+  bio: string;
+  isFollowing?: boolean;
+  isVerified?: boolean;
+}
+
+export interface Video {
+  id: string;
+  user: User;
+  videoUrl: string;
+  thumbnailUrl: string;
+  caption: string;
+  likes: number;
+  comments: number;
+  shares: number;
+  views: number;
+  isLiked?: boolean;
+  isBookmarked?: boolean;
+  isPremium?: boolean;
+  hashtags: string[];
+}
+
+export interface Message {
+  id: string;
+  user: User;
+  lastMessage: string;
+  timestamp: string;
+  unread: number;
+  isOnline: boolean;
+}
+
+export interface AITool {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  gradient: [string, string];
+}
+
+export const mockUsers: User[] = [
+  {
+    id: '1',
+    username: '@alexcreator',
+    displayName: 'Alex Martinez',
+    avatar: 'https://i.pravatar.cc/300?img=33',
+    followers: 1200000,
+    following: 342,
+    likes: 45000000,
+    bio: '🎥 Creator | AI Enthusiast | Building the future',
+    isVerified: true,
+  },
+  {
+    id: '2',
+    username: '@sarahdance',
+    displayName: 'Sarah Johnson',
+    avatar: 'https://i.pravatar.cc/300?img=45',
+    followers: 850000,
+    following: 521,
+    likes: 23000000,
+    bio: '💃 Dancer | Content Creator | Love & Light ✨',
+    isVerified: true,
+  },
+  {
+    id: '3',
+    username: '@mikefitness',
+    displayName: 'Mike Thompson',
+    avatar: 'https://i.pravatar.cc/300?img=12',
+    followers: 2100000,
+    following: 189,
+    likes: 78000000,
+    bio: '💪 Fitness Coach | Transform Your Life',
+    isVerified: true,
+  },
+  {
+    id: '4',
+    username: '@emilychef',
+    displayName: 'Emily Chen',
+    avatar: 'https://i.pravatar.cc/300?img=47',
+    followers: 650000,
+    following: 412,
+    likes: 15000000,
+    bio: '👩‍🍳 Chef | Food Content | Recipe Developer',
+  },
+  {
+    id: '5',
+    username: '@davidtech',
+    displayName: 'David Kumar',
+    avatar: 'https://i.pravatar.cc/300?img=68',
+    followers: 980000,
+    following: 234,
+    likes: 32000000,
+    bio: '🚀 Tech Reviewer | Gadget Lover | AI & Future',
+    isVerified: true,
+  },
+];
+
+export const mockVideos: Video[] = [
+  {
+    id: '1',
+    user: mockUsers[0],
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=400',
+    caption: 'Building my dream content studio! 🎥✨ #creator #contentcreator #studio',
+    likes: 245000,
+    comments: 1230,
+    shares: 4500,
+    views: 3200000,
+    isLiked: false,
+    isBookmarked: false,
+    hashtags: ['creator', 'contentcreator', 'studio'],
+  },
+  {
+    id: '2',
+    user: mockUsers[1],
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=400',
+    caption: 'New dance routine 💃 Who wants to learn? #dance #tutorial #trending',
+    likes: 567000,
+    comments: 2340,
+    shares: 8900,
+    views: 5600000,
+    isLiked: true,
+    hashtags: ['dance', 'tutorial', 'trending'],
+  },
+  {
+    id: '3',
+    user: mockUsers[2],
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400',
+    caption: '30-day transformation results 💪 #fitness #transformation #motivation',
+    likes: 892000,
+    comments: 4560,
+    shares: 12300,
+    views: 8900000,
+    hashtags: ['fitness', 'transformation', 'motivation'],
+    isPremium: true,
+  },
+  {
+    id: '4',
+    user: mockUsers[3],
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400',
+    caption: 'Secret recipe revealed! 👩‍🍳✨ #cooking #recipe #foodie',
+    likes: 324000,
+    comments: 1890,
+    shares: 5600,
+    views: 2800000,
+    isBookmarked: true,
+    hashtags: ['cooking', 'recipe', 'foodie'],
+  },
+  {
+    id: '5',
+    user: mockUsers[4],
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400',
+    caption: 'This AI tech is INSANE 🤯 #tech #ai #future',
+    likes: 678000,
+    comments: 3450,
+    shares: 9800,
+    views: 6700000,
+    isLiked: true,
+    hashtags: ['tech', 'ai', 'future'],
+  },
+];
+
+export const mockMessages: Message[] = [
+  {
+    id: '1',
+    user: mockUsers[1],
+    lastMessage: 'Hey! Love your latest video 🔥',
+    timestamp: '2m ago',
+    unread: 2,
+    isOnline: true,
+  },
+  {
+    id: '2',
+    user: mockUsers[2],
+    lastMessage: 'Thanks for the collab! Let\'s do another one',
+    timestamp: '1h ago',
+    unread: 0,
+    isOnline: true,
+  },
+  {
+    id: '3',
+    user: mockUsers[3],
+    lastMessage: 'Can you share the recipe?',
+    timestamp: '3h ago',
+    unread: 1,
+    isOnline: false,
+  },
+  {
+    id: '4',
+    user: mockUsers[4],
+    lastMessage: 'Check out this new gadget!',
+    timestamp: 'Yesterday',
+    unread: 0,
+    isOnline: false,
+  },
+  {
+    id: '5',
+    user: mockUsers[0],
+    lastMessage: 'When are you free for a call?',
+    timestamp: '2d ago',
+    unread: 0,
+    isOnline: true,
+  },
+];
+
+export const aiTools: AITool[] = [
+  {
+    id: '1',
+    title: 'AI Chat',
+    description: 'ChatGPT, Claude & Gemini',
+    icon: 'MessageSquare',
+    gradient: ['#FF1493', '#8B5CF6'],
+  },
+  {
+    id: '2',
+    title: 'Video Generator',
+    description: 'AI-powered video creation',
+    icon: 'Video',
+    gradient: ['#8B5CF6', '#00D4FF'],
+  },
+  {
+    id: '3',
+    title: 'AI Influencer',
+    description: 'Create AI avatars',
+    icon: 'User',
+    gradient: ['#00D4FF', '#FF1493'],
+  },
+  {
+    id: '4',
+    title: 'Viral Hooks',
+    description: 'Generate engaging hooks',
+    icon: 'Zap',
+    gradient: ['#FF1493', '#8B5CF6'],
+  },
+  {
+    id: '5',
+    title: 'Hashtags',
+    description: 'Trending hashtag generator',
+    icon: 'Hash',
+    gradient: ['#8B5CF6', '#00D4FF'],
+  },
+  {
+    id: '6',
+    title: 'Trending',
+    description: 'Current trends by niche',
+    icon: 'TrendingUp',
+    gradient: ['#00D4FF', '#FF1493'],
+  },
+  {
+    id: '7',
+    title: 'Captions',
+    description: 'AI caption writer',
+    icon: 'Type',
+    gradient: ['#FF1493', '#8B5CF6'],
+  },
+  {
+    id: '8',
+    title: 'Predictor',
+    description: 'Engagement prediction',
+    icon: 'BarChart',
+    gradient: ['#8B5CF6', '#00D4FF'],
+  },
+];

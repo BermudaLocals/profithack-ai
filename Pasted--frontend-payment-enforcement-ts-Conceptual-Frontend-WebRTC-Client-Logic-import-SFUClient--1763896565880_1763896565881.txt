@@ -1,0 +1,78 @@
+// frontend_payment_enforcement.ts - Conceptual Frontend WebRTC Client Logic
+
+import { SFUClient } from './frontend_sfu_client'; // Assuming the previously generated SFUClient
+
+/**
+ * Extends the SFUClient to handle the termination signal from the backend.
+ */
+export class PrivateCallClient extends SFUClient {
+    private videoElement: HTMLVideoElement | null = null;
+    private audioElement: HTMLAudioElement | null = null;
+
+    // Override the signaling channel listener to check for the termination signal
+    protected override handleIncomingSignal(signal: any): void {
+        if (signal.type === 'TERMINATE_CALL') {
+            this.handleTermination(signal.reason, signal.redirectUrl);
+        } else {
+            // Pass to standard WebRTC signaling logic
+            super.handleIncomingSignal(signal);
+        }
+    }
+
+    /**
+     * Attaches the stream to the video/audio elements and stores references.
+     */
+    public attachStreamElements(videoEl: HTMLVideoElement, audioEl: HTMLAudioElement): void {
+        this.videoElement = videoEl;
+        this.audioElement = audioEl;
+        // Assuming the stream is already started and attached by the base SFUClient
+    }
+
+    /**
+     * Executes the required actions upon receiving the termination signal.
+     * @param reason The reason for termination ('PAYMENT_FAILED' or 'TIME_EXPIRED').
+     * @param redirectUrl The URL to redirect the user to.
+     */
+    private handleTermination(reason: string, redirectUrl: string): void {
+        console.warn(`Call terminated by server. Reason: ${reason}. Redirecting to ${redirectUrl}`);
+
+        // 1. Cut Video (Screen goes black)
+        if (this.videoElement) {
+            this.videoElement.srcObject = null;
+            this.videoElement.style.backgroundColor = 'black';
+        }
+
+        // 2. Cut Audio (No sound)
+        if (this.audioElement) {
+            this.audioElement.srcObject = null;
+            this.audioElement.muted = true;
+        }
+        
+        // 3. Stop the WebRTC connection cleanly
+        this.close(); 
+
+        // 4. Display a message and redirect
+        alert(`Your private call has ended. Reason: ${reason.replace('_', ' ')}. Redirecting now.`);
+        
+        // Redirect after a short delay for the user to read the alert
+        setTimeout(() => {
+            window.location.href = redirectUrl;
+        }, 1000);
+    }
+}
+
+// Example Usage in a Private Call Component:
+/*
+// Assume the base SFUClient has been extended to PrivateCallClient
+const privateCallClient = new PrivateCallClient(roomId, userId, signalingClient, cameraService);
+
+// Attach the elements
+const videoEl = document.getElementById('remote-video') as HTMLVideoElement;
+const audioEl = document.getElementById('remote-audio') as HTMLAudioElement;
+privateCallClient.attachStreamElements(videoEl, audioEl);
+
+// Start the call
+privateCallClient.joinAsParticipant();
+
+// The handleTermination method will automatically be called if the backend sends the signal.
+*/
