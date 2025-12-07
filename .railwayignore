@@ -1,8 +1,7 @@
-# Ignore everything except what's needed for production
+# Ignore everything except production code
 *
-!backend/
-!apps/web/
-!public/
+!server/
+!client/
 !dist/
 !package.json
 !package-lock.json
@@ -12,3 +11,5 @@
 !.env.production
 !*.config.js
 !*.config.ts
+!vite.config.ts
+!drizzle.config.ts
