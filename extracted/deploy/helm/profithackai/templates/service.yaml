@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: profithackai-api
+spec:
+  selector: { app: profithackai-api }
+  ports:
+    - protocol: TCP
+      port: 4000
+      targetPort: 4000

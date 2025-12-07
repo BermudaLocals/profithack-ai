@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: profithackai-api
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels: { app: profithackai-api }
+  template:
+    metadata:
+      labels: { app: profithackai-api }
+    spec:
+      containers:
+      - name: api
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports: [{containerPort: 4000}]
+        env:
+        - name: POSTGRES_URL
+          value: "{{ .Values.env.POSTGRES_URL }}"
+        - name: REDIS_URL
+          value: "{{ .Values.env.REDIS_URL }}"
+        - name: JWT_SECRET
+          value: "{{ .Values.env.JWT_SECRET }}"
+        livenessProbe: { httpGet: { path: /healthz, port: 4000 }, initialDelaySeconds: 5, periodSeconds: 10 }
+        readinessProbe: { httpGet: { path: /readyz, port: 4000 }, initialDelaySeconds: 5, periodSeconds: 5 }

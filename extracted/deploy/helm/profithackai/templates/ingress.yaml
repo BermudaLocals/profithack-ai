@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: profithackai-api
+spec:
+  rules:
+    - host: api.profithackai.yourdomain.com
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: profithackai-api
+              port:
+                number: 4000
