@@ -1,16 +1,15 @@
 {
   "$schema": "https://railway.app/schema.json",
   "build": {
-    "builder": "nixpacks"
+    "builder": "dockerfile"
   },
   "deploy": {
     "numReplicas": 1,
-    "startCommand": "npm run build && npm start",
+    "startCommand": "npm start",
     "restartPolicyMaxRetries": 10
   },
   "variables": {
     "NODE_ENV": "production",
-    "PORT": "3000",
-    "NODE_MAJOR": "20"
+    "PORT": "3000"
   }
 }
