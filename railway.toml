@@ -1,0 +1,19 @@
+[build]
+builder = "nixpacks"
+buildCommand = "npm run build:full"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+
+# Define services your app needs
+[[services]]
+name = "rofithack-ai"
+port = 5000
+
+[[services.postgresql]]
+name = "main-db"
+
+[[services.redis]]
+name = "main-cache"
