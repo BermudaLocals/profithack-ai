@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+.env
+.env.local
+.DS_Store
+client/node_modules
+client/build
+attached_assets/*.mp4 # Ignore large video assets; reference them externally
+*.tar.gz
