@@ -1,60 +1,42 @@
-# ============================================================================
-# PROFITHACK AI - Railway Production Build
-# TikTok-style app optimized for Railway deployment
-# ============================================================================
+# Use a Node.js image that includes Python and build tools for native dependencies (like gRPC, Mediasoup)
+FROM node:20-bullseye-slim
 
-FROM node:20-alpine AS builder
+# Install system dependencies: Python, build tools, FFmpeg (for video processing), PostgreSQL client
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    ffmpeg \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apk add --no-cache python3 make g++ git curl
+# Set working directory
+WORKDIR /usr/src/app
 
-WORKDIR /app
+# Copy dependency definitions FIRST (for better Docker layer caching)
+COPY package*.json ./
+COPY client/package*.json ./client/
 
-# Copy package files
-COPY package.json ./
-COPY .npmrc ./
+# Install ALL dependencies (root and client)
+RUN npm ci --only=production --ignore-scripts
+RUN cd client && npm ci --only=production
 
-# Install ALL dependencies (including devDependencies for building)
-RUN npm install --legacy-peer-deps
-
-# Copy all source code
+# Copy the rest of your application code
 COPY . .
 
-# Replace vite config with production version (no Replit plugins)
-RUN if [ -f "vite.config.production.ts" ]; then cp vite.config.production.ts vite.config.ts; fi
+# Build the React frontend
+RUN cd client && npm run build
 
-# Build frontend with installed vite
-RUN ./node_modules/.bin/vite build
-
-# Build backend with installed esbuild
-RUN ./node_modules/.bin/esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
-
-# ============================================================================
-# Production Stage - Minimal image
-# ============================================================================
-FROM node:20-alpine AS production
-
-RUN apk add --no-cache curl
-
-WORKDIR /app
-
+# Set environment variable to serve frontend from backend
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV CLIENT_PATH=/usr/src/app/client/build
 
-# Copy package files
-COPY package.json ./
-COPY .npmrc ./
+# Expose the port your server uses
+EXPOSE 5000
 
-# Install production dependencies only
-RUN npm install --omit=dev --legacy-peer-deps --ignore-scripts
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:5000/health', (r)=>{process.exit(r.statusCode===200?0:1)})"
 
-# Copy built artifacts from builder
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/shared ./shared
-COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
-
-EXPOSE 3000
-
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:3000/healthz || exit 1
-
-CMD ["node", "dist/index.js"]
+# Start the server. This single command should start your main API and gRPC services.
+CMD ["npm", "start"]
