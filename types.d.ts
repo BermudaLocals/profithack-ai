@@ -1,28 +1,59 @@
-/**
- * PROFITHACK AI - TypeScript Type Declarations
- * Fixes common type issues in routes.ts
- */
-
-import { users } from "@shared/schema";
-
-declare global {
-  namespace Express {
-    interface User {
-      id: string;
-      email: string | null;
-      username: string | null;
-      displayName: string | null;
-      firstName: string | null;
-      lastName: string | null;
-      profileImageUrl: string | null;
-      createdAt: Date | null;
-      passwordHash?: string | null;
-    }
-
-    interface Request {
-      user?: User;
-    }
-  }
+declare module "*.css" {
+  const content: { [className: string]: string };
+  export default content;
 }
 
-export {};
+declare module "*.svg" {
+  const content: string;
+  export default content;
+}
+
+declare module "*.png" {
+  const content: string;
+  export default content;
+}
+
+declare module "*.jpg" {
+  const content: string;
+  export default content;
+}
+
+declare module "*.jpeg" {
+  const content: string;
+  export default content;
+}
+
+declare module "*.gif" {
+  const content: string;
+  export default content;
+}
+
+declare module "*.webp" {
+  const content: string;
+  export default content;
+}
+
+declare module "*.mp4" {
+  const content: string;
+  export default content;
+}
+
+declare module "*.json" {
+  const content: any;
+  export default content;
+}
+
+declare namespace Express {
+  interface Request {
+    user?: {
+      id: number;
+      username: string;
+      email?: string | null;
+      isAdmin?: boolean;
+    };
+  }
+  interface Session {
+    userId?: number;
+    isAdmin?: boolean;
+  }
+}
