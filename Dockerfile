@@ -17,7 +17,7 @@ COPY . .
 # 4. ==== THE FIXED BUILD COMMAND ====
 # Runs 'esbuild' directly with npx, exactly as your 'package.json' script intended.
 # This will create the 'dist' folder.
-RUN npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+RUN npx esbuild server/index.ts --platform=node --external:../vite.config --bundle --format=esm --outdir=dist
 
 # 5. Start the application from the built 'dist' folder
 ENV NODE_ENV=production
