@@ -23,7 +23,7 @@ RUN npm install --legacy-peer-deps
 # Copy the rest of the application
 COPY . .
 
-# Build steps (skip if commands don't exist)
+# Build steps
 RUN if [ -f "vite.config.ts" ] || [ -f "vite.config.js" ]; then \
       npm run build:client 2>/dev/null || ./node_modules/.bin/vite build 2>/dev/null || true; \
     fi
@@ -56,13 +56,9 @@ RUN npm install --omit=dev --legacy-peer-deps --ignore-scripts
 
 # Copy built artifacts from builder
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/public ./public 2>/dev/null || true
 
-# Copy mediasoup worker if it was built
-COPY --from=builder /app/node_modules/mediasoup ./node_modules/mediasoup 2>/dev/null || true
-
-# Copy other necessary files
-COPY drizzle.config.ts ./
+# Copy mediasoup worker if it exists (simplified)
+COPY --from=builder /app/node_modules/mediasoup/worker ./node_modules/mediasoup/worker 2>/dev/null || :
 
 # Expose port
 EXPOSE 5000
@@ -71,5 +67,5 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:5000/healthz || exit 1
 
-# Start the application
+# Start command
 CMD ["node", "dist/index.js"]
