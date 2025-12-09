@@ -4,6 +4,7 @@ WORKDIR /app
 COPY package.json ./
 RUN npm install --legacy-peer-deps --ignore-scripts
 COPY . .
+RUN if [ -f "client/public/index.html" ] && [ ! -f "client/index.html" ]; then cp client/public/index.html client/index.html; fi
 RUN npm run build:client || ./node_modules/.bin/vite build
 RUN npm run build:server || ./node_modules/.bin/esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
 
