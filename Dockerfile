@@ -1,48 +1,24 @@
-# Use a more complete Node.js base image with build tools
-FROM node:20-bookworm-slim AS builder
-
-# Install Python, pip, and build dependencies
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    make \
-    g++ \
-    git \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
+FROM node:20-alpine AS builder
+RUN apk add --no-cache python3 py3-pip make g++ git curl linux-headers
 WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
+COPY package.json ./
 RUN npm install --legacy-peer-deps
-
-# Copy source code and build
 COPY . .
-RUN npm run build:client || npm run build || ./node_modules/.bin/vite build
+RUN npm run build:client || ./node_modules/.bin/vite build
+RUN npm run build:server || ./node_modules/.bin/esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
 
-# Production stage
-FROM node:20-alpine
-
-# Install runtime dependencies
+FROM node:20-alpine AS production
 RUN apk add --no-cache curl
-
 WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install production dependencies
+ENV NODE_ENV=production
+ENV PORT=5000
+COPY package.json ./
 RUN npm install --omit=dev --legacy-peer-deps --ignore-scripts
-
-# Copy built artifacts from builder stage
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-
-# Expose port (Railway automatically assigns a port)
-EXPOSE 3000
-
-# Start the application
-CMD ["npm", "start"]
+COPY --from=builder /app/server/shared ./server/shared
+COPY --from=builder /app/node_modules/mediasoup ./node_modules/mediasoup
+COPY drizzle.config.ts ./
+EXPOSE 5000
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:5000/healthz || exit 1
+CMD ["node", "dist/index.js"]
