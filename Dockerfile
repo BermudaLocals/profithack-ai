@@ -2,7 +2,8 @@ FROM node:20-slim AS builder
 RUN apt-get update && apt-get install -y python3 make g++ curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm install --legacy-peer-deps
+# Fresh install Dec 9 2025
+RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 COPY . .
 RUN npx vite build
 RUN npx esbuild server/index.ts --platform=node --packages=external --external:vite --external:@vitejs/plugin-react --bundle --format=esm --outdir=dist
