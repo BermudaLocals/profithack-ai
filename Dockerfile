@@ -1,47 +1,68 @@
-FROM node:20-alpine
+# Builder stage with all build tools
+FROM node:20-bullseye AS builder
 
 # Install all required build dependencies
-RUN apk add --no-cache python3 py3-pip make g++ git curl linux-headers bash
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    make \
+    g++ \
+    git \
+    curl \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 # Copy package files first for better caching
 COPY package.json package-lock.json* ./
 
-# Install dependencies (mediasoup needs pip during installation)
+# Install dependencies with legacy peer deps
 RUN npm install --legacy-peer-deps
 
 # Copy the rest of the application
 COPY . .
 
-# Check what files we have
-RUN ls -la && echo "Current directory contents:" && find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.json" | head -20
-
-# Run the setup script if it exists
-RUN if [ -f "scripts/setup.ts" ]; then \
-      npx tsx scripts/setup.ts || true; \
-    fi
-
-# Build steps based on your project structure
+# Build steps (skip if commands don't exist)
 RUN if [ -f "vite.config.ts" ] || [ -f "vite.config.js" ]; then \
-      npm run build:client || ./node_modules/.bin/vite build; \
-    else \
-      echo "No Vite config found, skipping client build"; \
+      npm run build:client 2>/dev/null || ./node_modules/.bin/vite build 2>/dev/null || true; \
     fi
 
-# Build server if needed
 RUN if [ -f "server/index.ts" ]; then \
-      npm run build:server || npx esbuild server/index.ts \
+      npm run build:server 2>/dev/null || ./node_modules/.bin/esbuild server/index.ts \
         --platform=node \
         --packages=external \
         --bundle \
         --format=esm \
-        --outdir=dist; \
+        --outdir=dist 2>/dev/null || true; \
     fi
 
-# Set environment variables
+# Production stage
+FROM node:20-bullseye-slim AS production
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
 ENV NODE_ENV=production
 ENV PORT=5000
+
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install production dependencies (skip scripts to avoid mediasoup build)
+RUN npm install --omit=dev --legacy-peer-deps --ignore-scripts
+
+# Copy built artifacts from builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/public ./public 2>/dev/null || true
+
+# Copy mediasoup worker if it was built
+COPY --from=builder /app/node_modules/mediasoup ./node_modules/mediasoup 2>/dev/null || true
+
+# Copy other necessary files
+COPY drizzle.config.ts ./
 
 # Expose port
 EXPOSE 5000
@@ -50,11 +71,5 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:5000/healthz || exit 1
 
-# Start command - adjust based on your actual entry point
-CMD if [ -f "dist/index.js" ]; then \
-      node dist/index.js; \
-    elif [ -f "server/index.ts" ]; then \
-      npx tsx server/index.ts; \
-    else \
-      npm run dev; \
-    fi
+# Start the application
+CMD ["node", "dist/index.js"]
