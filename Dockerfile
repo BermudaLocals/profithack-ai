@@ -1,43 +1,44 @@
-# Stage 1: Builder (installs everything and builds)
+# Stage 1: Builder
 FROM node:20-slim AS builder
 
-# 1. Install system build tools
 RUN apt-get update && apt-get install -y \
     python3 python3-pip make g++ git curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# 2. Install all project dependencies
+# Install ALL dependencies (including devDeps for building)
 COPY package.json package-lock.json* ./
 RUN npm install --legacy-peer-deps
 
-# 3. Copy source code and build the server
+# Copy source and build
 COPY . .
-# In the final stage, after copying the server dist:
-COPY --from=builder /app/dist ./dist
-RUN npx esbuild server/index.ts --platform=node --packages=external --external:../vite.config --bundle --format=esm --outdir=dist
 
-# NEW LINE: Build the Vite client for production
-RUN npm run build
+# Build frontend first
+RUN npx vite build
 
-# Stage 2: Production (clean runtime environment)
+# Build backend (exclude vite completely)
+RUN npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+
+# Stage 2: Production
 FROM node:20-slim
 
-# 4. Set the working directory for the final image
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=5000
 
-# 5. FIRST copy the dependency list, THEN install
+# Install ONLY production dependencies
 COPY package.json package-lock.json* ./
-RUN npm install --legacy-peer-deps  # TEST: Remove --omit=dev
+RUN npm install --omit=dev --legacy-peer-deps --ignore-scripts
 
-# 6. Copy the compiled application and required files from the builder
+# Copy built artifacts
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/server/shared ./server/shared
-COPY --from=builder /app/drizzle.config.ts ./
 
 EXPOSE 5000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:5000/health || exit 1
+
 CMD ["node", "dist/index.js"]
