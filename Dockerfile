@@ -24,7 +24,7 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=5000
-
+RUN npm install --legacy-peer-deps # Removes '--omit=dev'
 # 5. Copy only production dependencies
 COPY package.json package-lock.json* ./
 RUN npm install --omit=dev --legacy-peer-deps
