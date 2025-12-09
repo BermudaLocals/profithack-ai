@@ -1,0 +1,25 @@
+export default function App() {
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%)",
+      color: "#fff",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontFamily: "system-ui, sans-serif"
+    }}>
+      <div style={{ textAlign: "center" }}>
+        <h1 style={{
+          fontSize: "3rem",
+          background: "linear-gradient(90deg, #FF1493, #8B5CF6, #00D4FF)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent"
+        }}>
+          ROFITHACK AI
+        </h1>
+        <p>Creator Monetization Platform</p>
+      </div>
+    </div>
+  );
+}
