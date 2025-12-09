@@ -36,7 +36,7 @@ RUN npm install --omit=dev --legacy-peer-deps
 COPY --from=builder /app/dist ./dist
 
 # Copy other necessary runtime files
-COPY --from=builder /app/server/shared ./server/shared 2>/dev/null || :
+COPY --from=builder /app/server/shared ./server/shared
 COPY --from=builder /app/drizzle.config.ts ./ 2>/dev/null || :
 
 EXPOSE 5000
