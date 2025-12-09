@@ -1,19 +1,9 @@
 [build]
-builder = "nixpacks"
-buildCommand = "npm run build:full"
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "npm start"
-healthcheckPath = "/health"
+healthcheckPath = "/healthz"
 healthcheckTimeout = 30
-
-# Define services your app needs
-[[services]]
-name = "rofithack-ai"
-port = 5000
-
-[[services.postgresql]]
-name = "main-db"
-
-[[services.redis]]
-name = "main-cache"
+restartPolicyType = "onFailure"
+restartPolicyMaxRetries = 10
