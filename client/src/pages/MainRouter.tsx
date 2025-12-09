@@ -15,7 +15,7 @@ export default function MainRouter({ user }: MainRouterProps) {
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-pink-500/20">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent">
-            ROFITHACK AI
+            PROFITHACK AI
           </h1>
           {user ? (
             <div className="flex items-center gap-3">
