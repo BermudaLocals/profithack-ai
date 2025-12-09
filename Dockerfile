@@ -14,7 +14,8 @@ RUN npm install --legacy-peer-deps
 
 # 3. Copy source code and build the server
 COPY . .
-# In the 'builder' stage:
+# In the final stage, after copying the server dist:
+COPY --from=builder /app/dist ./dist
 RUN npx esbuild server/index.ts --platform=node --packages=external --external:../vite.config --bundle --format=esm --outdir=dist
 
 # NEW LINE: Build the Vite client for production
