@@ -4,27 +4,16 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
-  root: "./client",
-  publicDir: "public",
-  build: {
-    outDir: "dist",
-    emptyOutDir: true,
-    sourcemap: true,
-  },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./client/src"),
-      "@shared": path.resolve(__dirname, "./server/shared"),
-      "@assets": path.resolve(__dirname, "./attached_assets"),
+      "@": path.resolve(import.meta.dirname, "client", "src"),
+      "@shared": path.resolve(import.meta.dirname, "shared"),
+      "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },
-  server: {
-    port: 3000,
-    proxy: {
-      "/api": {
-        target: "http://localhost:5000",
-        changeOrigin: true,
-      },
-    },
+  root: path.resolve(import.meta.dirname, "client"),
+  build: {
+    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    emptyOutDir: true,
   },
 });
