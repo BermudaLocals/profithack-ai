@@ -1,4 +1,4 @@
-# Stage 1: Builder (installs tools and creates the build)
+# Stage 1: Builder (installs everything and builds)
 FROM node:20-slim AS builder
 
 # 1. Install system build tools
@@ -24,13 +24,12 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=5000
-RUN npm install --legacy-peer-deps # Removes '--omit=dev'
-# 5. Copy only production dependencies
+
+# 5. FIRST copy the dependency list, THEN install
 COPY package.json package-lock.json* ./
-RUN npm install --omit=dev --legacy-peer-deps
+RUN npm install --legacy-peer-deps  # TEST: Remove --omit=dev
 
 # 6. Copy the compiled application and required files from the builder
-#    NOTE: No '|| :' shell operators are used here.
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/server/shared ./server/shared
 COPY --from=builder /app/drizzle.config.ts ./
