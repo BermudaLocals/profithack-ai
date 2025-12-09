@@ -16,7 +16,7 @@ export default function App() {
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent"
         }}>
-          ROFITHACK AI
+          PROFITHACK AI
         </h1>
         <p>Creator Monetization Platform</p>
       </div>
