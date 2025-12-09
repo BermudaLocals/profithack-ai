@@ -9,7 +9,7 @@ export default function Loading({ progress = 0, message = "Loading..." }: Loadin
       <div className="text-center max-w-md mx-auto px-4">
         <div className="mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 bg-clip-text text-transparent mb-2">
-            ROFITHACK AI
+            PROFITHACK AI
           </h1>
           <p className="text-white/60">Creator Monetization Platform</p>
         </div>
