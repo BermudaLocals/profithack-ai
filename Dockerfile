@@ -3,7 +3,8 @@ RUN apt-get update && apt-get install -y python3 make g++ curl && rm -rf /var/li
 WORKDIR /app
 COPY . .
 RUN rm -rf node_modules
-RUN npm install vite@5 esbuild @vitejs/plugin-react react react-dom @tanstack/react-query wouter drizzle-orm drizzle-zod zod express tailwindcss@3 postcss autoprefixer --save --legacy-peer-depsRUN cp vite.config.production.mjs vite.config.mjs
+RUN npm install vite@5 esbuild @vitejs/plugin-react react react-dom @tanstack/react-query wouter drizzle-orm drizzle-zod zod express tailwindcss@3 postcss autoprefixer --save --legacy-peer-deps
+RUN cp vite.config.production.mjs vite.config.mjs
 RUN ./node_modules/.bin/vite build --config vite.config.mjs
 RUN ./node_modules/.bin/esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
 
