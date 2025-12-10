@@ -2,7 +2,7 @@ FROM node:20-slim AS builder
 RUN apt-get update && apt-get install -y python3 make g++ curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY . .
-RUN npm install vite esbuild @vitejs/plugin-react --save-dev
+RUN npm install vite esbuild @vitejs/plugin-react react react-dom --save
 RUN npm install --legacy-peer-deps
 RUN cp vite.config.production.ts vite.config.ts
 RUN npx vite build
