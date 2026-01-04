@@ -1,5 +1,6 @@
 import express from "express";
 import compression from "compression";
+import * as http from "http"; // <-- 1. IMPORT HTTP MODULE
 import path from "path";
 import { fileURLToPath } from "url";
 import { WebSocketServer } from 'ws';
@@ -9,7 +10,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
 // --- NEW WEBSOCKET SERVER INITIALIZATION ---
+
+// 2. CREATE AN HTTP SERVER FROM THE EXPRESS APP
+const server = http.createServer(app);
 
 // Create a new WebSocket server, attaching it to the HTTP server
 // This allows us to handle both HTTP and WebSocket traffic on the same port
@@ -25,6 +30,7 @@ server.on('upgrade', (request, socket, head) => {
     wss.emit('connection', ws, request);
   });
 });
+
 app.use(compression());
 app.use(express.json());
 
@@ -39,6 +45,7 @@ app.get("*", (_req, res) => {
 });
 
 const PORT = parseInt(process.env.PORT || "5000");
-app.listen(PORT, "0.0.0.0", () => {
+// 3. USE SERVER.LISTEN INSTEAD OF APP.LISTEN
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
