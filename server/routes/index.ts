@@ -255,3 +255,41 @@ router.get('/user/profile', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch user profile' });
   }
 });
+// --- NEW ROUTES: AI TOOLS ---
+
+// Generate an ad script using our AI router
+router.post('/tools/generate-ad-script', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const { productDescription, targetAudience, platform } = req.body;
+
+  if (!productDescription || !targetAudience || !platform) {
+    return res.status(400).json({ error: 'Missing required fields: productDescription, targetAudience, platform' });
+  }
+
+  const cost = 10; // Cost in credits for this tool
+
+  try {
+    const canAfford = await hasCredits(req.user.id, cost);
+    if (!canAfford) {
+      return res.status(402).json({ error: 'Insufficient credits' }); // 402 Payment Required
+    }
+    await deductCredits(req.user.id, cost);
+
+    const prompt = `Generate a compelling, viral-ready ad script for the following product.
+    Product: ${productDescription}
+    Target Audience: ${platform} users interested in ${targetAudience}
+    Platform: ${platform}
+    The script should be short, punchy, and include a strong call to action.`;
+
+    const messages = [{ role: 'user', content: prompt }];
+    const response = await callAI('text_fast', messages);
+
+    res.json({ script: response.content });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to generate ad script' });
+  }
+});
