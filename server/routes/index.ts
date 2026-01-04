@@ -293,3 +293,39 @@ router.post('/tools/generate-ad-script', async (req, res) => {
     res.status(500).json({ error: 'Failed to generate ad script' });
   }
 });
+// --- NEW ROUTES: ACADEMY ---
+
+// Generate a practice question for the Google Ads Challenge
+router.post('/academy/generate-question', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    // We can make this cost credits if we want, but for now, let's make it free to encourage usage
+    const prompt = "Generate a multiple-choice question for the Google Ads certification exam. Provide 4 options (A, B, C, D) and clearly indicate the correct answer. The question should be about Google Search Ads best practices.";
+    const messages = [{ role: 'user', content: prompt }];
+    const response = await callAI('text_balanced', messages);
+    res.json({ question: response.content });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to generate question' });
+  }
+});
+
+// Submit a completed challenge to earn credits/rewards
+router.post('/academy/complete-challenge', async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  const { challengeId, score } = req.body; // e.g., { challengeId: 'google-ads-01', score: 95 }
+
+  if (score >= 90) {
+    const reward = 50; // Reward credits for a high score
+    await addCredits(req.user.id, reward);
+    // You could also update their 'affiliateStatus' to 'approved' here
+    res.json({ message: 'Challenge completed! You earned 50 credits.', reward });
+  } else {
+    res.json({ message: 'Challenge completed. A score of 90 or higher is required to earn rewards.' });
+  }
+});
