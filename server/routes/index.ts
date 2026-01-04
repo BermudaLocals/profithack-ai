@@ -1,6 +1,6 @@
 import { Express, Request, Response, NextFunction } from "express";
 import { storage } from "../storage";
-
+import { processLikeInteraction } from '../services/interactionService';
 export function isAuthenticated(req: Request, res: Response, next: NextFunction) {
   if (req.isAuthenticated?.() || req.session?.userId || (req as any).user) {
     return next();
@@ -329,3 +329,41 @@ router.post('/academy/complete-challenge', async (req, res) => {
     res.json({ message: 'Challenge completed. A score of 90 or higher is required to earn rewards.' });
   }
 });
+// --- NEW ROUTES: UNIFIED INTERACTIONS ---
+
+// This is the unified endpoint for all real-time interactions
+router.post('/interactions', async (req, res) => {
+  // Assuming you have authentication middleware that sets req.user
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const { type, targetId } = req.body;
+
+  if (!type || !targetId) {
+    return res.status(400).json({ error: 'Missing required fields: type, targetId' });
+  }
+
+  try {
+    switch (type) {
+      case 'like':
+        // targetId is the videoId for a 'like' interaction
+        await processLikeInteraction(req.user.id, targetId);
+        res.json({ success: true, message: 'Like processed' });
+        break;
+
+      // We will add more cases here for 'gift', 'bet', etc.
+      // case 'gift':
+      //   await processGiftInteraction(req.user.id, targetId, req.body.value);
+      //   res.json({ success: true, message: 'Gift sent' });
+      //   break;
+
+      default:
+        res.status(400).json({ error: 'Invalid interaction type' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to process interaction' });
+  }
+});
+
