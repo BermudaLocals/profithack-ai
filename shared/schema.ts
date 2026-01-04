@@ -12,7 +12,7 @@ export const users = pgTable("users", {
   // Example: updatedAt: timestamp("updated_at").defaultNow().notNull(),
 
   // --- NEW MONETIZATION & STATUS FIELDS ---
-  subscriptionTier: text("subscription_tier").default("free").notNull(), // 'free', 'premium', 'business'
+  subscriptionTier: text("subscription_tier").default("free").notNull(), // 'free', 'premium', 'business', 'founder'
   credits: integer("credits").default(50).notNull(), // Daily credits for free users
   lastCreditReset: timestamp("last_credit_reset").defaultNow(),
   affiliateStatus: text("affiliate_status").default("potential"), // 'potential', 'approved'
