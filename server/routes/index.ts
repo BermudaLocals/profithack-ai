@@ -224,3 +224,34 @@ export async function registerRoutes(app: Express) {
 }
 
 export { registerRoutes as default };
+// --- NEW ROUTES: USER PROFILE & CREDITS ---
+
+// Get current user's profile, including tier and credits
+router.get('/user/profile', async (req, res) => {
+  // Assuming you have authentication middleware that sets req.user
+  if (!req.user) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  try {
+    const userProfile = await db.select({
+      id: users.id,
+      username: users.username,
+      subscriptionTier: users.subscriptionTier,
+      credits: users.credits,
+      affiliateStatus: users.affiliateStatus,
+    }).from(users).where(eq(users.id, req.user.id)).limit(1);
+
+    if (!userProfile.length) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Reset daily credits if needed
+    const currentCredits = await resetDailyCreditsIfNeeded(req.user.id);
+    userProfile[0].credits = currentCredits;
+
+    res.json(userProfile[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch user profile' });
+  }
+});
